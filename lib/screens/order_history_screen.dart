@@ -6,6 +6,33 @@ import 'package:shared_preferences/shared_preferences.dart';
 import '../config/theme.dart';
 import '../widgets/empty_state.dart';
 
+/// Save an order to local history (SharedPreferences).
+/// Call from checkout_screen after successful order creation.
+Future<void> saveOrderToHistory({
+  required String code,
+  required double total,
+  required int itemCount,
+  required String customerName,
+}) async {
+  final prefs = await SharedPreferences.getInstance();
+  final raw = prefs.getString('order_history');
+  List<dynamic> orders = [];
+  if (raw != null) {
+    try {
+      orders = jsonDecode(raw);
+    } catch (_) {}
+  }
+  orders.add({
+    'code': code,
+    'total': total,
+    'itemCount': itemCount,
+    'customerName': customerName,
+    'date': DateTime.now().toIso8601String(),
+    'status': 'Đang xử lý',
+  });
+  await prefs.setString('order_history', jsonEncode(orders));
+}
+
 /// Order history screen — reads saved orders from SharedPreferences.
 class OrderHistoryScreen extends StatefulWidget {
   const OrderHistoryScreen({super.key});
@@ -43,32 +70,6 @@ class _OrderHistoryScreenState extends State<OrderHistoryScreen> {
     }
   }
 
-  /// Call this statically to save an order from checkout_screen
-  static Future<void> saveOrder({
-    required String code,
-    required double total,
-    required int itemCount,
-    required String customerName,
-  }) async {
-    final prefs = await SharedPreferences.getInstance();
-    final raw = prefs.getString('order_history');
-    List<dynamic> orders = [];
-    if (raw != null) {
-      try {
-        orders = jsonDecode(raw);
-      } catch (_) {}
-    }
-    orders.add({
-      'code': code,
-      'total': total,
-      'itemCount': itemCount,
-      'customerName': customerName,
-      'date': DateTime.now().toIso8601String(),
-      'status': 'Đang xử lý',
-    });
-    await prefs.setString('order_history', jsonEncode(orders));
-  }
-
   @override
   Widget build(BuildContext context) {
     return CupertinoPageScaffold(
@@ -87,7 +88,7 @@ class _OrderHistoryScreenState extends State<OrderHistoryScreen> {
                   physics: const BouncingScrollPhysics(),
                   padding: const EdgeInsets.all(16),
                   itemCount: _orders.length,
-                  separatorBuilder: (_, __) => const SizedBox(height: 12),
+                  separatorBuilder: (_, _a) => const SizedBox(height: 12),
                   itemBuilder: (context, index) {
                     final order = _orders[index];
                     final date = DateTime.tryParse(order['date'] ?? '');
@@ -112,7 +113,6 @@ class _OrderHistoryScreenState extends State<OrderHistoryScreen> {
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          // Header
                           Row(
                             mainAxisAlignment: MainAxisAlignment.spaceBetween,
                             children: [
@@ -143,7 +143,6 @@ class _OrderHistoryScreenState extends State<OrderHistoryScreen> {
                             ],
                           ),
                           const SizedBox(height: 10),
-                          // Details
                           Row(
                             children: [
                               const Icon(CupertinoIcons.calendar,
@@ -165,7 +164,6 @@ class _OrderHistoryScreenState extends State<OrderHistoryScreen> {
                             ],
                           ),
                           const SizedBox(height: 8),
-                          // Total
                           Row(
                             mainAxisAlignment: MainAxisAlignment.spaceBetween,
                             children: [

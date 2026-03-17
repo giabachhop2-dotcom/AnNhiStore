@@ -37,7 +37,7 @@ class SectionHeader extends StatelessWidget {
           if (onSeeAll != null)
             CupertinoButton(
               padding: EdgeInsets.zero,
-              minSize: 0,
+              minimumSize: Size.zero,
               onPressed: onSeeAll,
               child: const Row(
                 mainAxisSize: MainAxisSize.min,

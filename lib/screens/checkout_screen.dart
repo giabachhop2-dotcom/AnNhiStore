@@ -87,7 +87,7 @@ class _CheckoutScreenState extends ConsumerState<CheckoutScreen> {
       HapticFeedback.heavyImpact();
 
       // Save to order history
-      await OrderHistoryScreen.saveOrder(
+      await saveOrderToHistory(
         code: (result['code'] as String?) ?? '',
         total: total,
         itemCount: cart.length,

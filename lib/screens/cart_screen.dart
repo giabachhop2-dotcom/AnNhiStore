@@ -280,7 +280,7 @@ class _IosStepper extends StatelessWidget {
         children: [
           CupertinoButton(
             padding: const EdgeInsets.all(6),
-            minSize: 0,
+            minimumSize: Size.zero,
             onPressed: quantity > 1 ? () => onChanged(quantity - 1) : null,
             child: Icon(
               CupertinoIcons.minus,
@@ -298,7 +298,7 @@ class _IosStepper extends StatelessWidget {
           ),
           CupertinoButton(
             padding: const EdgeInsets.all(6),
-            minSize: 0,
+            minimumSize: Size.zero,
             onPressed: () => onChanged(quantity + 1),
             child: const Icon(CupertinoIcons.plus, size: 14),
           ),

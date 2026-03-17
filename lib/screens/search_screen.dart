@@ -185,7 +185,7 @@ class _SearchScreenState extends ConsumerState<SearchScreen>
           const SizedBox(width: 10),
           CupertinoButton(
             padding: EdgeInsets.zero,
-            minSize: 0,
+            minimumSize: Size.zero,
             onPressed: () {
               HapticFeedback.selectionClick();
               Navigator.of(context).pop();
@@ -303,7 +303,7 @@ class _SearchScreenState extends ConsumerState<SearchScreen>
               ),
               CupertinoButton(
                 padding: EdgeInsets.zero,
-                minSize: 0,
+                minimumSize: Size.zero,
                 onPressed: _clearRecentSearches,
                 child: const Text(
                   'Xóa tất cả',
@@ -330,7 +330,7 @@ class _SearchScreenState extends ConsumerState<SearchScreen>
             ),
             trailing: CupertinoButton(
               padding: EdgeInsets.zero,
-              minSize: 0,
+              minimumSize: Size.zero,
               onPressed: () {
                 setState(() => _recentSearches.remove(query));
                 SharedPreferences.getInstance().then(

@@ -541,7 +541,7 @@ class _ProductDetailScreenState extends ConsumerState<ProductDetailScreen>
             children: [
               CupertinoButton(
                 padding: const EdgeInsets.all(8),
-                minSize: 0,
+                minimumSize: Size.zero,
                 onPressed: quantity > 1
                     ? () {
                         HapticFeedback.selectionClick();
@@ -564,7 +564,7 @@ class _ProductDetailScreenState extends ConsumerState<ProductDetailScreen>
               ),
               CupertinoButton(
                 padding: const EdgeInsets.all(8),
-                minSize: 0,
+                minimumSize: Size.zero,
                 onPressed: () {
                   HapticFeedback.selectionClick();
                   setState(() => quantity++);
