@@ -212,6 +212,13 @@ class MoreScreen extends ConsumerWidget {
                   subtitle: 'Tích điểm, đổi quà, ưu đãi',
                   onTap: () => context.push('/vip-card'),
                 ),
+                _MenuItem(
+                  icon: CupertinoIcons.calendar,
+                  gradientColors: const [Color(0xFFE53935), Color(0xFFC62828)],
+                  title: 'Sự Kiện & Workshop',
+                  subtitle: 'Workshop trà đạo, tasting, khuyến mãi',
+                  onTap: () => context.push('/events'),
+                ),
               ],
             ),
           ),

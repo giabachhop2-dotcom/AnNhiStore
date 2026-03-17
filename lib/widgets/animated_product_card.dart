@@ -299,6 +299,36 @@ class _AnimatedProductCardState extends ConsumerState<AnimatedProductCard>
                                   ),
                                 ),
                               ),
+                            // Social proof — real view count from API
+                            if ((widget.product.view ?? 0) > 10)
+                              Positioned(
+                                bottom: 8,
+                                left: 8,
+                                child: Container(
+                                  padding: const EdgeInsets.symmetric(
+                                      horizontal: 6, vertical: 3),
+                                  decoration: BoxDecoration(
+                                    color: Colors.black.withValues(alpha: 0.55),
+                                    borderRadius: BorderRadius.circular(6),
+                                  ),
+                                  child: Row(
+                                    mainAxisSize: MainAxisSize.min,
+                                    children: [
+                                      const Text('🔥',
+                                          style: TextStyle(fontSize: 10)),
+                                      const SizedBox(width: 3),
+                                      Text(
+                                        '${widget.product.view} lượt xem',
+                                        style: const TextStyle(
+                                          color: CupertinoColors.white,
+                                          fontSize: 9,
+                                          fontWeight: FontWeight.w500,
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              ),
                             // Favorite heart icon with burst effect
                             Positioned(
                               top: 4,

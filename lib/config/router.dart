@@ -20,6 +20,7 @@ import '../screens/tea_traceability_screen.dart';
 import '../screens/tea_comparison_screen.dart';
 import '../screens/vip_card_screen.dart';
 import '../screens/tea_table_setup_screen.dart';
+import '../screens/events_screen.dart';
 
 final _rootNavigatorKey = GlobalKey<NavigatorState>();
 
@@ -145,6 +146,12 @@ final router = GoRouter(
       parentNavigatorKey: _rootNavigatorKey,
       pageBuilder: (context, state) =>
           SlideUpTransitionPage(child: const TeaTableSetupScreen()),
+    ),
+    GoRoute(
+      path: '/events',
+      parentNavigatorKey: _rootNavigatorKey,
+      pageBuilder: (context, state) =>
+          SlideUpTransitionPage(child: const EventsScreen()),
     ),
   ],
 );
