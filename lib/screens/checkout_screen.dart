@@ -10,6 +10,7 @@ import '../models/models.dart';
 import '../config/theme.dart';
 import '../widgets/premium_widgets.dart';
 import '../widgets/tea_leaf_celebration.dart';
+import '../widgets/gift_wrapping.dart';
 import 'order_history_screen.dart';
 
 class CheckoutScreen extends ConsumerStatefulWidget {
@@ -183,6 +184,11 @@ class _CheckoutScreenState extends ConsumerState<CheckoutScreen> {
                 onChanged: (v) => setState(() => paymentMethod = v!),
               ),
             ]),
+
+            const SizedBox(height: 8),
+
+            // Gift wrapping
+            GiftWrappingSection(onChanged: (opts) {}),
 
             const SizedBox(height: 24),
 
