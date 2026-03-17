@@ -177,6 +177,13 @@ class MoreScreen extends ConsumerWidget {
                   subtitle: 'Theo dõi đơn hàng',
                   onTap: () => context.push('/orders'),
                 ),
+                _MenuItem(
+                  icon: CupertinoIcons.timer,
+                  gradientColors: const [Color(0xFF26A69A), Color(0xFF00897B)],
+                  title: 'Hẹn Giờ Pha Trà',
+                  subtitle: 'Pha đúng cách, thưởng đúng vị',
+                  onTap: () => context.push('/tea-timer'),
+                ),
               ],
             ),
           ),

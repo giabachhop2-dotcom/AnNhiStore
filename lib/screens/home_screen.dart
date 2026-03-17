@@ -16,6 +16,7 @@ import '../widgets/shimmer_grid.dart';
 import '../widgets/empty_state.dart';
 import '../widgets/scroll_to_top_fab.dart';
 import '../widgets/floating_contact_cta.dart';
+import '../widgets/daily_tea_wisdom.dart';
 
 class HomeScreen extends ConsumerStatefulWidget {
   const HomeScreen({super.key});
@@ -141,6 +142,9 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                 // ── Parallax Hero Banner ──
                 if (slides.isNotEmpty)
                   SliverToBoxAdapter(child: _buildBanner()),
+
+                // ── Daily Tea Wisdom ──
+                const SliverToBoxAdapter(child: DailyTeaWisdom()),
 
                 // ── Featured Ấm Tử Sa — Horizontal Showcase ──
                 if (productsAmTuSa.isNotEmpty) ...[

@@ -9,6 +9,7 @@ import '../providers/providers.dart';
 import '../models/models.dart';
 import '../config/theme.dart';
 import '../widgets/premium_widgets.dart';
+import '../widgets/tea_leaf_celebration.dart';
 import 'order_history_screen.dart';
 
 class CheckoutScreen extends ConsumerStatefulWidget {
@@ -117,7 +118,7 @@ class _CheckoutScreenState extends ConsumerState<CheckoutScreen> {
     final cartNotifier = ref.read(cartProvider.notifier);
     final formatter = NumberFormat.currency(locale: 'vi_VN', symbol: '₫');
 
-    if (orderSuccess) return PopScope(canPop: false, child: _buildSuccess(formatter));
+    if (orderSuccess) return PopScope(canPop: false, child: TeaLeafCelebration(showCelebration: true, child: _buildSuccess(formatter)));
 
     return CupertinoPageScaffold(
       navigationBar: const CupertinoNavigationBar(middle: Text('Thanh Toán')),

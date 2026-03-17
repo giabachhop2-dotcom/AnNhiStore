@@ -15,6 +15,7 @@ import '../screens/checkout_screen.dart';
 import '../screens/search_screen.dart';
 import '../screens/favorites_screen.dart';
 import '../screens/order_history_screen.dart';
+import '../screens/tea_brewing_timer.dart';
 
 final _rootNavigatorKey = GlobalKey<NavigatorState>();
 
@@ -110,6 +111,12 @@ final router = GoRouter(
       parentNavigatorKey: _rootNavigatorKey,
       pageBuilder: (context, state) =>
           SlideUpTransitionPage(child: const OrderHistoryScreen()),
+    ),
+    GoRoute(
+      path: '/tea-timer',
+      parentNavigatorKey: _rootNavigatorKey,
+      pageBuilder: (context, state) =>
+          SlideUpTransitionPage(child: const TeaBrewingTimerScreen()),
     ),
   ],
 );
