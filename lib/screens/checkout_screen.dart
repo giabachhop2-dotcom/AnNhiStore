@@ -8,6 +8,7 @@ import 'package:qr_flutter/qr_flutter.dart';
 import '../providers/providers.dart';
 import '../models/models.dart';
 import '../config/theme.dart';
+import '../widgets/premium_widgets.dart';
 import 'order_history_screen.dart';
 
 class CheckoutScreen extends ConsumerStatefulWidget {
@@ -184,12 +185,11 @@ class _CheckoutScreenState extends ConsumerState<CheckoutScreen> {
 
             const SizedBox(height: 24),
 
-            CupertinoButton.filled(
+            GoldCTAButton(
+              label: 'Xác nhận đặt hàng',
+              icon: CupertinoIcons.checkmark_seal,
+              isLoading: isSubmitting,
               onPressed: isSubmitting ? null : _submit,
-              borderRadius: BorderRadius.circular(14),
-              child: isSubmitting
-                  ? const CupertinoActivityIndicator(color: CupertinoColors.white)
-                  : const Text('Xác nhận đặt hàng', style: TextStyle(fontWeight: FontWeight.w600, fontSize: 16)),
             ),
 
             const SizedBox(height: 32),

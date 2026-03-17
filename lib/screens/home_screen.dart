@@ -11,7 +11,7 @@ import '../services/api_service.dart';
 import '../models/models.dart';
 import '../config/theme.dart';
 import '../widgets/animated_product_card.dart';
-import '../widgets/section_header.dart';
+import '../widgets/premium_widgets.dart';
 import '../widgets/shimmer_grid.dart';
 import '../widgets/empty_state.dart';
 import '../widgets/scroll_to_top_fab.dart';
@@ -145,8 +145,9 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                 // ── Featured Ấm Tử Sa — Horizontal Showcase ──
                 if (productsAmTuSa.isNotEmpty) ...[
                   SliverToBoxAdapter(
-                    child: SectionHeader(
+                    child: TeaCeremonyHeader(
                       title: 'Ấm Tử Sa Nghệ Thuật',
+                      subtitle: 'Nghệ nhân hàng đầu Nghi Hưng',
                       onSeeAll: () => context.push('/products'),
                     ),
                   ),
@@ -178,8 +179,9 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                 // ── Trà Shan Tuyết — Grid Layout ──
                 if (productsTra.isNotEmpty) ...[
                   SliverToBoxAdapter(
-                    child: SectionHeader(
+                    child: TeaCeremonyHeader(
                       title: 'Trà Shan Tuyết Cổ Thụ',
+                      subtitle: 'Hương vị đỉnh núi 1500m',
                       onSeeAll: () => context.push('/products'),
                     ),
                   ),
@@ -193,8 +195,9 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                 // ── News ──
                 if (newsItems.isNotEmpty) ...[
                   SliverToBoxAdapter(
-                    child: SectionHeader(
+                    child: TeaCeremonyHeader(
                       title: 'Tin Tức & Sự Kiện',
+                      subtitle: 'Cập nhật từ An Nhi Trà',
                       onSeeAll: () => context.go('/news'),
                     ),
                   ),

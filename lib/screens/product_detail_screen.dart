@@ -12,6 +12,7 @@ import '../models/models.dart';
 import '../services/api_service.dart';
 import '../config/theme.dart';
 import '../widgets/animated_toast.dart';
+import '../widgets/premium_widgets.dart';
 import '../widgets/fly_to_cart.dart';
 
 class ProductDetailScreen extends ConsumerStatefulWidget {
@@ -444,18 +445,11 @@ class _ProductDetailScreenState extends ConsumerState<ProductDetailScreen>
                             Expanded(
                               child: ScaleTransition(
                                 scale: _cartBounce,
-                                child: CupertinoButton.filled(
+                                child: GoldCTAButton(
+                                  label: 'Thêm vào giỏ',
+                                  icon: CupertinoIcons.cart_badge_plus,
+                                  compact: true,
                                   onPressed: _addToCart,
-                                  borderRadius: BorderRadius.circular(14),
-                                  child: const Row(
-                                    mainAxisAlignment: MainAxisAlignment.center,
-                                    children: [
-                                      Icon(CupertinoIcons.cart_badge_plus, size: 20),
-                                      SizedBox(width: 8),
-                                      Text('Thêm vào giỏ',
-                                          style: TextStyle(fontWeight: FontWeight.w600)),
-                                    ],
-                                  ),
                                 ),
                               ),
                             ),
