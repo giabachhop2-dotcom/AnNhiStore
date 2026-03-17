@@ -86,6 +86,76 @@ class _ProductDetailScreenState extends ConsumerState<ProductDetailScreen>
     );
   }
 
+  void _openImageViewer(BuildContext ctx) {
+    if (product == null) return;
+    Navigator.of(ctx).push(
+      PageRouteBuilder(
+        opaque: false,
+        barrierDismissible: true,
+        barrierColor: Colors.black.withValues(alpha: 0.9),
+        transitionsBuilder: (_, anim, __, child) =>
+            FadeTransition(opacity: anim, child: child),
+        pageBuilder: (_, __, ___) => Scaffold(
+          backgroundColor: Colors.transparent,
+          body: Stack(
+            children: [
+              // Dismiss on tap background
+              GestureDetector(
+                onTap: () => Navigator.pop(ctx),
+                child: Container(color: Colors.transparent),
+              ),
+              // Zoomable image
+              Center(
+                child: InteractiveViewer(
+                  minScale: 0.5,
+                  maxScale: 4.0,
+                  child: CachedNetworkImage(
+                    imageUrl: ApiService.getImageUrl(product!.photo, 'product'),
+                    fit: BoxFit.contain,
+                    errorWidget: (_, __, ___) => const Icon(
+                      CupertinoIcons.photo,
+                      size: 64,
+                      color: Colors.white54,
+                    ),
+                  ),
+                ),
+              ),
+              // Close button
+              Positioned(
+                top: MediaQuery.of(ctx).padding.top + 8,
+                right: 16,
+                child: CupertinoButton(
+                  padding: EdgeInsets.zero,
+                  onPressed: () => Navigator.pop(ctx),
+                  child: Container(
+                    padding: const EdgeInsets.all(8),
+                    decoration: BoxDecoration(
+                      color: Colors.black.withValues(alpha: 0.5),
+                      shape: BoxShape.circle,
+                    ),
+                    child: const Icon(CupertinoIcons.xmark, color: Colors.white, size: 20),
+                  ),
+                ),
+              ),
+              // Zoom hint
+              Positioned(
+                bottom: MediaQuery.of(ctx).padding.bottom + 24,
+                left: 0,
+                right: 0,
+                child: const Center(
+                  child: Text(
+                    'Chụm ngón tay để phóng to',
+                    style: TextStyle(color: Colors.white60, fontSize: 13),
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final formatter = NumberFormat.currency(locale: 'vi_VN', symbol: '₫');
@@ -145,18 +215,21 @@ class _ProductDetailScreenState extends ConsumerState<ProductDetailScreen>
                       physics: const BouncingScrollPhysics(),
                       slivers: [
                         SliverToBoxAdapter(
-                          child: Hero(
-                            tag: heroTag,
-                            child: CachedNetworkImage(
-                              imageUrl: ApiService.getImageUrl(product!.photo, 'product'),
-                              width: double.infinity,
-                              height: 380,
-                              fit: BoxFit.cover,
-                              errorWidget: (_, _a, _b) => Container(
+                          child: GestureDetector(
+                            onTap: () => _openImageViewer(context),
+                            child: Hero(
+                              tag: heroTag,
+                              child: CachedNetworkImage(
+                                imageUrl: ApiService.getImageUrl(product!.photo, 'product'),
+                                width: double.infinity,
                                 height: 380,
-                                color: AppTheme.groupedBg,
-                                child: const Center(
-                                  child: Icon(CupertinoIcons.photo, size: 48, color: AppTheme.textMuted),
+                                fit: BoxFit.cover,
+                                errorWidget: (_, _a, _b) => Container(
+                                  height: 380,
+                                  color: AppTheme.groupedBg,
+                                  child: const Center(
+                                    child: Icon(CupertinoIcons.photo, size: 48, color: AppTheme.textMuted),
+                                  ),
                                 ),
                               ),
                             ),

@@ -207,24 +207,64 @@ class _CheckoutScreenState extends ConsumerState<CheckoutScreen> {
           padding: const EdgeInsets.all(32),
           child: Column(
             children: [
-              const SizedBox(height: 40),
-              // Animated check
-              TweenAnimationBuilder(
-                tween: Tween<double>(begin: 0.0, end: 1.0),
-                duration: const Duration(milliseconds: 600),
-                curve: Curves.elasticOut,
-                builder: (_, value, __) => Transform.scale(
-                  scale: value,
-                  child: Container(
-                    width: 90,
-                    height: 90,
-                    decoration: BoxDecoration(
-                      color: AppTheme.primaryDark.withValues(alpha: 0.1),
-                      shape: BoxShape.circle,
+              // Animated check with pulse ring
+              SizedBox(
+                width: 120,
+                height: 120,
+                child: Stack(
+                  alignment: Alignment.center,
+                  children: [
+                    // Pulse ring
+                    TweenAnimationBuilder(
+                      tween: Tween<double>(begin: 0.0, end: 1.0),
+                      duration: const Duration(milliseconds: 1200),
+                      curve: Curves.easeOut,
+                      builder: (_, value, __) => Container(
+                        width: 90 + (value * 40),
+                        height: 90 + (value * 40),
+                        decoration: BoxDecoration(
+                          shape: BoxShape.circle,
+                          border: Border.all(
+                            color: AppTheme.primaryDark.withValues(alpha: 0.3 * (1 - value)),
+                            width: 2,
+                          ),
+                        ),
+                      ),
                     ),
-                    child: const Icon(CupertinoIcons.checkmark_alt_circle_fill,
-                        size: 60, color: AppTheme.primaryDark),
-                  ),
+                    // Checkmark bounce
+                    TweenAnimationBuilder(
+                      tween: Tween<double>(begin: 0.0, end: 1.0),
+                      duration: const Duration(milliseconds: 600),
+                      curve: Curves.elasticOut,
+                      builder: (_, value, __) => Transform.scale(
+                        scale: value,
+                        child: Container(
+                          width: 90,
+                          height: 90,
+                          decoration: BoxDecoration(
+                            gradient: LinearGradient(
+                              colors: [
+                                AppTheme.primaryDark,
+                                AppTheme.primaryDark.withValues(alpha: 0.8),
+                              ],
+                              begin: Alignment.topLeft,
+                              end: Alignment.bottomRight,
+                            ),
+                            shape: BoxShape.circle,
+                            boxShadow: [
+                              BoxShadow(
+                                color: AppTheme.primaryDark.withValues(alpha: 0.3),
+                                blurRadius: 16,
+                                offset: const Offset(0, 4),
+                              ),
+                            ],
+                          ),
+                          child: const Icon(CupertinoIcons.checkmark_alt,
+                              size: 45, color: Colors.white),
+                        ),
+                      ),
+                    ),
+                  ],
                 ),
               ),
               const SizedBox(height: 20),

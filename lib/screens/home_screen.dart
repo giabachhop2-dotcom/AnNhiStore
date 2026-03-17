@@ -15,6 +15,7 @@ import '../widgets/section_header.dart';
 import '../widgets/shimmer_grid.dart';
 import '../widgets/empty_state.dart';
 import '../widgets/scroll_to_top_fab.dart';
+import '../widgets/floating_contact_cta.dart';
 
 class HomeScreen extends ConsumerStatefulWidget {
   const HomeScreen({super.key});
@@ -193,6 +194,26 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
               ],
             ),
             ScrollToTopFab(scrollController: _scrollController),
+            // Floating Zalo/Phone CTA
+            Positioned(
+              right: 16,
+              bottom: MediaQuery.of(context).padding.bottom + 80,
+              child: Consumer(
+                builder: (context, ref, _) {
+                  final settingsAsync = ref.watch(settingsProvider);
+                  return settingsAsync.when(
+                    data: (s) {
+                      final opts = s['optionsParsed'] as Map<String, dynamic>? ?? {};
+                      final phone = opts['hotline'] ?? opts['phone'] ?? '0827626962';
+                      final zalo = opts['zalo'] ?? phone;
+                      return FloatingContactCta(phone: phone.toString(), zalo: zalo.toString());
+                    },
+                    loading: () => const SizedBox.shrink(),
+                    error: (_, __) => const FloatingContactCta(phone: '0827626962', zalo: '0827626962'),
+                  );
+                },
+              ),
+            ),
           ],
         ),
     );
