@@ -40,13 +40,16 @@ class _FavoritesScreenState extends ConsumerState<FavoritesScreen> {
 
     try {
       final api = ref.read(apiServiceProvider);
-      final List<Product> loaded = [];
-      for (final id in favoriteIds) {
+      // Batch-load all favorites in parallel (not N+1)
+      final futures = favoriteIds.map((id) async {
         try {
-          final p = await api.getProductById(id);
-          loaded.add(p);
-        } catch (_) {}
-      }
+          return await api.getProductById(id);
+        } catch (_) {
+          return null;
+        }
+      });
+      final results = await Future.wait(futures);
+      final loaded = results.whereType<Product>().toList();
       if (mounted) {
         setState(() {
           _products = loaded;
