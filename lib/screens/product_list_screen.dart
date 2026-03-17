@@ -25,6 +25,7 @@ class _ProductListScreenState extends ConsumerState<ProductListScreen> {
   bool isLoading = true;
   int totalPages = 1;
   String searchQuery = '';
+  String _sortBy = 'default'; // default, price_asc, price_desc, name
   final _searchCtrl = TextEditingController();
   Timer? _debounce;
 
@@ -74,16 +75,73 @@ class _ProductListScreenState extends ConsumerState<ProductListScreen> {
     }
   }
 
+  List<Product> get _sortedProducts {
+    if (_sortBy == 'default') return products;
+    final sorted = [...products];
+    switch (_sortBy) {
+      case 'price_asc':
+        sorted.sort((a, b) => a.displayPrice.compareTo(b.displayPrice));
+      case 'price_desc':
+        sorted.sort((a, b) => b.displayPrice.compareTo(a.displayPrice));
+      case 'name':
+        sorted.sort((a, b) => (a.namevi ?? '').compareTo(b.namevi ?? ''));
+    }
+    return sorted;
+  }
+
+  void _showSortOptions() {
+    HapticFeedback.selectionClick();
+    showCupertinoModalPopup(
+      context: context,
+      builder: (_) => CupertinoActionSheet(
+        title: const Text('Sắp xếp theo'),
+        actions: [
+          _sortAction('Mặc định', 'default'),
+          _sortAction('Giá tăng dần', 'price_asc'),
+          _sortAction('Giá giảm dần', 'price_desc'),
+          _sortAction('Tên A → Z', 'name'),
+        ],
+        cancelButton: CupertinoActionSheetAction(
+          onPressed: () => Navigator.pop(context),
+          child: const Text('Hủy'),
+        ),
+      ),
+    );
+  }
+
+  CupertinoActionSheetAction _sortAction(String label, String value) {
+    return CupertinoActionSheetAction(
+      onPressed: () {
+        setState(() => _sortBy = value);
+        Navigator.pop(context);
+      },
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Text(label),
+          if (_sortBy == value) ...[
+            const SizedBox(width: 8),
+            const Icon(CupertinoIcons.checkmark, size: 16, color: AppTheme.primaryDark),
+          ],
+        ],
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return CupertinoPageScaffold(
       child: CustomScrollView(
         physics: const BouncingScrollPhysics(parent: AlwaysScrollableScrollPhysics()),
         slivers: [
-          // iOS Large Title + Search
           CupertinoSliverNavigationBar(
             largeTitle: const Text('Sản Phẩm'),
             border: null,
+            trailing: CupertinoButton(
+              padding: EdgeInsets.zero,
+              onPressed: _showSortOptions,
+              child: const Icon(CupertinoIcons.sort_down, size: 24),
+            ),
           ),
 
           // Search bar
@@ -181,10 +239,10 @@ class _ProductListScreenState extends ConsumerState<ProductListScreen> {
               sliver: SliverGrid(
                 delegate: SliverChildBuilderDelegate(
                   (context, index) => AnimatedProductCard(
-                    product: products[index],
+                    product: _sortedProducts[index],
                     index: index,
                   ),
-                  childCount: products.length,
+                  childCount: _sortedProducts.length,
                 ),
                 gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
                   crossAxisCount: 2,

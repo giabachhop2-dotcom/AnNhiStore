@@ -8,6 +8,7 @@ import 'package:qr_flutter/qr_flutter.dart';
 import '../providers/providers.dart';
 import '../models/models.dart';
 import '../config/theme.dart';
+import 'order_history_screen.dart';
 
 class CheckoutScreen extends ConsumerStatefulWidget {
   const CheckoutScreen({super.key});
@@ -84,6 +85,14 @@ class _CheckoutScreenState extends ConsumerState<CheckoutScreen> {
       final result = await api.createOrder(order);
       cartNotifier.clearCart();
       HapticFeedback.heavyImpact();
+
+      // Save to order history
+      await OrderHistoryScreen.saveOrder(
+        code: (result['code'] as String?) ?? '',
+        total: total,
+        itemCount: cart.length,
+        customerName: _nameCtrl.text.trim(),
+      );
 
       if (mounted) {
         setState(() {

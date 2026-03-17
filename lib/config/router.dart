@@ -13,6 +13,8 @@ import '../screens/about_screen.dart';
 import '../screens/contact_screen.dart';
 import '../screens/checkout_screen.dart';
 import '../screens/search_screen.dart';
+import '../screens/favorites_screen.dart';
+import '../screens/order_history_screen.dart';
 
 final _rootNavigatorKey = GlobalKey<NavigatorState>();
 
@@ -96,6 +98,18 @@ final router = GoRouter(
       parentNavigatorKey: _rootNavigatorKey,
       pageBuilder: (context, state) =>
           SlideUpTransitionPage(child: const SearchScreen()),
+    ),
+    GoRoute(
+      path: '/favorites',
+      parentNavigatorKey: _rootNavigatorKey,
+      pageBuilder: (context, state) =>
+          SlideUpTransitionPage(child: const FavoritesScreen()),
+    ),
+    GoRoute(
+      path: '/orders',
+      parentNavigatorKey: _rootNavigatorKey,
+      pageBuilder: (context, state) =>
+          SlideUpTransitionPage(child: const OrderHistoryScreen()),
     ),
   ],
 );

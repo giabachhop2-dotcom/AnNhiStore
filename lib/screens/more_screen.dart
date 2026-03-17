@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:url_launcher/url_launcher.dart';
+import 'package:share_plus/share_plus.dart';
 import '../providers/providers.dart';
 import '../config/theme.dart';
 import '../main.dart';
@@ -84,6 +85,18 @@ class MoreScreen extends ConsumerWidget {
                   trailing: const CupertinoListTileChevron(),
                   onTap: () => context.push('/contact'),
                 ),
+                CupertinoListTile(
+                  leading: _MenuIcon(CupertinoIcons.heart_fill, CupertinoColors.systemPink),
+                  title: const Text('Sản phẩm yêu thích'),
+                  trailing: const CupertinoListTileChevron(),
+                  onTap: () => context.push('/favorites'),
+                ),
+                CupertinoListTile(
+                  leading: _MenuIcon(CupertinoIcons.cube_box_fill, CupertinoColors.systemOrange),
+                  title: const Text('Lịch sử đơn hàng'),
+                  trailing: const CupertinoListTileChevron(),
+                  onTap: () => context.push('/orders'),
+                ),
               ],
             ),
           ),
@@ -158,6 +171,22 @@ class MoreScreen extends ConsumerWidget {
                   leading: _MenuIcon(CupertinoIcons.moon_fill, CupertinoColors.systemIndigo),
                   title: const Text('Giao diện'),
                   trailing: _ThemeModeSelector(),
+                ),
+              ],
+            ),
+          ),
+          // Share section
+          SliverToBoxAdapter(
+            child: CupertinoListSection.insetGrouped(
+              header: const Text('CHIA SẺ'),
+              children: [
+                CupertinoListTile(
+                  leading: _MenuIcon(CupertinoIcons.share, CupertinoColors.activeOrange),
+                  title: const Text('Chia sẻ app cho bạn bè'),
+                  trailing: const CupertinoListTileChevron(),
+                  onTap: () {
+                    Share.share('Tải app An Nhi Trà - Trà Ngon & Ấm Tử Sa Chính Hãng 🍵\nhttps://annhitra.com');
+                  },
                 ),
               ],
             ),
