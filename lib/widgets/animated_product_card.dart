@@ -10,6 +10,7 @@ import '../services/api_service.dart';
 import '../config/theme.dart';
 import '../providers/providers.dart';
 import 'animated_toast.dart';
+import 'package:share_plus/share_plus.dart';
 
 /// Animated product card with:
 /// - Press-to-scale (0.95x on press, spring-back on release)
@@ -171,6 +172,29 @@ class _AnimatedProductCardState extends ConsumerState<AnimatedProductCard>
                 trailingIcon: CupertinoIcons.eye,
                 child: const Text('Xem chi tiết'),
               ),
+              CupertinoContextMenuAction(
+                onPressed: () {
+                  Navigator.pop(context);
+                  ref.read(favoritesProvider.notifier).toggle(widget.product.id);
+                  HapticFeedback.selectionClick();
+                },
+                trailingIcon: CupertinoIcons.heart,
+                child: Text(
+                  ref.watch(favoritesProvider).contains(widget.product.id)
+                      ? 'Bỏ yêu thích'
+                      : 'Yêu thích',
+                ),
+              ),
+              CupertinoContextMenuAction(
+                onPressed: () {
+                  Navigator.pop(context);
+                  Share.share(
+                    '${widget.product.namevi} - An Nhi Trà\nhttps://annhitra.com/${widget.product.slugvi ?? ""}',
+                  );
+                },
+                trailingIcon: CupertinoIcons.share,
+                child: const Text('Chia sẻ'),
+              ),
             ],
             child: GestureDetector(
               onTapDown: _onTapDown,
@@ -254,6 +278,34 @@ class _AnimatedProductCardState extends ConsumerState<AnimatedProductCard>
                                   ),
                                 ),
                               ),
+                            // Favorite heart icon
+                            Positioned(
+                              top: 8,
+                              right: 8,
+                              child: GestureDetector(
+                                onTap: () {
+                                  HapticFeedback.selectionClick();
+                                  ref.read(favoritesProvider.notifier).toggle(widget.product.id);
+                                },
+                                child: AnimatedSwitcher(
+                                  duration: const Duration(milliseconds: 200),
+                                  transitionBuilder: (child, anim) => ScaleTransition(scale: anim, child: child),
+                                  child: Icon(
+                                    ref.watch(favoritesProvider).contains(widget.product.id)
+                                        ? CupertinoIcons.heart_fill
+                                        : CupertinoIcons.heart,
+                                    key: ValueKey(ref.watch(favoritesProvider).contains(widget.product.id)),
+                                    color: ref.watch(favoritesProvider).contains(widget.product.id)
+                                        ? AppTheme.priceRed
+                                        : CupertinoColors.white,
+                                    size: 22,
+                                    shadows: const [
+                                      Shadow(color: Colors.black38, blurRadius: 8),
+                                    ],
+                                  ),
+                                ),
+                              ),
+                            ),
                             // Quick add button with bounce animation
                             Positioned(
                               bottom: 6,

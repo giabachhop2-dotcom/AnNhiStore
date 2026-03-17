@@ -81,6 +81,8 @@ class _ContactScreenState extends ConsumerState<ContactScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final settingsAsync = ref.watch(settingsProvider);
+
     return CupertinoPageScaffold(
       navigationBar: const CupertinoNavigationBar(middle: Text('Liên Hệ')),
       child: SafeArea(
@@ -88,32 +90,58 @@ class _ContactScreenState extends ConsumerState<ContactScreen> {
           padding: const EdgeInsets.all(16),
           physics: const BouncingScrollPhysics(),
           children: [
-            // Quick actions (iOS grouped list style)
-            CupertinoListSection.insetGrouped(
-              header: const Text('LIÊN HỆ NHANH'),
-              children: [
-                CupertinoListTile(
-                  leading: const Icon(CupertinoIcons.phone_fill, color: AppTheme.primaryDark),
-                  title: const Text('Hotline'),
-                  subtitle: const Text('082 762 6962'),
-                  trailing: const CupertinoListTileChevron(),
-                  onTap: () => launchUrl(Uri.parse('tel:0827626962')),
-                ),
-                CupertinoListTile(
-                  leading: const Icon(CupertinoIcons.chat_bubble_2_fill, color: Colors.blue),
-                  title: const Text('Zalo'),
-                  subtitle: const Text('Chat trực tiếp'),
-                  trailing: const CupertinoListTileChevron(),
-                  onTap: () => launchUrl(Uri.parse('https://zalo.me/0827626962')),
-                ),
-                CupertinoListTile(
-                  leading: const Icon(CupertinoIcons.location_fill, color: AppTheme.priceRed),
-                  title: const Text('Chỉ đường'),
-                  subtitle: const Text('Google Maps'),
-                  trailing: const CupertinoListTileChevron(),
-                  onTap: () => launchUrl(Uri.parse('https://maps.google.com/?q=An+Nhi+Tra')),
-                ),
-              ],
+            // Quick actions from API
+            settingsAsync.when(
+              data: (settings) {
+                final opts = settings['optionsParsed'] as Map<String, dynamic>? ?? {};
+                final phone = opts['hotline'] ?? opts['phone'] ?? '0827626962';
+                final zalo = opts['zalo'] ?? phone;
+                final address = settings['addressvi'] ?? opts['address'] ?? '';
+
+                return CupertinoListSection.insetGrouped(
+                  header: const Text('LIÊN HỆ NHANH'),
+                  children: [
+                    CupertinoListTile(
+                      leading: const Icon(CupertinoIcons.phone_fill, color: AppTheme.primaryDark),
+                      title: const Text('Hotline'),
+                      subtitle: Text(_formatPhone(phone)),
+                      trailing: const CupertinoListTileChevron(),
+                      onTap: () => launchUrl(Uri.parse('tel:$phone')),
+                    ),
+                    CupertinoListTile(
+                      leading: Icon(CupertinoIcons.chat_bubble_2_fill, color: Colors.blue),
+                      title: const Text('Zalo'),
+                      subtitle: const Text('Chat trực tiếp'),
+                      trailing: const CupertinoListTileChevron(),
+                      onTap: () => launchUrl(Uri.parse('https://zalo.me/$zalo')),
+                    ),
+                    if (address.isNotEmpty)
+                      CupertinoListTile(
+                        leading: const Icon(CupertinoIcons.location_fill, color: AppTheme.priceRed),
+                        title: const Text('Địa chỉ'),
+                        subtitle: Text(address, maxLines: 2, overflow: TextOverflow.ellipsis),
+                        trailing: const CupertinoListTileChevron(),
+                        onTap: () => launchUrl(Uri.parse('https://maps.google.com/?q=${Uri.encodeComponent(address)}')),
+                      ),
+                  ],
+                );
+              },
+              loading: () => const Padding(
+                padding: EdgeInsets.all(20),
+                child: Center(child: CupertinoActivityIndicator()),
+              ),
+              error: (_, __) => CupertinoListSection.insetGrouped(
+                header: const Text('LIÊN HỆ NHANH'),
+                children: [
+                  CupertinoListTile(
+                    leading: const Icon(CupertinoIcons.phone_fill, color: AppTheme.primaryDark),
+                    title: const Text('Hotline'),
+                    subtitle: const Text('082 762 6962'),
+                    trailing: const CupertinoListTileChevron(),
+                    onTap: () => launchUrl(Uri.parse('tel:0827626962')),
+                  ),
+                ],
+              ),
             ),
 
             const SizedBox(height: 20),
@@ -193,5 +221,12 @@ class _ContactScreenState extends ConsumerState<ContactScreen> {
         ),
       ),
     );
+  }
+
+  String _formatPhone(String phone) {
+    if (phone.length == 10) {
+      return '${phone.substring(0, 3)} ${phone.substring(3, 6)} ${phone.substring(6)}';
+    }
+    return phone;
   }
 }

@@ -146,3 +146,36 @@ class CartNotifier extends StateNotifier<List<CartItem>> {
     }
   }
 }
+
+// ── Favorites ──
+final favoritesProvider = StateNotifierProvider<FavoritesNotifier, Set<int>>((ref) {
+  return FavoritesNotifier();
+});
+
+class FavoritesNotifier extends StateNotifier<Set<int>> {
+  FavoritesNotifier() : super({}) {
+    _load();
+  }
+
+  bool isFavorite(int productId) => state.contains(productId);
+
+  void toggle(int productId) {
+    if (state.contains(productId)) {
+      state = {...state}..remove(productId);
+    } else {
+      state = {...state, productId};
+    }
+    _save();
+  }
+
+  Future<void> _save() async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setStringList('favorites', state.map((e) => e.toString()).toList());
+  }
+
+  Future<void> _load() async {
+    final prefs = await SharedPreferences.getInstance();
+    final ids = prefs.getStringList('favorites') ?? [];
+    state = ids.map((e) => int.tryParse(e) ?? 0).where((e) => e > 0).toSet();
+  }
+}

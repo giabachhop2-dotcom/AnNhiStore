@@ -9,6 +9,7 @@ import '../models/models.dart';
 import '../services/api_service.dart';
 import '../config/theme.dart';
 import '../widgets/shimmer_grid.dart';
+import '../widgets/empty_state.dart';
 
 class NewsListScreen extends ConsumerStatefulWidget {
   const NewsListScreen({super.key});
@@ -58,17 +59,10 @@ class _NewsListScreenState extends ConsumerState<NewsListScreen> {
             )
           else if (articles.isEmpty)
             SliverFillRemaining(
-              child: Center(
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Icon(CupertinoIcons.news, size: 60,
-                        color: AppTheme.textMuted.withValues(alpha: 0.4)),
-                    const SizedBox(height: 12),
-                    const Text('Chưa có tin tức',
-                        style: TextStyle(color: AppTheme.textMuted, fontSize: 16)),
-                  ],
-                ),
+              child: EmptyState(
+                icon: CupertinoIcons.news,
+                title: 'Chưa có tin tức',
+                description: 'Nội dung sẽ được cập nhật sớm',
               ),
             )
           else

@@ -86,16 +86,41 @@ class _ProductDetailScreenState extends ConsumerState<ProductDetailScreen>
           maxLines: 1,
           overflow: TextOverflow.ellipsis,
         ),
-        trailing: CupertinoButton(
-          padding: EdgeInsets.zero,
-          child: const Icon(CupertinoIcons.share),
-          onPressed: () {
-            if (product != null) {
-              Share.share(
-                '${product!.namevi} - An Nhi Trà\nhttps://annhitra.com/${product!.slugvi ?? ""}',
-              );
-            }
-          },
+        trailing: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            CupertinoButton(
+              padding: EdgeInsets.zero,
+              child: AnimatedSwitcher(
+                duration: const Duration(milliseconds: 200),
+                transitionBuilder: (child, anim) => ScaleTransition(scale: anim, child: child),
+                child: Icon(
+                  ref.watch(favoritesProvider).contains(widget.productId)
+                      ? CupertinoIcons.heart_fill
+                      : CupertinoIcons.heart,
+                  key: ValueKey(ref.watch(favoritesProvider).contains(widget.productId)),
+                  color: ref.watch(favoritesProvider).contains(widget.productId)
+                      ? AppTheme.priceRed
+                      : null,
+                ),
+              ),
+              onPressed: () {
+                HapticFeedback.selectionClick();
+                ref.read(favoritesProvider.notifier).toggle(widget.productId);
+              },
+            ),
+            CupertinoButton(
+              padding: EdgeInsets.zero,
+              child: const Icon(CupertinoIcons.share),
+              onPressed: () {
+                if (product != null) {
+                  Share.share(
+                    '${product!.namevi} - An Nhi Trà\nhttps://annhitra.com/${product!.slugvi ?? ""}',
+                  );
+                }
+              },
+            ),
+          ],
         ),
       ),
       child: isLoading
@@ -303,14 +328,24 @@ class _ProductDetailScreenState extends ConsumerState<ProductDetailScreen>
                               mainAxisSize: MainAxisSize.min,
                               children: [
                                 const Text('Tổng', style: TextStyle(color: AppTheme.textMuted, fontSize: 12)),
-                                Text(
-                                  formatter.format(product!.displayPrice * quantity),
-                                  style: const TextStyle(
-                                    fontSize: 20,
-                                    fontWeight: FontWeight.bold,
-                                    color: AppTheme.priceRed,
-                                  ),
-                                ),
+                                product!.displayPrice > 0
+                                    ? Text(
+                                        formatter.format(product!.displayPrice * quantity),
+                                        style: const TextStyle(
+                                          fontSize: 20,
+                                          fontWeight: FontWeight.bold,
+                                          color: AppTheme.priceRed,
+                                        ),
+                                      )
+                                    : const Text(
+                                        'Liên hệ',
+                                        style: TextStyle(
+                                          fontSize: 18,
+                                          fontWeight: FontWeight.w600,
+                                          color: AppTheme.accentGold,
+                                          fontStyle: FontStyle.italic,
+                                        ),
+                                      ),
                               ],
                             ),
                             const SizedBox(width: 16),

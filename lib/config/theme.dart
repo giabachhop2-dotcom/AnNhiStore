@@ -89,4 +89,63 @@ class AppTheme {
           : SystemUiOverlayStyle.light.copyWith(statusBarColor: Colors.transparent),
     );
   }
+
+  // ── Dark Mode Colors ──
+  static const darkSurface = Color(0xFF1C1C1E);
+  static const darkGroupedBg = Color(0xFF000000);
+  static const darkElevated = Color(0xFF2C2C2E);
+  static const darkSeparator = Color(0xFF38383A);
+  static const darkTextPrimary = Color(0xFFFFFFFF);
+  static const darkTextSecondary = Color(0xFFEBEBF5);
+
+  /// Dark Cupertino theme
+  static CupertinoThemeData get darkCupertinoTheme {
+    return const CupertinoThemeData(
+      brightness: Brightness.dark,
+      primaryColor: accentGold,
+      primaryContrastingColor: CupertinoColors.black,
+      barBackgroundColor: darkSurface,
+      scaffoldBackgroundColor: darkGroupedBg,
+      textTheme: CupertinoTextThemeData(
+        primaryColor: accentGold,
+        navTitleTextStyle: TextStyle(
+          fontWeight: FontWeight.w600,
+          fontSize: 17,
+          color: darkTextPrimary,
+          letterSpacing: -0.41,
+        ),
+        navLargeTitleTextStyle: TextStyle(
+          fontWeight: FontWeight.bold,
+          fontSize: 34,
+          color: darkTextPrimary,
+          letterSpacing: 0.37,
+        ),
+      ),
+    );
+  }
+
+  /// Dark Material theme
+  static ThemeData get darkMaterialTheme {
+    return ThemeData(
+      useMaterial3: true,
+      brightness: Brightness.dark,
+      colorScheme: ColorScheme.fromSeed(
+        seedColor: primaryDark,
+        brightness: Brightness.dark,
+        primary: accentGold,
+        secondary: primaryDark,
+        surface: darkSurface,
+        error: priceRed,
+      ),
+      scaffoldBackgroundColor: darkGroupedBg,
+      cardTheme: CardThemeData(
+        color: darkElevated,
+        elevation: 0,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(12),
+          side: BorderSide(color: darkSeparator.withValues(alpha: 0.3)),
+        ),
+      ),
+    );
+  }
 }
