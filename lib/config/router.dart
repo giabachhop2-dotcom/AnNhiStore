@@ -16,6 +16,7 @@ import '../screens/search_screen.dart';
 import '../screens/favorites_screen.dart';
 import '../screens/order_history_screen.dart';
 import '../screens/tea_brewing_timer.dart';
+import '../screens/tea_traceability_screen.dart';
 
 final _rootNavigatorKey = GlobalKey<NavigatorState>();
 
@@ -117,6 +118,12 @@ final router = GoRouter(
       parentNavigatorKey: _rootNavigatorKey,
       pageBuilder: (context, state) =>
           SlideUpTransitionPage(child: const TeaBrewingTimerScreen()),
+    ),
+    GoRoute(
+      path: '/traceability',
+      parentNavigatorKey: _rootNavigatorKey,
+      pageBuilder: (context, state) =>
+          SlideUpTransitionPage(child: const TeaTraceabilityScreen()),
     ),
   ],
 );

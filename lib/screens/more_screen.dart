@@ -150,6 +150,13 @@ class MoreScreen extends ConsumerWidget {
               isDark: isDark,
               items: [
                 _MenuItem(
+                  icon: CupertinoIcons.qrcode_viewfinder,
+                  gradientColors: const [Color(0xFFD4A830), Color(0xFFB8860B)],
+                  title: 'Truy Xuất Nguồn Gốc',
+                  subtitle: 'Nhập mã — xem lô trà, vùng trồng',
+                  onTap: () => context.push('/traceability'),
+                ),
+                _MenuItem(
                   icon: CupertinoIcons.info_circle_fill,
                   gradientColors: const [Color(0xFF4A90D9), Color(0xFF3478C7)],
                   title: 'Giới thiệu',
