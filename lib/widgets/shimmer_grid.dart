@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:shimmer/shimmer.dart';
+import '../config/theme.dart';
 
 /// iOS-style shimmer loading skeleton for product cards
 class ShimmerProductCard extends StatelessWidget {
@@ -8,8 +9,8 @@ class ShimmerProductCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Shimmer.fromColors(
-      baseColor: Colors.grey.shade300,
-      highlightColor: Colors.grey.shade100,
+      baseColor: AppTheme.separator,
+      highlightColor: AppTheme.groupedBg,
       child: Container(
         decoration: BoxDecoration(
           color: Colors.white,
@@ -59,8 +60,8 @@ class ShimmerListItem extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Shimmer.fromColors(
-      baseColor: Colors.grey.shade300,
-      highlightColor: Colors.grey.shade100,
+      baseColor: AppTheme.separator,
+      highlightColor: AppTheme.groupedBg,
       child: Container(
         margin: const EdgeInsets.only(bottom: 12),
         height: 90,

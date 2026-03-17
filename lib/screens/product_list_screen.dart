@@ -296,7 +296,7 @@ class _ProductListScreenState extends ConsumerState<ProductListScreen> {
   }
 }
 
-class _CatChip extends StatelessWidget {
+class _CatChip extends StatefulWidget {
   final String label;
   final bool selected;
   final VoidCallback onTap;
@@ -304,35 +304,77 @@ class _CatChip extends StatelessWidget {
   const _CatChip({required this.label, required this.selected, required this.onTap});
 
   @override
+  State<_CatChip> createState() => _CatChipState();
+}
+
+class _CatChipState extends State<_CatChip> with SingleTickerProviderStateMixin {
+  late AnimationController _scaleCtrl;
+  late Animation<double> _scaleAnim;
+
+  @override
+  void initState() {
+    super.initState();
+    _scaleCtrl = AnimationController(
+      duration: const Duration(milliseconds: 100),
+      reverseDuration: const Duration(milliseconds: 250),
+      vsync: this,
+    );
+    _scaleAnim = Tween<double>(begin: 1.0, end: 0.92).animate(
+      CurvedAnimation(parent: _scaleCtrl, curve: Curves.easeOut, reverseCurve: Curves.elasticOut),
+    );
+  }
+
+  @override
+  void dispose() {
+    _scaleCtrl.dispose();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 4),
       child: GestureDetector(
-        onTap: onTap,
-        child: AnimatedContainer(
-          duration: const Duration(milliseconds: 200),
-          padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
-          decoration: BoxDecoration(
-            color: selected ? AppTheme.primaryDark : CupertinoColors.white,
-            borderRadius: BorderRadius.circular(20),
-            border: Border.all(
-              color: selected ? AppTheme.primaryDark : AppTheme.separator,
-              width: 1,
-            ),
-            boxShadow: selected ? [
-              BoxShadow(
-                color: AppTheme.primaryDark.withValues(alpha: 0.2),
-                blurRadius: 6,
-                offset: const Offset(0, 2),
+        onTapDown: (_) => _scaleCtrl.forward(),
+        onTapUp: (_) => _scaleCtrl.reverse(),
+        onTapCancel: () => _scaleCtrl.reverse(),
+        onTap: widget.onTap,
+        child: ScaleTransition(
+          scale: _scaleAnim,
+          child: AnimatedContainer(
+            duration: const Duration(milliseconds: 250),
+            curve: Curves.easeOutCubic,
+            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+            decoration: BoxDecoration(
+              color: widget.selected ? AppTheme.primaryDark : CupertinoColors.white,
+              borderRadius: BorderRadius.circular(20),
+              border: Border.all(
+                color: widget.selected ? AppTheme.primaryDark : AppTheme.separator,
+                width: 1,
               ),
-            ] : null,
-          ),
-          child: Text(
-            label,
-            style: TextStyle(
-              fontSize: 13,
-              fontWeight: selected ? FontWeight.w600 : FontWeight.w500,
-              color: selected ? CupertinoColors.white : AppTheme.textPrimary,
+              boxShadow: widget.selected ? [
+                BoxShadow(
+                  color: AppTheme.primaryDark.withValues(alpha: 0.25),
+                  blurRadius: 8,
+                  offset: const Offset(0, 3),
+                ),
+              ] : [
+                BoxShadow(
+                  color: Colors.black.withValues(alpha: 0.04),
+                  blurRadius: 4,
+                  offset: const Offset(0, 1),
+                ),
+              ],
+            ),
+            child: AnimatedDefaultTextStyle(
+              duration: const Duration(milliseconds: 200),
+              style: TextStyle(
+                fontSize: 13,
+                fontWeight: widget.selected ? FontWeight.w600 : FontWeight.w500,
+                color: widget.selected ? CupertinoColors.white : AppTheme.textPrimary,
+                letterSpacing: widget.selected ? 0.2 : 0,
+              ),
+              child: Text(widget.label),
             ),
           ),
         ),

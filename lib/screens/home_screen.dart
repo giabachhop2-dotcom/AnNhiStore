@@ -249,8 +249,8 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                     fit: BoxFit.cover,
                     width: double.infinity,
                     placeholder: (_, _a) => Shimmer.fromColors(
-                      baseColor: Colors.grey.shade300,
-                      highlightColor: Colors.grey.shade100,
+                      baseColor: AppTheme.separator,
+                      highlightColor: AppTheme.groupedBg,
                       child: Container(
                         decoration: BoxDecoration(
                           color: Colors.white,
@@ -499,8 +499,8 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
         ),
         SliverToBoxAdapter(
           child: Shimmer.fromColors(
-            baseColor: Colors.grey.shade300,
-            highlightColor: Colors.grey.shade100,
+            baseColor: AppTheme.separator,
+            highlightColor: AppTheme.groupedBg,
             child: Container(
               margin: const EdgeInsets.all(16),
               height: 200,

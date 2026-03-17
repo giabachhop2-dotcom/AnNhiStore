@@ -6,6 +6,7 @@ import 'package:go_router/go_router.dart';
 import '../providers/providers.dart';
 import '../models/models.dart';
 import '../widgets/animated_product_card.dart';
+import '../widgets/shimmer_grid.dart';
 import '../widgets/empty_state.dart';
 import '../config/theme.dart';
 
@@ -104,7 +105,20 @@ class _FavoritesScreenState extends ConsumerState<FavoritesScreen> {
             : null,
       ),
       child: _isLoading
-          ? const Center(child: CupertinoActivityIndicator(radius: 14))
+          ? Padding(
+              padding: const EdgeInsets.all(16),
+              child: GridView.builder(
+                physics: const NeverScrollableScrollPhysics(),
+                gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                  crossAxisCount: 2,
+                  childAspectRatio: 0.62,
+                  crossAxisSpacing: 12,
+                  mainAxisSpacing: 12,
+                ),
+                itemCount: 4,
+                itemBuilder: (_, __) => const ShimmerProductCard(),
+              ),
+            )
           : favoriteIds.isEmpty
               ? EmptyState(
                   icon: CupertinoIcons.heart,
