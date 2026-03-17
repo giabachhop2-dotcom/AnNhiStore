@@ -66,7 +66,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
         api.getPhotos(type: 'slide'),
         api.getProducts(limit: 6, listId: 1),
         api.getProducts(limit: 6, listId: 2),
-        api.getNews(limit: 6, type: 'tintuc'),
+        api.getNews(limit: 6),
         api.getPhotos(type: 'chung-nhan'),
         api.getNews(limit: 6, type: 'camnhan'),
       ]);

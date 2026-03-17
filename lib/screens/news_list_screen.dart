@@ -30,7 +30,7 @@ class _NewsListScreenState extends ConsumerState<NewsListScreen> {
 
   Future<void> _load() async {
     try {
-      final result = await ref.read(apiServiceProvider).getNews(limit: 20, type: 'tintuc');
+      final result = await ref.read(apiServiceProvider).getNews(limit: 20);
       if (mounted) setState(() { articles = result.items; isLoading = false; });
     } catch (_) {
       if (mounted) setState(() => isLoading = false);
