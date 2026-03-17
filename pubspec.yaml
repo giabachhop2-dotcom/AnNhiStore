@@ -52,9 +52,9 @@ dev_dependencies:
 flutter_launcher_icons:
   ios: true
   android: true
-  image_path: "assets/images/app_icon.png"
+  image_path: "assets/images/logo_app.png"
   adaptive_icon_background: "#F0ECE4"
-  adaptive_icon_foreground: "assets/images/app_icon.png"
+  adaptive_icon_foreground: "assets/images/logo_app.png"
   min_sdk_android: 21
   remove_alpha_ios: true
   web:
@@ -63,9 +63,9 @@ flutter_launcher_icons:
 # ── Native Splash Screen Config ──
 flutter_native_splash:
   color: "#1B322A"
-  image: "assets/images/app_icon.png"
+  image: "assets/images/logo_app.png"
   color_dark: "#1B322A"
-  image_dark: "assets/images/app_icon.png"
+  image_dark: "assets/images/logo_app.png"
   ios: true
   android: true
   android_12:
