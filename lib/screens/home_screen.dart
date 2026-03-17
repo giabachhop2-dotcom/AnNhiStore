@@ -293,6 +293,15 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                       ? AppTheme.primaryDark
                       : AppTheme.textMuted.withValues(alpha: 0.3),
                   borderRadius: BorderRadius.circular(3),
+                  boxShadow: _currentSlide == index
+                      ? [
+                          BoxShadow(
+                            color: AppTheme.primaryDark.withValues(alpha: 0.4),
+                            blurRadius: 6,
+                            spreadRadius: 1,
+                          ),
+                        ]
+                      : null,
                 ),
               );
             }),

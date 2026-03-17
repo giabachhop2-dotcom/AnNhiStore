@@ -74,13 +74,68 @@ class CartScreen extends ConsumerWidget {
                     final item = cart[index];
                     final imageUrl = ApiService.getImageUrl(item.product.photo, 'product');
 
-                    // iOS swipe-to-delete
+                    // iOS swipe-to-delete with undo
                     return Dismissible(
                       key: Key('cart-${item.product.id}'),
                       direction: DismissDirection.endToStart,
-                      onDismissed: (_) {
+                      confirmDismiss: (_) async {
                         HapticFeedback.mediumImpact();
+                        // Remove immediately for visual feedback
                         cartNotifier.removeItem(item.product.id);
+                        // Show undo snackbar
+                        if (context.mounted) {
+                          ScaffoldMessenger.of(context).hideCurrentSnackBar();
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            SnackBar(
+                              content: Row(
+                                children: [
+                                  ClipRRect(
+                                    borderRadius: BorderRadius.circular(6),
+                                    child: CachedNetworkImage(
+                                      imageUrl: imageUrl,
+                                      width: 32,
+                                      height: 32,
+                                      fit: BoxFit.cover,
+                                      errorWidget: (_, e, s) =>
+                                          const SizedBox(width: 32, height: 32),
+                                    ),
+                                  ),
+                                  const SizedBox(width: 10),
+                                  Expanded(
+                                    child: Text(
+                                      'Đã xóa "${item.product.namevi ?? ""}"',
+                                      maxLines: 1,
+                                      overflow: TextOverflow.ellipsis,
+                                      style: const TextStyle(fontSize: 14),
+                                    ),
+                                  ),
+                                ],
+                              ),
+                              backgroundColor: AppTheme.primaryDark.withValues(alpha: 0.95),
+                              behavior: SnackBarBehavior.floating,
+                              margin: EdgeInsets.fromLTRB(
+                                16, 0, 16,
+                                MediaQuery.of(context).padding.bottom + 100,
+                              ),
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(12),
+                              ),
+                              duration: const Duration(seconds: 4),
+                              action: SnackBarAction(
+                                label: 'Hoàn tác',
+                                textColor: AppTheme.accentGold,
+                                onPressed: () {
+                                  HapticFeedback.selectionClick();
+                                  cartNotifier.addItem(
+                                    item.product,
+                                    quantity: item.quantity,
+                                  );
+                                },
+                              ),
+                            ),
+                          );
+                        }
+                        return false; // we already removed it manually
                       },
                       background: Container(
                         alignment: Alignment.centerRight,

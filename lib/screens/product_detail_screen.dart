@@ -72,7 +72,11 @@ class _ProductDetailScreenState extends ConsumerState<ProductDetailScreen>
     HapticFeedback.mediumImpact();
     ref.read(cartProvider.notifier).addItem(product!, quantity: quantity);
     _cartAnimController.forward().then((_) => _cartAnimController.reverse());
-    AnimatedToast.showCartAdded(context);
+    AnimatedToast.showCartAddedWithProduct(
+      context,
+      productName: product!.namevi ?? '',
+      imageUrl: ApiService.getImageUrl(product!.photo, 'product'),
+    );
 
     // Fly-to-cart
     final imgUrl = ApiService.getImageUrl(product!.photo, 'product');

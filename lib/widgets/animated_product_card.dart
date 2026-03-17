@@ -11,6 +11,7 @@ import '../config/theme.dart';
 import '../providers/providers.dart';
 import 'animated_toast.dart';
 import 'fly_to_cart.dart';
+import 'heart_burst_effect.dart';
 import 'package:share_plus/share_plus.dart';
 
 /// Animated product card with:
@@ -141,7 +142,11 @@ class _AnimatedProductCardState extends ConsumerState<AnimatedProductCard>
     HapticFeedback.mediumImpact();
     ref.read(cartProvider.notifier).addItem(widget.product);
     _addBounceController.forward(from: 0);
-    AnimatedToast.showCartAdded(context);
+    AnimatedToast.showCartAddedWithProduct(
+      context,
+      productName: widget.product.namevi ?? '',
+      imageUrl: ApiService.getImageUrl(widget.product.photo, 'product'),
+    );
 
     // Fly-to-cart animation
     final imgUrl = ApiService.getImageUrl(widget.product.photo, 'product');
@@ -294,31 +299,27 @@ class _AnimatedProductCardState extends ConsumerState<AnimatedProductCard>
                                   ),
                                 ),
                               ),
-                            // Favorite heart icon
+                            // Favorite heart icon with burst effect
                             Positioned(
-                              top: 8,
-                              right: 8,
-                              child: GestureDetector(
+                              top: 4,
+                              right: 4,
+                              child: HeartBurstEffect(
+                                isActive: ref.watch(favoritesProvider).contains(widget.product.id),
                                 onTap: () {
                                   HapticFeedback.selectionClick();
                                   ref.read(favoritesProvider.notifier).toggle(widget.product.id);
                                 },
-                                child: AnimatedSwitcher(
-                                  duration: const Duration(milliseconds: 200),
-                                  transitionBuilder: (child, anim) => ScaleTransition(scale: anim, child: child),
-                                  child: Icon(
-                                    ref.watch(favoritesProvider).contains(widget.product.id)
-                                        ? CupertinoIcons.heart_fill
-                                        : CupertinoIcons.heart,
-                                    key: ValueKey(ref.watch(favoritesProvider).contains(widget.product.id)),
-                                    color: ref.watch(favoritesProvider).contains(widget.product.id)
-                                        ? AppTheme.priceRed
-                                        : CupertinoColors.white,
-                                    size: 22,
-                                    shadows: const [
-                                      Shadow(color: Colors.black38, blurRadius: 8),
-                                    ],
-                                  ),
+                                child: Icon(
+                                  ref.watch(favoritesProvider).contains(widget.product.id)
+                                      ? CupertinoIcons.heart_fill
+                                      : CupertinoIcons.heart,
+                                  color: ref.watch(favoritesProvider).contains(widget.product.id)
+                                      ? AppTheme.priceRed
+                                      : CupertinoColors.white,
+                                  size: 22,
+                                  shadows: const [
+                                    Shadow(color: Colors.black38, blurRadius: 8),
+                                  ],
                                 ),
                               ),
                             ),
