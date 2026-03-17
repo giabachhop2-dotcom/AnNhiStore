@@ -95,7 +95,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                     style: TextStyle(
                       color: AppTheme.accentGold.withValues(alpha: 0.8),
                       fontSize: 14,
-                      fontFamily: 'Georgia',
+                      fontFamily: 'UTMKhuccamta',
                     )),
                 onPressed: _complete,
               ),
@@ -142,7 +142,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                           color: Color(0xFFF5F0E8),
                           fontWeight: FontWeight.bold,
                           fontSize: 16,
-                          fontFamily: 'Georgia',
+                          fontFamily: 'UTMKhuccamta',
                           letterSpacing: 0.5,
                         ),
                       ),
@@ -207,7 +207,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                   page.title,
                   textAlign: TextAlign.center,
                   style: TextStyle(
-                    fontFamily: 'Georgia',
+                    fontFamily: 'UTMKhuccamta',
                     fontSize: 28,
                     fontWeight: FontWeight.bold,
                     color: const Color(0xFFF5F0E8),
@@ -245,7 +245,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                   page.subtitle,
                   textAlign: TextAlign.center,
                   style: TextStyle(
-                    fontFamily: 'Georgia',
+                    fontFamily: 'UTMKhuccamta',
                     fontSize: 15,
                     color: const Color(0xFFF5F0E8).withValues(alpha: 0.85),
                     height: 1.7,

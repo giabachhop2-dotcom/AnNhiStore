@@ -37,14 +37,14 @@ class AppTheme {
       textTheme: CupertinoTextThemeData(
         primaryColor: primaryDark,
         navTitleTextStyle: TextStyle(
-          fontFamily: 'Georgia',
+          fontFamily: 'UTMKhuccamta',
           fontWeight: FontWeight.w600,
           fontSize: 17,
           color: textPrimary,
           letterSpacing: -0.3,
         ),
         navLargeTitleTextStyle: TextStyle(
-          fontFamily: 'Georgia',
+          fontFamily: 'UTMKhuccamta',
           fontWeight: FontWeight.bold,
           fontSize: 34,
           color: textPrimary,
@@ -58,7 +58,7 @@ class AppTheme {
   static ThemeData get materialTheme {
     return ThemeData(
       useMaterial3: true,
-      fontFamily: 'Georgia',
+      fontFamily: 'UTMKhuccamta',
       colorScheme: ColorScheme.fromSeed(
         seedColor: primaryDark,
         primary: primaryDark,
@@ -120,14 +120,14 @@ class AppTheme {
       textTheme: CupertinoTextThemeData(
         primaryColor: accentGold,
         navTitleTextStyle: TextStyle(
-          fontFamily: 'Georgia',
+          fontFamily: 'UTMKhuccamta',
           fontWeight: FontWeight.w600,
           fontSize: 17,
           color: darkTextPrimary,
           letterSpacing: -0.3,
         ),
         navLargeTitleTextStyle: TextStyle(
-          fontFamily: 'Georgia',
+          fontFamily: 'UTMKhuccamta',
           fontWeight: FontWeight.bold,
           fontSize: 34,
           color: darkTextPrimary,
@@ -142,7 +142,7 @@ class AppTheme {
     return ThemeData(
       useMaterial3: true,
       brightness: Brightness.dark,
-      fontFamily: 'Georgia',
+      fontFamily: 'UTMKhuccamta',
       colorScheme: ColorScheme.fromSeed(
         seedColor: primaryDark,
         brightness: Brightness.dark,

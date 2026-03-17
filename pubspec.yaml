@@ -77,3 +77,9 @@ flutter:
   uses-material-design: true
   assets:
     - assets/images/
+    - assets/font/
+
+  fonts:
+    - family: UTMKhuccamta
+      fonts:
+        - asset: assets/font/UTM Khuccamta.ttf
