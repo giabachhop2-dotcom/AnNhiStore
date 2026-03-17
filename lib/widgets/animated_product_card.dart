@@ -10,6 +10,7 @@ import '../services/api_service.dart';
 import '../config/theme.dart';
 import '../providers/providers.dart';
 import 'animated_toast.dart';
+import 'fly_to_cart.dart';
 import 'package:share_plus/share_plus.dart';
 
 /// Animated product card with:
@@ -134,11 +135,25 @@ class _AnimatedProductCardState extends ConsumerState<AnimatedProductCard>
     context.push('/product/${widget.product.id}');
   }
 
+  final GlobalKey _imageKey = GlobalKey();
+
   void _addToCart() {
     HapticFeedback.mediumImpact();
     ref.read(cartProvider.notifier).addItem(widget.product);
     _addBounceController.forward(from: 0);
     AnimatedToast.showCartAdded(context);
+
+    // Fly-to-cart animation
+    final imgUrl = ApiService.getImageUrl(widget.product.photo, 'product');
+    final box = _imageKey.currentContext?.findRenderObject() as RenderBox?;
+    if (box != null) {
+      final pos = box.localToGlobal(Offset(box.size.width / 2, box.size.height / 2));
+      FlyToCartAnimation.fly(
+        context: context,
+        imageWidget: CachedNetworkImage(imageUrl: imgUrl, fit: BoxFit.cover),
+        startGlobalOffset: pos,
+      );
+    }
   }
 
   @override
@@ -226,6 +241,7 @@ class _AnimatedProductCardState extends ConsumerState<AnimatedProductCard>
                           fit: StackFit.expand,
                           children: [
                             Hero(
+                              key: _imageKey,
                               tag: heroTag,
                               child: CachedNetworkImage(
                                 imageUrl: imageUrl,

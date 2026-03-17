@@ -135,14 +135,22 @@ class CartScreen extends ConsumerWidget {
                                     ),
                                   ),
                                   const SizedBox(height: 4),
-                                  Text(
-                                    formatter.format(item.product.displayPrice),
-                                    style: const TextStyle(
-                                      color: AppTheme.priceRed,
-                                      fontWeight: FontWeight.bold,
-                                      fontSize: 15,
-                                    ),
-                                  ),
+                                  item.product.displayPrice > 0
+                                      ? Text(
+                                          formatter.format(item.product.displayPrice),
+                                          style: const TextStyle(
+                                            color: AppTheme.priceRed,
+                                            fontWeight: FontWeight.bold,
+                                            fontSize: 15,
+                                          ),
+                                        )
+                                      : const Text('Liên hệ',
+                                          style: TextStyle(
+                                            color: AppTheme.accentGold,
+                                            fontWeight: FontWeight.w600,
+                                            fontSize: 14,
+                                            fontStyle: FontStyle.italic,
+                                          )),
                                   const SizedBox(height: 8),
                                   // iOS-style stepper
                                   Row(
@@ -155,14 +163,22 @@ class CartScreen extends ConsumerWidget {
                                         },
                                       ),
                                       const Spacer(),
-                                      Text(
-                                        formatter.format(item.lineTotal),
-                                        style: const TextStyle(
-                                          fontWeight: FontWeight.w600,
-                                          fontSize: 14,
-                                          color: AppTheme.textPrimary,
-                                        ),
-                                      ),
+                                      item.lineTotal > 0
+                                          ? Text(
+                                              formatter.format(item.lineTotal),
+                                              style: const TextStyle(
+                                                fontWeight: FontWeight.w600,
+                                                fontSize: 14,
+                                                color: AppTheme.textPrimary,
+                                              ),
+                                            )
+                                          : const Text('Liên hệ',
+                                              style: TextStyle(
+                                                fontWeight: FontWeight.w600,
+                                                fontSize: 13,
+                                                color: AppTheme.accentGold,
+                                                fontStyle: FontStyle.italic,
+                                              )),
                                     ],
                                   ),
                                 ],
@@ -204,14 +220,23 @@ class CartScreen extends ConsumerWidget {
                             children: [
                               const Text('Tổng cộng:',
                                   style: TextStyle(color: AppTheme.textMuted, fontSize: 12)),
-                              Text(
-                                formatter.format(cart.fold(0.0, (sum, item) => sum + item.lineTotal)),
-                                style: const TextStyle(
-                                  fontSize: 22,
-                                  fontWeight: FontWeight.bold,
-                                  color: AppTheme.priceRed,
-                                ),
-                              ),
+                              Builder(builder: (_) {
+                                final total = cart.fold(0.0, (sum, item) => sum + item.lineTotal);
+                                final hasContactItems = cart.any((item) => item.product.displayPrice <= 0);
+                                return Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    total > 0
+                                        ? Text(formatter.format(total),
+                                            style: const TextStyle(fontSize: 22, fontWeight: FontWeight.bold, color: AppTheme.priceRed))
+                                        : const Text('Liên hệ',
+                                            style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: AppTheme.accentGold, fontStyle: FontStyle.italic)),
+                                    if (hasContactItems && total > 0)
+                                      const Text('+ SP liên hệ giá',
+                                          style: TextStyle(fontSize: 11, color: AppTheme.accentGold)),
+                                  ],
+                                );
+                              }),
                             ],
                           ),
                           const SizedBox(width: 16),

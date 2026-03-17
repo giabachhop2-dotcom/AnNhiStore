@@ -14,6 +14,7 @@ import '../widgets/animated_product_card.dart';
 import '../widgets/section_header.dart';
 import '../widgets/shimmer_grid.dart';
 import '../widgets/empty_state.dart';
+import '../widgets/scroll_to_top_fab.dart';
 
 class HomeScreen extends ConsumerStatefulWidget {
   const HomeScreen({super.key});
@@ -107,7 +108,9 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
     return CupertinoPageScaffold(
       child: isLoading
           ? _buildShimmerLoading()
-          : CustomScrollView(
+          : Stack(
+              children: [
+                CustomScrollView(
               controller: _scrollController,
               physics: const BouncingScrollPhysics(
                 parent: AlwaysScrollableScrollPhysics(),
@@ -189,6 +192,9 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                 const SliverToBoxAdapter(child: SizedBox(height: 32)),
               ],
             ),
+            ScrollToTopFab(scrollController: _scrollController),
+          ],
+        ),
     );
   }
 

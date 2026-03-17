@@ -12,6 +12,7 @@ import '../models/models.dart';
 import '../services/api_service.dart';
 import '../config/theme.dart';
 import '../widgets/animated_toast.dart';
+import '../widgets/fly_to_cart.dart';
 
 class ProductDetailScreen extends ConsumerStatefulWidget {
   final int productId;
@@ -72,6 +73,17 @@ class _ProductDetailScreenState extends ConsumerState<ProductDetailScreen>
     ref.read(cartProvider.notifier).addItem(product!, quantity: quantity);
     _cartAnimController.forward().then((_) => _cartAnimController.reverse());
     AnimatedToast.showCartAdded(context);
+
+    // Fly-to-cart
+    final imgUrl = ApiService.getImageUrl(product!.photo, 'product');
+    FlyToCartAnimation.fly(
+      context: context,
+      imageWidget: CachedNetworkImage(imageUrl: imgUrl, fit: BoxFit.cover),
+      startGlobalOffset: Offset(
+        MediaQuery.of(context).size.width / 2,
+        280,
+      ),
+    );
   }
 
   @override
@@ -284,8 +296,11 @@ class _ProductDetailScreenState extends ConsumerState<ProductDetailScreen>
                                                 Text(rp.namevi ?? '', maxLines: 2, overflow: TextOverflow.ellipsis,
                                                   style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w600, color: AppTheme.textPrimary)),
                                                 const SizedBox(height: 4),
-                                                Text(formatter.format(rp.displayPrice),
-                                                  style: const TextStyle(fontSize: 13, fontWeight: FontWeight.bold, color: AppTheme.priceRed)),
+                                                rp.displayPrice > 0
+                                                  ? Text(formatter.format(rp.displayPrice),
+                                                      style: const TextStyle(fontSize: 13, fontWeight: FontWeight.bold, color: AppTheme.priceRed))
+                                                  : const Text('Liên hệ',
+                                                      style: TextStyle(fontSize: 12, fontWeight: FontWeight.w600, color: AppTheme.accentGold, fontStyle: FontStyle.italic)),
                                               ],
                                             ),
                                           ),
