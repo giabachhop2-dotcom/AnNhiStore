@@ -2,20 +2,23 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
-/// An Nhi Trà iOS-native brand theme
-/// Follows Apple Human Interface Guidelines
+/// An Nhi Trà – Trà Đạo Classical Theme
+/// Deep tea-green tones, warm parchment, antique gold accents.
+/// Inspired by traditional Vietnamese/Asian tea ceremony aesthetics.
 class AppTheme {
-  // ── Brand Colors ──
-  static const primaryDark = Color(0xFF1B322A);
-  static const primaryBg = Color(0xFFF0ECE4);
-  static const accentGold = Color(0xFFB8860B);
-  static const priceRed = Color(0xFFD32F2F);
-  static const surfaceWhite = Colors.white;
-  static const textMuted = Color(0xFF8E8E93); // iOS systemGray
-  static const textPrimary = Color(0xFF1C1C1E); // iOS label
-  static const textSecondary = Color(0xFF3C3C43); // iOS secondaryLabel
-  static const separator = Color(0xFFC6C6C8); // iOS separator
-  static const groupedBg = Color(0xFFF2F2F7); // iOS systemGroupedBackground
+  // ── Trà Đạo Brand Colors ──
+  static const primaryDark   = Color(0xFF1A3C28); // Rêu trà đậm
+  static const primaryMid    = Color(0xFF2D5E3E); // Lá trà tươi
+  static const primaryLight  = Color(0xFF4A7C5C); // Lá trà nhạt
+  static const primaryBg     = Color(0xFFF5F0E8); // Giấy dó cổ / parchment
+  static const accentGold    = Color(0xFFC49B2C); // Vàng đồng cổ
+  static const priceRed      = Color(0xFFC62828); // Đỏ son
+  static const surfaceWhite  = Color(0xFFFAF8F4); // Trắng ngà
+  static const textPrimary   = Color(0xFF2C2416); // Mực nâu đậm
+  static const textSecondary = Color(0xFF5C4E3C); // Mực nâu nhạt
+  static const textMuted     = Color(0xFF8C7E6A); // Nâu bạc
+  static const separator     = Color(0xFFD9CEBD); // Gạch ngà
+  static const groupedBg     = Color(0xFFF0EBE0); // Nền grouped ấm
 
   // ── Animation Constants ──
   static const Duration animFast = Duration(milliseconds: 150);
@@ -24,7 +27,7 @@ class AppTheme {
   static const Curve springCurve = Curves.elasticOut;
   static const Curve smoothCurve = Curves.easeOutCubic;
 
-  /// iOS Cupertino theme
+  /// Cupertino theme — Trà Đạo classical style
   static CupertinoThemeData get cupertinoTheme {
     return const CupertinoThemeData(
       primaryColor: primaryDark,
@@ -34,25 +37,28 @@ class AppTheme {
       textTheme: CupertinoTextThemeData(
         primaryColor: primaryDark,
         navTitleTextStyle: TextStyle(
+          fontFamily: 'Georgia',
           fontWeight: FontWeight.w600,
           fontSize: 17,
           color: textPrimary,
-          letterSpacing: -0.41,
+          letterSpacing: -0.3,
         ),
         navLargeTitleTextStyle: TextStyle(
+          fontFamily: 'Georgia',
           fontWeight: FontWeight.bold,
           fontSize: 34,
           color: textPrimary,
-          letterSpacing: 0.37,
+          letterSpacing: 0.2,
         ),
       ),
     );
   }
 
-  /// Material theme fallback (for widgets that require MaterialApp)
+  /// Material theme — classical tea ceremony
   static ThemeData get materialTheme {
     return ThemeData(
       useMaterial3: true,
+      fontFamily: 'Georgia',
       colorScheme: ColorScheme.fromSeed(
         seedColor: primaryDark,
         primary: primaryDark,
@@ -61,12 +67,17 @@ class AppTheme {
         error: priceRed,
       ),
       scaffoldBackgroundColor: groupedBg,
+      appBarTheme: const AppBarTheme(
+        backgroundColor: surfaceWhite,
+        foregroundColor: textPrimary,
+        elevation: 0,
+      ),
       cardTheme: CardThemeData(
         color: surfaceWhite,
         elevation: 0,
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(12),
-          side: BorderSide(color: separator.withValues(alpha: 0.3)),
+          side: BorderSide(color: separator.withValues(alpha: 0.4)),
         ),
       ),
       inputDecorationTheme: InputDecorationTheme(
@@ -90,15 +101,15 @@ class AppTheme {
     );
   }
 
-  // ── Dark Mode Colors ──
-  static const darkSurface = Color(0xFF1C1C1E);
-  static const darkGroupedBg = Color(0xFF000000);
-  static const darkElevated = Color(0xFF2C2C2E);
-  static const darkSeparator = Color(0xFF38383A);
-  static const darkTextPrimary = Color(0xFFFFFFFF);
-  static const darkTextSecondary = Color(0xFFEBEBF5);
+  // ── Dark Mode — Trà Đạo đêm ──
+  static const darkSurface       = Color(0xFF1A1612); // Gỗ mun đậm
+  static const darkGroupedBg     = Color(0xFF0F0D0A); // Đêm trà
+  static const darkElevated      = Color(0xFF2A241E); // Gỗ nâu
+  static const darkSeparator     = Color(0xFF3A3228); // Viền gỗ
+  static const darkTextPrimary   = Color(0xFFF5F0E8); // Giấy dó sáng
+  static const darkTextSecondary = Color(0xFFD9CEBD); // Ngà nhạt
 
-  /// Dark Cupertino theme
+  /// Dark Cupertino — tea ceremony by candlelight
   static CupertinoThemeData get darkCupertinoTheme {
     return const CupertinoThemeData(
       brightness: Brightness.dark,
@@ -109,26 +120,29 @@ class AppTheme {
       textTheme: CupertinoTextThemeData(
         primaryColor: accentGold,
         navTitleTextStyle: TextStyle(
+          fontFamily: 'Georgia',
           fontWeight: FontWeight.w600,
           fontSize: 17,
           color: darkTextPrimary,
-          letterSpacing: -0.41,
+          letterSpacing: -0.3,
         ),
         navLargeTitleTextStyle: TextStyle(
+          fontFamily: 'Georgia',
           fontWeight: FontWeight.bold,
           fontSize: 34,
           color: darkTextPrimary,
-          letterSpacing: 0.37,
+          letterSpacing: 0.2,
         ),
       ),
     );
   }
 
-  /// Dark Material theme
+  /// Dark Material theme — candlelight tea
   static ThemeData get darkMaterialTheme {
     return ThemeData(
       useMaterial3: true,
       brightness: Brightness.dark,
+      fontFamily: 'Georgia',
       colorScheme: ColorScheme.fromSeed(
         seedColor: primaryDark,
         brightness: Brightness.dark,
@@ -143,7 +157,7 @@ class AppTheme {
         elevation: 0,
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(12),
-          side: BorderSide(color: darkSeparator.withValues(alpha: 0.3)),
+          side: BorderSide(color: darkSeparator.withValues(alpha: 0.4)),
         ),
       ),
     );

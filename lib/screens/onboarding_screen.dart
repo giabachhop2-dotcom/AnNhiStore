@@ -3,8 +3,8 @@ import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../config/theme.dart';
 
-/// Premium onboarding flow shown only on first app launch.
-/// 3-slide intro featuring 3 brands: Annshan, An Nhi Trà, An Tinh Yến.
+/// Premium onboarding — Trà Đạo classical style
+/// 3 slides for 3 brands with deep green gradients and warm parchment feel.
 class OnboardingScreen extends StatefulWidget {
   final VoidCallback onComplete;
   const OnboardingScreen({super.key, required this.onComplete});
@@ -22,19 +22,19 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
       logo: 'assets/images/annshan.png',
       title: 'ANNSHAN',
       subtitle: 'Trà Shan Tuyết Cổ Thụ\nCác dòng trà cao cấp chính gốc\nHương vị tinh tuý từ núi rừng Việt Nam',
-      gradient: [Color(0xFF1B5E20), Color(0xFF388E3C)],
+      gradient: [Color(0xFF142E1F), Color(0xFF1A3C28)],
     ),
     _OnboardingPage(
       logo: 'assets/images/annhi.png',
       title: 'AN NHI',
       subtitle: 'Ấm Tử Sa & Gốm nghệ thuật\nNghệ nhân hàng đầu Nghi Hưng\nTrà cụ · Bàn trà · Phụ kiện cao cấp',
-      gradient: [Color(0xFF3E2723), Color(0xFF6D4C41)],
+      gradient: [Color(0xFF2C1810), Color(0xFF4A2C1A)],
     ),
     _OnboardingPage(
       logo: 'assets/images/antinhyen.png',
       title: 'AN TINH YẾN',
       subtitle: 'Yến sào thiên nhiên cao cấp\nTổ yến nguyên chất · Nước yến\nSản phẩm sức khoẻ & làm đẹp',
-      gradient: [Color(0xFF880E4F), Color(0xFFAD1457)],
+      gradient: [Color(0xFF3A1428), Color(0xFF5C1E3E)],
     ),
   ];
 
@@ -66,7 +66,6 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
     return CupertinoPageScaffold(
       child: Stack(
         children: [
-          // Pages
           PageView.builder(
             controller: _controller,
             itemCount: _pages.length,
@@ -86,14 +85,18 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
             },
           ),
 
-          // Skip button
+          // Skip
           if (_currentPage < _pages.length - 1)
             Positioned(
               top: MediaQuery.of(context).padding.top + 8,
               right: 16,
               child: CupertinoButton(
-                child: const Text('Bỏ qua',
-                    style: TextStyle(color: CupertinoColors.white, fontSize: 15)),
+                child: Text('Bỏ qua',
+                    style: TextStyle(
+                      color: AppTheme.accentGold.withValues(alpha: 0.8),
+                      fontSize: 14,
+                      fontFamily: 'Georgia',
+                    )),
                 onPressed: _complete,
               ),
             ),
@@ -105,40 +108,42 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
             bottom: MediaQuery.of(context).padding.bottom + 32,
             child: Column(
               children: [
-                // Page indicators
+                // Dot indicators
                 Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: List.generate(_pages.length, (i) {
                     return AnimatedContainer(
                       duration: const Duration(milliseconds: 300),
                       margin: const EdgeInsets.symmetric(horizontal: 4),
-                      width: _currentPage == i ? 24 : 8,
+                      width: _currentPage == i ? 28 : 8,
                       height: 8,
                       decoration: BoxDecoration(
                         color: _currentPage == i
-                            ? CupertinoColors.white
-                            : CupertinoColors.white.withValues(alpha: 0.4),
+                            ? AppTheme.accentGold
+                            : const Color(0xFFF5F0E8).withValues(alpha: 0.35),
                         borderRadius: BorderRadius.circular(4),
                       ),
                     );
                   }),
                 ),
                 const SizedBox(height: 32),
-                // CTA button
+                // CTA
                 Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 40),
                   child: SizedBox(
                     width: double.infinity,
                     child: CupertinoButton(
-                      color: CupertinoColors.white,
-                      borderRadius: BorderRadius.circular(16),
+                      color: AppTheme.accentGold,
+                      borderRadius: BorderRadius.circular(14),
                       onPressed: _next,
                       child: Text(
                         _currentPage == _pages.length - 1 ? 'Bắt đầu mua sắm' : 'Tiếp tục',
-                        style: TextStyle(
-                          color: _pages[_currentPage].gradient[0],
+                        style: const TextStyle(
+                          color: Color(0xFFF5F0E8),
                           fontWeight: FontWeight.bold,
                           fontSize: 16,
+                          fontFamily: 'Georgia',
+                          letterSpacing: 0.5,
                         ),
                       ),
                     ),
@@ -156,8 +161,8 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
     return Container(
       decoration: BoxDecoration(
         gradient: LinearGradient(
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
+          begin: Alignment.topCenter,
+          end: Alignment.bottomCenter,
           colors: page.gradient,
         ),
       ),
@@ -167,48 +172,72 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              // Brand logo with parallax
+              // Logo in parchment circle
               Transform.translate(
                 offset: Offset(offset * -60, 0),
                 child: Container(
-                  width: 140,
-                  height: 140,
+                  width: 150,
+                  height: 150,
                   decoration: BoxDecoration(
-                    color: CupertinoColors.white,
+                    color: const Color(0xFFF5F0E8),
                     shape: BoxShape.circle,
+                    border: Border.all(
+                      color: AppTheme.accentGold.withValues(alpha: 0.4),
+                      width: 2,
+                    ),
                     boxShadow: [
                       BoxShadow(
-                        color: Colors.black.withValues(alpha: 0.2),
-                        blurRadius: 20,
-                        offset: const Offset(0, 8),
+                        color: Colors.black.withValues(alpha: 0.25),
+                        blurRadius: 24,
+                        offset: const Offset(0, 10),
                       ),
                     ],
                   ),
-                  padding: const EdgeInsets.all(16),
+                  padding: const EdgeInsets.all(20),
                   child: ClipOval(
-                    child: Image.asset(
-                      page.logo,
-                      fit: BoxFit.contain,
-                    ),
+                    child: Image.asset(page.logo, fit: BoxFit.contain),
                   ),
                 ),
               ),
-              const SizedBox(height: 40),
-              // Brand name with parallax
+              const SizedBox(height: 44),
+              // Brand name
               Transform.translate(
                 offset: Offset(offset * -30, 0),
                 child: Text(
                   page.title,
                   textAlign: TextAlign.center,
-                  style: const TextStyle(
-                    fontSize: 30,
+                  style: TextStyle(
+                    fontFamily: 'Georgia',
+                    fontSize: 28,
                     fontWeight: FontWeight.bold,
-                    color: CupertinoColors.white,
-                    letterSpacing: 2,
+                    color: const Color(0xFFF5F0E8),
+                    letterSpacing: 3,
+                    shadows: [
+                      Shadow(
+                        color: Colors.black.withValues(alpha: 0.3),
+                        blurRadius: 8,
+                      ),
+                    ],
                   ),
                 ),
               ),
-              const SizedBox(height: 16),
+              const SizedBox(height: 6),
+              // Ornamental divider
+              Transform.translate(
+                offset: Offset(offset * -20, 0),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Container(width: 30, height: 1, color: AppTheme.accentGold.withValues(alpha: 0.5)),
+                    const SizedBox(width: 8),
+                    Icon(CupertinoIcons.leaf_arrow_circlepath,
+                        size: 14, color: AppTheme.accentGold.withValues(alpha: 0.6)),
+                    const SizedBox(width: 8),
+                    Container(width: 30, height: 1, color: AppTheme.accentGold.withValues(alpha: 0.5)),
+                  ],
+                ),
+              ),
+              const SizedBox(height: 18),
               // Description
               Transform.translate(
                 offset: Offset(offset * -15, 0),
@@ -216,9 +245,11 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                   page.subtitle,
                   textAlign: TextAlign.center,
                   style: TextStyle(
-                    fontSize: 16,
-                    color: CupertinoColors.white.withValues(alpha: 0.9),
-                    height: 1.6,
+                    fontFamily: 'Georgia',
+                    fontSize: 15,
+                    color: const Color(0xFFF5F0E8).withValues(alpha: 0.85),
+                    height: 1.7,
+                    letterSpacing: 0.3,
                   ),
                 ),
               ),
