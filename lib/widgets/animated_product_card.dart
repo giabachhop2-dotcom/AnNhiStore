@@ -377,10 +377,10 @@ class _AnimatedProductCardState extends ConsumerState<AnimatedProductCard>
                                 widget.product.namevi ?? '',
                                 maxLines: 2,
                                 overflow: TextOverflow.ellipsis,
-                                style: const TextStyle(
+                                style: TextStyle(
                                   fontWeight: FontWeight.w600,
                                   fontSize: 13,
-                                  color: AppTheme.textPrimary,
+                                  color: CupertinoColors.label.resolveFrom(context),
                                   letterSpacing: -0.2,
                                 ),
                               ),

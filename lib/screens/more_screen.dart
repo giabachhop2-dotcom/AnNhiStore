@@ -14,6 +14,7 @@ class MoreScreen extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final settingsAsync = ref.watch(settingsProvider);
+    final isDark = CupertinoTheme.brightnessOf(context) == Brightness.dark;
 
     return CupertinoPageScaffold(
       child: CustomScrollView(
@@ -24,42 +25,116 @@ class MoreScreen extends ConsumerWidget {
             border: null,
           ),
 
-          // Profile / Brand header
+          // ── Premium Brand Header ──
           SliverToBoxAdapter(
             child: Container(
-              margin: const EdgeInsets.fromLTRB(16, 8, 16, 20),
-              padding: const EdgeInsets.all(20),
+              margin: const EdgeInsets.fromLTRB(16, 8, 16, 24),
               decoration: BoxDecoration(
-                gradient: LinearGradient(
+                gradient: const LinearGradient(
+                  begin: Alignment.topLeft,
+                  end: Alignment.bottomRight,
                   colors: [
+                    Color(0xFF142E1F),
                     AppTheme.primaryDark,
-                    AppTheme.primaryDark.withValues(alpha: 0.85),
+                    Color(0xFF1E4A32),
                   ],
                 ),
-                borderRadius: BorderRadius.circular(16),
+                borderRadius: BorderRadius.circular(20),
                 boxShadow: [
                   BoxShadow(
-                    color: AppTheme.primaryDark.withValues(alpha: 0.3),
-                    blurRadius: 12,
-                    offset: const Offset(0, 4),
+                    color: AppTheme.primaryDark.withValues(alpha: 0.4),
+                    blurRadius: 20,
+                    offset: const Offset(0, 8),
                   ),
                 ],
               ),
-              child: Row(
+              child: Stack(
                 children: [
-                  ClipRRect(
-                    borderRadius: BorderRadius.circular(14),
-                    child: Image.asset('assets/images/logo.png', height: 50, width: 50, fit: BoxFit.cover),
+                  // Decorative pattern
+                  Positioned(
+                    right: -20,
+                    top: -20,
+                    child: Icon(
+                      CupertinoIcons.leaf_arrow_circlepath,
+                      size: 120,
+                      color: CupertinoColors.white.withValues(alpha: 0.04),
+                    ),
                   ),
-                  const SizedBox(width: 16),
-                  Expanded(
+                  Positioned(
+                    left: -10,
+                    bottom: -10,
+                    child: Icon(
+                      CupertinoIcons.leaf_arrow_circlepath,
+                      size: 80,
+                      color: CupertinoColors.white.withValues(alpha: 0.03),
+                    ),
+                  ),
+                  Padding(
+                    padding: const EdgeInsets.all(24),
                     child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        const Text('An Nhi Trà',
-                            style: TextStyle(color: CupertinoColors.white, fontSize: 20, fontWeight: FontWeight.bold)),
-                        Text('Trà Ngon & Ấm Tử Sa Chính Hãng',
-                            style: TextStyle(color: CupertinoColors.white.withValues(alpha: 0.7), fontSize: 13)),
+                        Row(
+                          children: [
+                            Container(
+                              padding: const EdgeInsets.all(3),
+                              decoration: BoxDecoration(
+                                borderRadius: BorderRadius.circular(16),
+                                border: Border.all(
+                                  color: AppTheme.accentGold.withValues(alpha: 0.5),
+                                  width: 2,
+                                ),
+                              ),
+                              child: ClipRRect(
+                                borderRadius: BorderRadius.circular(13),
+                                child: Image.asset('assets/images/logo.png',
+                                    height: 56, width: 56, fit: BoxFit.cover),
+                              ),
+                            ),
+                            const SizedBox(width: 16),
+                            Expanded(
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  const Text('An Nhi Trà',
+                                      style: TextStyle(
+                                        color: CupertinoColors.white,
+                                        fontSize: 22,
+                                        fontWeight: FontWeight.bold,
+                                        letterSpacing: 0.5,
+                                      )),
+                                  const SizedBox(height: 4),
+                                  Text('Trà Đạo · Ấm Tử Sa · Yến Sào',
+                                      style: TextStyle(
+                                        color: AppTheme.accentGold.withValues(alpha: 0.9),
+                                        fontSize: 12,
+                                        fontWeight: FontWeight.w600,
+                                        letterSpacing: 0.8,
+                                      )),
+                                ],
+                              ),
+                            ),
+                          ],
+                        ),
+                        const SizedBox(height: 20),
+                        // Brand stats row
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceAround,
+                          children: [
+                            _BrandStat(value: '200+', label: 'Sản phẩm'),
+                            Container(
+                              width: 1,
+                              height: 30,
+                              color: CupertinoColors.white.withValues(alpha: 0.15),
+                            ),
+                            _BrandStat(value: '3', label: 'Thương hiệu'),
+                            Container(
+                              width: 1,
+                              height: 30,
+                              color: CupertinoColors.white.withValues(alpha: 0.15),
+                            ),
+                            _BrandStat(value: '2025', label: 'Top 10 VN'),
+                          ],
+                        ),
                       ],
                     ),
                   ),
@@ -68,40 +143,45 @@ class MoreScreen extends ConsumerWidget {
             ),
           ),
 
-          // Menu sections
+          // ── Menu: Thông tin ──
           SliverToBoxAdapter(
-            child: CupertinoListSection.insetGrouped(
-              header: const Text('THÔNG TIN'),
-              children: [
-                CupertinoListTile(
-                  leading: _MenuIcon(CupertinoIcons.info, CupertinoColors.activeBlue),
-                  title: const Text('Giới thiệu'),
-                  trailing: const CupertinoListTileChevron(),
+            child: _MenuSection(
+              title: 'THÔNG TIN',
+              isDark: isDark,
+              items: [
+                _MenuItem(
+                  icon: CupertinoIcons.info_circle_fill,
+                  gradientColors: const [Color(0xFF4A90D9), Color(0xFF3478C7)],
+                  title: 'Giới thiệu',
+                  subtitle: 'Về An Nhi Trà & sứ mệnh',
                   onTap: () => context.push('/about'),
                 ),
-                CupertinoListTile(
-                  leading: _MenuIcon(CupertinoIcons.mail, CupertinoColors.activeGreen),
-                  title: const Text('Liên hệ'),
-                  trailing: const CupertinoListTileChevron(),
+                _MenuItem(
+                  icon: CupertinoIcons.mail_solid,
+                  gradientColors: const [Color(0xFF4CAF50), Color(0xFF2E7D32)],
+                  title: 'Liên hệ',
+                  subtitle: 'Gửi yêu cầu & góp ý',
                   onTap: () => context.push('/contact'),
                 ),
-                CupertinoListTile(
-                  leading: _MenuIcon(CupertinoIcons.heart_fill, CupertinoColors.systemPink),
-                  title: const Text('Sản phẩm yêu thích'),
-                  trailing: const CupertinoListTileChevron(),
+                _MenuItem(
+                  icon: CupertinoIcons.heart_fill,
+                  gradientColors: const [Color(0xFFE91E63), Color(0xFFC2185B)],
+                  title: 'Sản phẩm yêu thích',
+                  subtitle: 'Bộ sưu tập cá nhân',
                   onTap: () => context.push('/favorites'),
                 ),
-                CupertinoListTile(
-                  leading: _MenuIcon(CupertinoIcons.cube_box_fill, CupertinoColors.systemOrange),
-                  title: const Text('Lịch sử đơn hàng'),
-                  trailing: const CupertinoListTileChevron(),
+                _MenuItem(
+                  icon: CupertinoIcons.cube_box_fill,
+                  gradientColors: const [Color(0xFFFF9800), Color(0xFFF57C00)],
+                  title: 'Lịch sử đơn hàng',
+                  subtitle: 'Theo dõi đơn hàng',
                   onTap: () => context.push('/orders'),
                 ),
               ],
             ),
           ),
 
-          // Dynamic connections from API
+          // ── Menu: Kết nối ──
           SliverToBoxAdapter(
             child: settingsAsync.when(
               data: (settings) {
@@ -111,34 +191,37 @@ class MoreScreen extends ConsumerWidget {
                 final website = opts['website'] ?? 'https://annhitra.com';
                 final fanpage = opts['fanpage'] ?? 'https://facebook.com/annhitra';
 
-                return CupertinoListSection.insetGrouped(
-                  header: const Text('KẾT NỐI'),
-                  children: [
-                    CupertinoListTile(
-                      leading: _MenuIcon(CupertinoIcons.phone_fill, CupertinoColors.activeGreen),
-                      title: const Text('Gọi điện'),
-                      subtitle: Text(_formatPhone(phone)),
-                      trailing: const CupertinoListTileChevron(),
+                return _MenuSection(
+                  title: 'KẾT NỐI',
+                  isDark: isDark,
+                  items: [
+                    _MenuItem(
+                      icon: CupertinoIcons.phone_fill,
+                      gradientColors: const [Color(0xFF66BB6A), Color(0xFF43A047)],
+                      title: 'Hotline',
+                      subtitle: _formatPhone(phone.toString()),
                       onTap: () => launchUrl(Uri.parse('tel:$phone')),
                     ),
-                    CupertinoListTile(
-                      leading: _MenuIcon(CupertinoIcons.chat_bubble_2_fill, CupertinoColors.activeBlue),
-                      title: const Text('Chat Zalo'),
-                      trailing: const CupertinoListTileChevron(),
+                    _MenuItem(
+                      icon: CupertinoIcons.chat_bubble_2_fill,
+                      gradientColors: const [Color(0xFF42A5F5), Color(0xFF1E88E5)],
+                      title: 'Chat Zalo',
+                      subtitle: 'Tư vấn trực tiếp',
                       onTap: () => launchUrl(Uri.parse('https://zalo.me/$zalo')),
                     ),
-                    CupertinoListTile(
-                      leading: _MenuIcon(CupertinoIcons.globe, CupertinoColors.systemPurple),
-                      title: const Text('Website'),
-                      subtitle: Text(website.replaceAll('https://', '')),
-                      trailing: const CupertinoListTileChevron(),
-                      onTap: () => launchUrl(Uri.parse(website)),
+                    _MenuItem(
+                      icon: CupertinoIcons.globe,
+                      gradientColors: const [Color(0xFFAB47BC), Color(0xFF8E24AA)],
+                      title: 'Website',
+                      subtitle: website.toString().replaceAll('https://', ''),
+                      onTap: () => launchUrl(Uri.parse(website.toString())),
                     ),
-                    CupertinoListTile(
-                      leading: _MenuIcon(CupertinoIcons.person_2, CupertinoColors.activeBlue),
-                      title: const Text('Facebook'),
-                      trailing: const CupertinoListTileChevron(),
-                      onTap: () => launchUrl(Uri.parse(fanpage)),
+                    _MenuItem(
+                      icon: CupertinoIcons.person_2_fill,
+                      gradientColors: const [Color(0xFF5C6BC0), Color(0xFF3F51B5)],
+                      title: 'Facebook',
+                      subtitle: 'Fanpage chính thức',
+                      onTap: () => launchUrl(Uri.parse(fanpage.toString())),
                     ),
                   ],
                 );
@@ -147,45 +230,44 @@ class MoreScreen extends ConsumerWidget {
                 padding: EdgeInsets.all(32),
                 child: Center(child: CupertinoActivityIndicator()),
               ),
-              error: (_, __) => CupertinoListSection.insetGrouped(
-                header: const Text('KẾT NỐI'),
-                children: [
-                  CupertinoListTile(
-                    leading: _MenuIcon(CupertinoIcons.phone_fill, CupertinoColors.activeGreen),
-                    title: const Text('Gọi điện'),
-                    subtitle: const Text('082 762 6962'),
-                    trailing: const CupertinoListTileChevron(),
-                    onTap: () => launchUrl(Uri.parse('tel:0827626962')),
-                  ),
-                ],
-              ),
+              error: (_, __) => const SizedBox.shrink(),
             ),
           ),
 
-          // Settings section
+          // ── Menu: Cài đặt ──
           SliverToBoxAdapter(
-            child: CupertinoListSection.insetGrouped(
-              header: const Text('CÀI ĐẶT'),
-              children: [
-                CupertinoListTile(
-                  leading: _MenuIcon(CupertinoIcons.moon_fill, CupertinoColors.systemIndigo),
-                  title: const Text('Giao diện'),
+            child: _MenuSection(
+              title: 'CÀI ĐẶT',
+              isDark: isDark,
+              items: [
+                _MenuItem(
+                  icon: CupertinoIcons.moon_fill,
+                  gradientColors: const [Color(0xFF5C6BC0), Color(0xFF3949AB)],
+                  title: 'Giao diện',
+                  subtitle: 'Chế độ sáng / tối',
                   trailing: _ThemeModeSelector(),
                 ),
               ],
             ),
           ),
-          // Share section
+
+          // ── Share ──
           SliverToBoxAdapter(
-            child: CupertinoListSection.insetGrouped(
-              header: const Text('CHIA SẺ'),
-              children: [
-                CupertinoListTile(
-                  leading: _MenuIcon(CupertinoIcons.share, CupertinoColors.activeOrange),
-                  title: const Text('Chia sẻ app cho bạn bè'),
-                  trailing: const CupertinoListTileChevron(),
+            child: _MenuSection(
+              title: 'CHIA SẺ',
+              isDark: isDark,
+              items: [
+                _MenuItem(
+                  icon: CupertinoIcons.share_up,
+                  gradientColors: const [AppTheme.accentGold, Color(0xFFD4A830)],
+                  title: 'Giới thiệu app cho bạn bè',
+                  subtitle: 'Chia sẻ trải nghiệm trà đạo',
                   onTap: () {
-                    Share.share('Tải app An Nhi Trà - Trà Ngon & Ấm Tử Sa Chính Hãng 🍵\nhttps://annhitra.com');
+                    try {
+                      Share.share(
+                        'Tải app An Nhi Trà - Trà Ngon & Ấm Tử Sa Chính Hãng 🍵\nhttps://annhitra.com',
+                      );
+                    } catch (_) {}
                   },
                 ),
               ],
@@ -194,10 +276,26 @@ class MoreScreen extends ConsumerWidget {
 
           SliverToBoxAdapter(
             child: Padding(
-              padding: const EdgeInsets.all(24),
+              padding: const EdgeInsets.fromLTRB(24, 8, 24, 32),
               child: Center(
-                child: Text('Phiên bản 1.1.0',
-                    style: TextStyle(color: AppTheme.textMuted.withValues(alpha: 0.6), fontSize: 13)),
+                child: Column(
+                  children: [
+                    Text('Phiên bản 1.1.0',
+                        style: TextStyle(
+                          color: isDark ? AppTheme.darkTextSecondary : AppTheme.textMuted,
+                          fontSize: 12,
+                        )),
+                    const SizedBox(height: 4),
+                    Text(
+                      '© 2025 Phương Nam Group',
+                      style: TextStyle(
+                        color: (isDark ? AppTheme.darkTextSecondary : AppTheme.textMuted)
+                            .withValues(alpha: 0.5),
+                        fontSize: 11,
+                      ),
+                    ),
+                  ],
+                ),
               ),
             ),
           ),
@@ -214,6 +312,174 @@ class MoreScreen extends ConsumerWidget {
   }
 }
 
+// ── Brand Stat Widget ──
+class _BrandStat extends StatelessWidget {
+  final String value;
+  final String label;
+  const _BrandStat({required this.value, required this.label});
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      children: [
+        Text(value,
+            style: const TextStyle(
+              color: AppTheme.accentGold,
+              fontSize: 18,
+              fontWeight: FontWeight.bold,
+            )),
+        const SizedBox(height: 2),
+        Text(label,
+            style: TextStyle(
+              color: CupertinoColors.white.withValues(alpha: 0.6),
+              fontSize: 11,
+            )),
+      ],
+    );
+  }
+}
+
+// ── Menu Section ──
+class _MenuSection extends StatelessWidget {
+  final String title;
+  final bool isDark;
+  final List<_MenuItem> items;
+  const _MenuSection({required this.title, required this.isDark, required this.items});
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(16, 0, 16, 16),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Padding(
+            padding: const EdgeInsets.only(left: 4, bottom: 8),
+            child: Text(title,
+                style: TextStyle(
+                  fontSize: 12,
+                  fontWeight: FontWeight.w600,
+                  color: isDark ? AppTheme.darkTextSecondary : AppTheme.textMuted,
+                  letterSpacing: 1.5,
+                )),
+          ),
+          Container(
+            decoration: BoxDecoration(
+              color: isDark ? AppTheme.darkElevated : AppTheme.surfaceWhite,
+              borderRadius: BorderRadius.circular(14),
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.black.withValues(alpha: isDark ? 0.2 : 0.04),
+                  blurRadius: 8,
+                  offset: const Offset(0, 2),
+                ),
+              ],
+            ),
+            child: Column(
+              children: List.generate(items.length * 2 - 1, (idx) {
+                if (idx.isOdd) {
+                  return Divider(
+                    height: 0.5,
+                    indent: 58,
+                    color: isDark
+                        ? AppTheme.darkSeparator.withValues(alpha: 0.3)
+                        : AppTheme.separator.withValues(alpha: 0.4),
+                  );
+                }
+                return items[idx ~/ 2].build(context, isDark);
+              }),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+// ── Menu Item ──
+class _MenuItem {
+  final IconData icon;
+  final List<Color> gradientColors;
+  final String title;
+  final String? subtitle;
+  final VoidCallback? onTap;
+  final Widget? trailing;
+
+  const _MenuItem({
+    required this.icon,
+    required this.gradientColors,
+    required this.title,
+    this.subtitle,
+    this.onTap,
+    this.trailing,
+  });
+
+  Widget build(BuildContext context, bool isDark) {
+    return CupertinoButton(
+      padding: EdgeInsets.zero,
+      onPressed: onTap,
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
+        child: Row(
+          children: [
+            Container(
+              width: 34,
+              height: 34,
+              decoration: BoxDecoration(
+                gradient: LinearGradient(
+                  begin: Alignment.topLeft,
+                  end: Alignment.bottomRight,
+                  colors: gradientColors,
+                ),
+                borderRadius: BorderRadius.circular(9),
+                boxShadow: [
+                  BoxShadow(
+                    color: gradientColors.first.withValues(alpha: 0.3),
+                    blurRadius: 6,
+                    offset: const Offset(0, 2),
+                  ),
+                ],
+              ),
+              child: Icon(icon, size: 18, color: CupertinoColors.white),
+            ),
+            const SizedBox(width: 14),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(title,
+                      style: TextStyle(
+                        fontSize: 15,
+                        fontWeight: FontWeight.w500,
+                        color: isDark ? AppTheme.darkTextPrimary : AppTheme.textPrimary,
+                      )),
+                  if (subtitle != null) ...[
+                    const SizedBox(height: 1),
+                    Text(subtitle!,
+                        style: TextStyle(
+                          fontSize: 12,
+                          color: isDark ? AppTheme.darkTextSecondary : AppTheme.textMuted,
+                        )),
+                  ],
+                ],
+              ),
+            ),
+            trailing ??
+                Icon(
+                  CupertinoIcons.chevron_right,
+                  size: 14,
+                  color: isDark
+                      ? AppTheme.darkTextSecondary.withValues(alpha: 0.5)
+                      : AppTheme.textMuted.withValues(alpha: 0.5),
+                ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+// ── Theme Mode Selector ──
 class _ThemeModeSelector extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -239,25 +505,6 @@ class _ThemeModeSelector extends ConsumerWidget {
           ref.read(themeModeProvider.notifier).setMode(value);
         }
       },
-    );
-  }
-}
-
-class _MenuIcon extends StatelessWidget {
-  final IconData icon;
-  final Color color;
-  const _MenuIcon(this.icon, this.color);
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      width: 30,
-      height: 30,
-      decoration: BoxDecoration(
-        color: color,
-        borderRadius: BorderRadius.circular(7),
-      ),
-      child: Icon(icon, size: 18, color: CupertinoColors.white),
     );
   }
 }

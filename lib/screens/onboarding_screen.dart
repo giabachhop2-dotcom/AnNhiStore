@@ -176,27 +176,31 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
               Transform.translate(
                 offset: Offset(offset * -60, 0),
                 child: Container(
-                  width: 150,
-                  height: 150,
+                  width: 180,
+                  height: 160,
                   decoration: BoxDecoration(
                     color: const Color(0xFFF5F0E8),
-                    shape: BoxShape.circle,
+                    borderRadius: BorderRadius.circular(28),
                     border: Border.all(
-                      color: AppTheme.accentGold.withValues(alpha: 0.4),
+                      color: AppTheme.accentGold.withValues(alpha: 0.5),
                       width: 2,
                     ),
                     boxShadow: [
                       BoxShadow(
-                        color: Colors.black.withValues(alpha: 0.25),
-                        blurRadius: 24,
+                        color: AppTheme.accentGold.withValues(alpha: 0.15),
+                        blurRadius: 30,
+                        spreadRadius: 2,
+                        offset: const Offset(0, 8),
+                      ),
+                      BoxShadow(
+                        color: Colors.black.withValues(alpha: 0.2),
+                        blurRadius: 20,
                         offset: const Offset(0, 10),
                       ),
                     ],
                   ),
-                  padding: const EdgeInsets.all(20),
-                  child: ClipOval(
-                    child: Image.asset(page.logo, fit: BoxFit.contain),
-                  ),
+                  padding: const EdgeInsets.all(22),
+                  child: Image.asset(page.logo, fit: BoxFit.contain),
                 ),
               ),
               const SizedBox(height: 44),

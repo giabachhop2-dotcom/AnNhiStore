@@ -142,22 +142,44 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                 if (slides.isNotEmpty)
                   SliverToBoxAdapter(child: _buildBanner()),
 
-                // ── Ấm Tử Sa ──
+                // ── Featured Ấm Tử Sa — Horizontal Showcase ──
                 if (productsAmTuSa.isNotEmpty) ...[
                   SliverToBoxAdapter(
                     child: SectionHeader(
-                      title: 'Ấm Tử Sa',
+                      title: 'Ấm Tử Sa Nghệ Thuật',
                       onSeeAll: () => context.push('/products'),
                     ),
                   ),
-                  _buildProductGrid(productsAmTuSa),
+                  SliverToBoxAdapter(
+                    child: SizedBox(
+                      height: 280,
+                      child: ListView.builder(
+                        scrollDirection: Axis.horizontal,
+                        physics: const BouncingScrollPhysics(),
+                        padding: const EdgeInsets.symmetric(horizontal: 12),
+                        itemCount: productsAmTuSa.length,
+                        itemBuilder: (context, index) {
+                          return SizedBox(
+                            width: 200,
+                            child: Padding(
+                              padding: const EdgeInsets.symmetric(horizontal: 4),
+                              child: AnimatedProductCard(
+                                product: productsAmTuSa[index],
+                                index: index,
+                              ),
+                            ),
+                          );
+                        },
+                      ),
+                    ),
+                  ),
                 ],
 
-                // ── Trà ──
+                // ── Trà Shan Tuyết — Grid Layout ──
                 if (productsTra.isNotEmpty) ...[
                   SliverToBoxAdapter(
                     child: SectionHeader(
-                      title: 'Trà',
+                      title: 'Trà Shan Tuyết Cổ Thụ',
                       onSeeAll: () => context.push('/products'),
                     ),
                   ),

@@ -101,11 +101,11 @@ class AppTheme {
     );
   }
 
-  // ── Dark Mode — Trà Đạo đêm ──
-  static const darkSurface       = Color(0xFF1A1612); // Gỗ mun đậm
-  static const darkGroupedBg     = Color(0xFF0F0D0A); // Đêm trà
-  static const darkElevated      = Color(0xFF2A241E); // Gỗ nâu
-  static const darkSeparator     = Color(0xFF3A3228); // Viền gỗ
+  // ── Dark Mode — Trà Đạo đêm (warm candlelight) ──
+  static const darkSurface       = Color(0xFF241F19); // Gỗ nâu ấm
+  static const darkGroupedBg     = Color(0xFF1C1814); // Nền ấm đêm trà
+  static const darkElevated      = Color(0xFF322B23); // Gỗ nâu nổi
+  static const darkSeparator     = Color(0xFF4A4038); // Viền gỗ ấm
   static const darkTextPrimary   = Color(0xFFF5F0E8); // Giấy dó sáng
   static const darkTextSecondary = Color(0xFFD9CEBD); // Ngà nhạt
 

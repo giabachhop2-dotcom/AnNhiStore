@@ -90,20 +90,30 @@ class _AnimatedNavBarState extends State<AnimatedNavBar>
   Widget build(BuildContext context) {
     final bottomPadding = MediaQuery.of(context).padding.bottom;
 
+    final isDark = CupertinoTheme.brightnessOf(context) == Brightness.dark;
+
     return Container(
       decoration: BoxDecoration(
-        color: CupertinoColors.systemBackground.resolveFrom(context),
+        gradient: LinearGradient(
+          begin: Alignment.topCenter,
+          end: Alignment.bottomCenter,
+          colors: isDark
+              ? [AppTheme.darkElevated, AppTheme.darkSurface]
+              : [AppTheme.surfaceWhite, AppTheme.primaryBg],
+        ),
         border: Border(
           top: BorderSide(
-            color: AppTheme.separator.withValues(alpha: 0.2),
+            color: isDark
+                ? AppTheme.accentGold.withValues(alpha: 0.15)
+                : AppTheme.accentGold.withValues(alpha: 0.2),
             width: 0.5,
           ),
         ),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withValues(alpha: 0.04),
-            blurRadius: 10,
-            offset: const Offset(0, -2),
+            color: Colors.black.withValues(alpha: isDark ? 0.3 : 0.06),
+            blurRadius: 12,
+            offset: const Offset(0, -3),
           ),
         ],
       ),
@@ -112,10 +122,10 @@ class _AnimatedNavBarState extends State<AnimatedNavBar>
         child: Padding(
           padding: EdgeInsets.only(bottom: bottomPadding > 0 ? 0 : 4),
           child: SizedBox(
-            height: 56,
+            height: 58,
             child: Stack(
               children: [
-                // Flowing indicator
+                // Glowing gold indicator
                 AnimatedPositioned(
                   duration: const Duration(milliseconds: 300),
                   curve: Curves.easeOutCubic,
@@ -125,10 +135,19 @@ class _AnimatedNavBarState extends State<AnimatedNavBar>
                     width: _tabWidth(context),
                     height: 3,
                     decoration: BoxDecoration(
-                      color: AppTheme.primaryDark,
+                      gradient: const LinearGradient(
+                        colors: [AppTheme.accentGold, AppTheme.primaryDark],
+                      ),
                       borderRadius: const BorderRadius.vertical(
                         bottom: Radius.circular(2),
                       ),
+                      boxShadow: [
+                        BoxShadow(
+                          color: AppTheme.accentGold.withValues(alpha: 0.4),
+                          blurRadius: 8,
+                          spreadRadius: 1,
+                        ),
+                      ],
                     ),
                   ),
                 ),
@@ -229,7 +248,9 @@ class _TabItemState extends State<_TabItem>
 
   @override
   Widget build(BuildContext context) {
-    final color = widget.isActive ? AppTheme.primaryDark : AppTheme.textMuted;
+    final isDark = CupertinoTheme.brightnessOf(context) == Brightness.dark;
+    final activeColor = isDark ? AppTheme.accentGold : AppTheme.primaryDark;
+    final color = widget.isActive ? activeColor : AppTheme.textMuted;
 
     Widget iconWidget = ScaleTransition(
       scale: _scale,
