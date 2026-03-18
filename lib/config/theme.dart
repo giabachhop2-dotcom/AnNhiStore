@@ -1,6 +1,7 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'design_tokens.dart';
 
 /// An Nhi Trà – Trà Đạo Classical Theme
 /// Deep tea-green tones, warm parchment, antique gold accents.
@@ -12,7 +13,6 @@ class AppTheme {
   static const primaryLight = Color(0xFF4A7C5C); // Lá trà nhạt
   static const primaryBg = Color(0xFFF5F0E8); // Giấy dó cổ / parchment
   static const accentGold = Color(0xFFC49B2C); // Vàng đồng cổ
-  static const priceRed = Color(0xFFC62828); // Đỏ son
   static const surfaceWhite = Color(0xFFFAF8F4); // Trắng ngà
   static const textPrimary = Color(0xFF2C2416); // Mực nâu đậm
   static const textSecondary = Color(0xFF5C4E3C); // Mực nâu nhạt
@@ -20,12 +20,15 @@ class AppTheme {
   static const separator = Color(0xFFD9CEBD); // Gạch ngà
   static const groupedBg = Color(0xFFF0EBE0); // Nền grouped ấm
 
-  // ── Animation Constants ──
-  static const Duration animFast = Duration(milliseconds: 150);
-  static const Duration animNormal = Duration(milliseconds: 300);
-  static const Duration animSlow = Duration(milliseconds: 500);
-  static const Curve springCurve = Curves.elasticOut;
-  static const Curve smoothCurve = Curves.easeOutCubic;
+  /// ⚠️ DEPRECATED — use BrandColors.goldMid instead
+  static const priceRed = BrandColors.goldMid;
+
+  // ── Animation Constants (delegate to design tokens) ──
+  static const Duration animFast = Anim.fast;
+  static const Duration animNormal = Anim.normal;
+  static const Duration animSlow = Anim.slow;
+  static const Curve springCurve = Anim.spring;
+  static const Curve smoothCurve = Anim.smooth;
 
   /// Cupertino theme — Trà Đạo classical style
   static CupertinoThemeData get cupertinoTheme {
@@ -64,7 +67,7 @@ class AppTheme {
         primary: primaryDark,
         secondary: accentGold,
         surface: surfaceWhite,
-        error: priceRed,
+        error: BrandColors.error,
       ),
       scaffoldBackgroundColor: groupedBg,
       appBarTheme: const AppBarTheme(
@@ -76,7 +79,7 @@ class AppTheme {
         color: surfaceWhite,
         elevation: 0,
         shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(12),
+          borderRadius: Radii.borderMd,
           side: BorderSide(color: separator.withValues(alpha: 0.4)),
         ),
       ),
@@ -84,12 +87,12 @@ class AppTheme {
         filled: true,
         fillColor: surfaceWhite,
         border: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(10),
+          borderRadius: Radii.borderSm,
           borderSide: BorderSide(color: separator),
         ),
         contentPadding: const EdgeInsets.symmetric(
-          horizontal: 16,
-          vertical: 12,
+          horizontal: Spacing.md,
+          vertical: Spacing.sm,
         ),
       ),
     );
@@ -108,11 +111,11 @@ class AppTheme {
     );
   }
 
-  // ── Dark Mode — Trà Đạo đêm (deep tea-green) ──
-  static const darkSurface = Color(0xFF0D1F14); // Rêu trà đậm đêm
-  static const darkGroupedBg = Color(0xFF0A1A10); // Nền xanh trà sâu
-  static const darkElevated = Color(0xFF16291E); // Lá trà nổi
-  static const darkSeparator = Color(0xFF2A4035); // Viền rêu ấm
+  // ── Dark Mode — Trà Đạo đêm (deep tea-green, NOT black) ──
+  static const darkSurface = Color(0xFF0F2518); // Rêu trà đậm đêm
+  static const darkGroupedBg = Color(0xFF0B1E12); // Nền xanh trà sâu
+  static const darkElevated = Color(0xFF162D1E); // Lá trà nổi
+  static const darkSeparator = Color(0xFF2A4A35); // Viền rêu ấm
   static const darkTextPrimary = Color(0xFFF5F0E8); // Giấy dó sáng
   static const darkTextSecondary = Color(0xFFD9CEBD); // Ngà nhạt
 
@@ -156,14 +159,14 @@ class AppTheme {
         primary: accentGold,
         secondary: primaryDark,
         surface: darkSurface,
-        error: priceRed,
+        error: BrandColors.error,
       ),
       scaffoldBackgroundColor: darkGroupedBg,
       cardTheme: CardThemeData(
         color: darkElevated,
         elevation: 0,
         shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(12),
+          borderRadius: Radii.borderMd,
           side: BorderSide(color: darkSeparator.withValues(alpha: 0.4)),
         ),
       ),

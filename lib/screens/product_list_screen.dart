@@ -9,6 +9,7 @@ import '../widgets/animated_product_card.dart';
 import '../widgets/shimmer_grid.dart';
 import '../widgets/empty_state.dart';
 import '../config/theme.dart';
+import '../config/design_tokens.dart';
 
 /// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 /// PRODUCT LIST — 2-Step Category-First Browsing
@@ -53,9 +54,11 @@ class _ProductListScreenState extends ConsumerState<ProductListScreen> {
   bool _showingCategoryBrowse = true; // Start with category selection
   String? _selectedType;
   int? _selectedListId;
+  int? _selectedBrandId;
   int _currentPage = 1;
   List<Product> _products = [];
   List<ProductCategory> _allLists = [];
+  List<CategoryTreeType> _categoryTree = [];
   bool _isLoading = true;
   bool _categoriesLoading = true;
   int _totalPages = 1;
@@ -85,9 +88,13 @@ class _ProductListScreenState extends ConsumerState<ProductListScreen> {
 
   Future<void> _loadCategories() async {
     try {
+      // Use new category-tree API
+      final tree = await ref.read(apiServiceProvider).getCategoryTree();
+      // Also load legacy list for backward compat
       final data = await ref.read(apiServiceProvider).getProductCategories();
       if (mounted) {
         setState(() {
+          _categoryTree = tree;
           _allLists = (data['lists'] as List)
               .map((e) => ProductCategory.fromJson(e))
               .where((c) => c.type != 'san-pham')
@@ -108,6 +115,7 @@ class _ProductListScreenState extends ConsumerState<ProductListScreen> {
           .getProducts(
             page: _currentPage,
             listId: _selectedListId,
+            brandId: _selectedBrandId,
             limit: 20,
             search: _searchQuery.isNotEmpty ? _searchQuery : null,
           );
@@ -146,6 +154,7 @@ class _ProductListScreenState extends ConsumerState<ProductListScreen> {
     setState(() {
       _selectedType = typeKey;
       _selectedListId = null;
+      _selectedBrandId = null;
       _currentPage = 1;
       _showingCategoryBrowse = false;
     });
@@ -179,6 +188,17 @@ class _ProductListScreenState extends ConsumerState<ProductListScreen> {
     HapticFeedback.selectionClick();
     setState(() {
       _selectedListId = listId;
+      _selectedBrandId = null;
+      _currentPage = 1;
+    });
+    _loadProducts();
+  }
+
+  /// Filter by nghệ nhân (brand) for am-tu-sa
+  void _selectBrand(int? brandId) {
+    HapticFeedback.selectionClick();
+    setState(() {
+      _selectedBrandId = brandId;
       _currentPage = 1;
     });
     _loadProducts();
@@ -686,6 +706,12 @@ class _ProductListScreenState extends ConsumerState<ProductListScreen> {
               ),
             ),
 
+          // ── Nghệ Nhân Brand Filter (am-tu-sa only) ──
+          if (_selectedType == 'am-tu-sa' && _categoryTree.isNotEmpty)
+            SliverToBoxAdapter(
+              child: _buildBrandFilter(isDark, currentType.color),
+            ),
+
           // ── Filter Status Bar ──
           SliverToBoxAdapter(
             child: Padding(
@@ -833,13 +859,75 @@ class _ProductListScreenState extends ConsumerState<ProductListScreen> {
     );
   }
 
+  Widget _buildBrandFilter(bool isDark, Color accent) {
+    // Get brand data from categoryTree for am-tu-sa
+    final amTuSaType = _categoryTree.cast<CategoryTreeType?>().firstWhere(
+      (t) => t?.type == 'am-tu-sa',
+      orElse: () => null,
+    );
+    if (amTuSaType == null || amTuSaType.brands.isEmpty) {
+      return const SizedBox.shrink();
+    }
+
+    final brands = amTuSaType.brands;
+
+    return Padding(
+      padding: const EdgeInsets.only(top: 4),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Padding(
+            padding: const EdgeInsets.fromLTRB(16, 4, 16, 6),
+            child: Text(
+              'Nghệ nhân',
+              style: TextStyle(
+                fontSize: 11,
+                fontWeight: FontWeight.w600,
+                letterSpacing: 0.5,
+                color: isDark ? AppTheme.darkTextSecondary : AppTheme.textMuted,
+              ),
+            ),
+          ),
+          SizedBox(
+            height: 32,
+            child: ListView(
+              scrollDirection: Axis.horizontal,
+              physics: const BouncingScrollPhysics(),
+              padding: const EdgeInsets.symmetric(horizontal: 12),
+              children: [
+                _buildCompactPill(
+                  'Tất cả',
+                  _selectedBrandId == null,
+                  BrandColors.amTuSa,
+                  isDark,
+                  () => _selectBrand(null),
+                ),
+                ...brands.map(
+                  (brand) => _buildCompactPill(
+                    brand.name ?? '',
+                    _selectedBrandId == brand.id,
+                    BrandColors.amTuSa,
+                    isDark,
+                    () => _selectBrand(brand.id),
+                    count: brand.productCount,
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
   Widget _buildCompactPill(
     String label,
     bool selected,
     Color accent,
     bool isDark,
-    VoidCallback onTap,
-  ) {
+    VoidCallback onTap, {
+    int? count,
+  }) {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 3),
       child: GestureDetector(
@@ -863,17 +951,39 @@ class _ProductListScreenState extends ConsumerState<ProductListScreen> {
               width: selected ? 1.2 : 0.5,
             ),
           ),
-          child: Text(
-            label,
-            style: TextStyle(
-              fontSize: 11,
-              fontWeight: selected ? FontWeight.w700 : FontWeight.w500,
-              color: selected
-                  ? accent
-                  : (isDark
-                        ? AppTheme.darkTextSecondary
-                        : AppTheme.textSecondary),
-            ),
+          child: Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Text(
+                label,
+                style: TextStyle(
+                  fontSize: 11,
+                  fontWeight: selected ? FontWeight.w700 : FontWeight.w500,
+                  color: selected
+                      ? accent
+                      : (isDark
+                            ? AppTheme.darkTextSecondary
+                            : AppTheme.textSecondary),
+                ),
+              ),
+              if (count != null) ...[
+                const SizedBox(width: 4),
+                Text(
+                  '$count',
+                  style: TextStyle(
+                    fontSize: 9,
+                    fontWeight: FontWeight.w700,
+                    color: selected
+                        ? accent.withValues(alpha: 0.7)
+                        : (isDark
+                              ? AppTheme.darkTextSecondary.withValues(
+                                  alpha: 0.5,
+                                )
+                              : AppTheme.textMuted.withValues(alpha: 0.7)),
+                  ),
+                ),
+              ],
+            ],
           ),
         ),
       ),

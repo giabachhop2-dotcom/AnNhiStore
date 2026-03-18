@@ -49,6 +49,7 @@ class Radii {
   static BorderRadius get borderLg => BorderRadius.circular(lg);
   static BorderRadius get borderXl => BorderRadius.circular(xl);
   static BorderRadius get borderPill => BorderRadius.circular(pill);
+  static BorderRadius get borderFull => BorderRadius.circular(pill);
 }
 
 // ────────────────────────────────────────────────────
@@ -325,6 +326,7 @@ class Anim {
   // Curves
   static const Curve springy = Curves.elasticOut;
   static const Curve smooth = Curves.easeOutCubic;
+  static const Curve spring = Curves.elasticOut;
   static const Curve decelerate = Curves.decelerate;
   static const Curve sharp = Curves.easeInOutCubic;
 
@@ -347,6 +349,7 @@ class BrandColors {
 
   /// Status colors
   static const Color success = Color(0xFF2E7D32);
+  static const Color error = Color(0xFFC62828);
   static const Color warning = Color(0xFFE65100);
   static const Color info = Color(0xFF1565C0);
   static const Color zalo = Color(0xFF0068FF);
