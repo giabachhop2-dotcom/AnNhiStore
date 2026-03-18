@@ -4,6 +4,7 @@ class Product {
   final int? idList;
   final int? idCat;
   final int? idItem;
+  final int? idBrand;
   final String? photo;
   final String? slugvi;
   final String? namevi;
@@ -25,6 +26,7 @@ class Product {
     this.idList,
     this.idCat,
     this.idItem,
+    this.idBrand,
     this.photo,
     this.slugvi,
     this.namevi,
@@ -48,6 +50,7 @@ class Product {
       idList: json['id_list'] as int?,
       idCat: json['id_cat'] as int?,
       idItem: json['id_item'] as int?,
+      idBrand: json['id_brand'] as int?,
       photo: json['photo'] as String?,
       slugvi: json['slugvi'] as String?,
       namevi: json['namevi'] as String?,
@@ -67,10 +70,15 @@ class Product {
   }
 
   /// Display price — sale price if available, else regular
-  double get displayPrice => (salePrice != null && salePrice! > 0) ? salePrice! : (regularPrice ?? 0);
+  double get displayPrice =>
+      (salePrice != null && salePrice! > 0) ? salePrice! : (regularPrice ?? 0);
 
   /// Whether product is on sale
-  bool get isOnSale => salePrice != null && salePrice! > 0 && regularPrice != null && regularPrice! > salePrice!;
+  bool get isOnSale =>
+      salePrice != null &&
+      salePrice! > 0 &&
+      regularPrice != null &&
+      regularPrice! > salePrice!;
 }
 
 /// Product category tree node
@@ -284,4 +292,99 @@ class CartItem {
   CartItem({required this.product, this.quantity = 1});
 
   double get lineTotal => product.displayPrice * quantity;
+}
+
+// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+// CATEGORY TREE MODELS
+// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+/// A product type (am-tu-sa, tra, tra-cu) in the category tree
+class CategoryTreeType {
+  final String type;
+  final String label;
+  final String icon;
+  final String color;
+  final int productCount;
+  final List<CategoryNode> categories;
+  final List<BrandNode> brands;
+
+  CategoryTreeType({
+    required this.type,
+    required this.label,
+    required this.icon,
+    required this.color,
+    required this.productCount,
+    required this.categories,
+    required this.brands,
+  });
+
+  factory CategoryTreeType.fromJson(Map<String, dynamic> json) {
+    return CategoryTreeType(
+      type: json['type'] as String,
+      label: json['label'] as String,
+      icon: json['icon'] as String? ?? 'box',
+      color: json['color'] as String? ?? '#666',
+      productCount: json['productCount'] as int? ?? 0,
+      categories: (json['categories'] as List? ?? [])
+          .map((e) => CategoryNode.fromJson(e))
+          .toList(),
+      brands: (json['brands'] as List? ?? [])
+          .map((e) => BrandNode.fromJson(e))
+          .toList(),
+    );
+  }
+}
+
+/// A category node (sub-list within a type)
+class CategoryNode {
+  final int id;
+  final String? name;
+  final String? slug;
+  final String? photo;
+  final int productCount;
+
+  CategoryNode({
+    required this.id,
+    this.name,
+    this.slug,
+    this.photo,
+    required this.productCount,
+  });
+
+  factory CategoryNode.fromJson(Map<String, dynamic> json) {
+    return CategoryNode(
+      id: json['id'] as int,
+      name: json['name'] as String?,
+      slug: json['slug'] as String?,
+      photo: json['photo'] as String?,
+      productCount: json['productCount'] as int? ?? 0,
+    );
+  }
+}
+
+/// A brand node (nghệ nhân for am-tu-sa)
+class BrandNode {
+  final int id;
+  final String? name;
+  final String? slug;
+  final String? photo;
+  final int productCount;
+
+  BrandNode({
+    required this.id,
+    this.name,
+    this.slug,
+    this.photo,
+    required this.productCount,
+  });
+
+  factory BrandNode.fromJson(Map<String, dynamic> json) {
+    return BrandNode(
+      id: json['id'] as int,
+      name: json['name'] as String?,
+      slug: json['slug'] as String?,
+      photo: json['photo'] as String?,
+      productCount: json['productCount'] as int? ?? 0,
+    );
+  }
 }

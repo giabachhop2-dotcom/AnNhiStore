@@ -7,12 +7,14 @@ class ApiService {
   late final Dio _dio;
 
   ApiService() {
-    _dio = Dio(BaseOptions(
-      baseUrl: ApiConfig.apiBase,
-      connectTimeout: const Duration(seconds: 10),
-      receiveTimeout: const Duration(seconds: 10),
-      headers: {'Content-Type': 'application/json'},
-    ));
+    _dio = Dio(
+      BaseOptions(
+        baseUrl: ApiConfig.apiBase,
+        connectTimeout: const Duration(seconds: 10),
+        receiveTimeout: const Duration(seconds: 10),
+        headers: {'Content-Type': 'application/json'},
+      ),
+    );
   }
 
   /// Set auth token for admin/member requests
@@ -33,10 +35,7 @@ class ApiService {
     int? catId,
     String? search,
   }) async {
-    final params = <String, dynamic>{
-      'page': page,
-      'limit': limit,
-    };
+    final params = <String, dynamic>{'page': page, 'limit': limit};
     if (listId != null) params['list'] = listId;
     if (catId != null) params['cat'] = catId;
     if (search != null && search.isNotEmpty) params['search'] = search;
@@ -78,7 +77,9 @@ class ApiService {
     final res = await _dio.get('/news', queryParameters: params);
     final data = res.data['data'];
     return (
-      items: (data['items'] as List).map((e) => NewsArticle.fromJson(e)).toList(),
+      items: (data['items'] as List)
+          .map((e) => NewsArticle.fromJson(e))
+          .toList(),
       total: data['total'] as int,
     );
   }
@@ -113,6 +114,36 @@ class ApiService {
     return res.data['data'] as Map<String, dynamic>;
   }
 
+  // ── Category Tree ──
+
+  Future<List<CategoryTreeType>> getCategoryTree() async {
+    final res = await _dio.get('/products/category-tree');
+    final tree = res.data['data']['tree'] as List;
+    return tree.map((e) => CategoryTreeType.fromJson(e)).toList();
+  }
+
+  // ── Products by Brand (nghệ nhân) ──
+
+  Future<({List<Product> items, int total, int totalPages})>
+  getProductsByBrand({
+    required int brandId,
+    int page = 1,
+    int limit = 12,
+  }) async {
+    final params = <String, dynamic>{
+      'page': page,
+      'limit': limit,
+      'brand': brandId,
+    };
+    final res = await _dio.get('/products', queryParameters: params);
+    final data = res.data['data'];
+    return (
+      items: (data['items'] as List).map((e) => Product.fromJson(e)).toList(),
+      total: data['total'] as int,
+      totalPages: data['totalPages'] as int,
+    );
+  }
+
   // ── Orders ──
 
   Future<Map<String, dynamic>> createOrder(Order order) async {
@@ -128,12 +159,15 @@ class ApiService {
     String? email,
     String? content,
   }) async {
-    await _dio.post('/contacts', data: {
-      'fullname': fullname,
-      'phone': phone,
-      'email': email ?? '',
-      'content': content ?? '',
-    });
+    await _dio.post(
+      '/contacts',
+      data: {
+        'fullname': fullname,
+        'phone': phone,
+        'email': email ?? '',
+        'content': content ?? '',
+      },
+    );
   }
 
   // ── Settings ──
