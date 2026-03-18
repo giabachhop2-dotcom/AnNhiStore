@@ -340,8 +340,25 @@ class _ProductDetailScreenState extends ConsumerState<ProductDetailScreen>
                                       ? AppTheme.darkTextPrimary
                                       : AppTheme.textPrimary,
                                   fontSize: 15,
-                                  height: 1.6,
+                                  height: 1.7,
+                                  letterSpacing: 0.1,
                                 ),
+                                customStylesBuilder: (element) {
+                                  if (element.localName == 'a') {
+                                    return {
+                                      'text-decoration': 'none',
+                                      'color': '#C8A96E',
+                                      'font-weight': '600',
+                                    };
+                                  }
+                                  if (element.localName == 'strong' ||
+                                      element.localName == 'b') {
+                                    return {
+                                      'color': isDark ? '#F5EFE3' : '#2C1810',
+                                    };
+                                  }
+                                  return null;
+                                },
                               ),
                             ],
                           ],
@@ -438,7 +455,18 @@ class _ProductDetailScreenState extends ConsumerState<ProductDetailScreen>
                                           fit: BoxFit.cover,
                                           errorWidget: (_, _a, _b) => Container(
                                             height: 130,
-                                            color: AppTheme.groupedBg,
+                                            color: isDark
+                                                ? AppTheme.darkSurface
+                                                : AppTheme.groupedBg,
+                                            child: Center(
+                                              child: Icon(
+                                                CupertinoIcons.photo,
+                                                color: isDark
+                                                    ? AppTheme.darkTextSecondary
+                                                    : AppTheme.textMuted,
+                                                size: 24,
+                                              ),
+                                            ),
                                           ),
                                         ),
                                       ),
@@ -515,12 +543,14 @@ class _ProductDetailScreenState extends ConsumerState<ProductDetailScreen>
                       MediaQuery.of(context).padding.bottom + 12,
                     ),
                     decoration: BoxDecoration(
-                      color: CupertinoColors.systemBackground.resolveFrom(
-                        context,
-                      ),
+                      color: isDark
+                          ? AppTheme.darkElevated
+                          : AppTheme.surfaceWhite,
                       border: Border(
                         top: BorderSide(
-                          color: AppTheme.separator.withValues(alpha: 0.3),
+                          color: isDark
+                              ? AppTheme.darkSeparator.withValues(alpha: 0.2)
+                              : AppTheme.separator.withValues(alpha: 0.3),
                         ),
                       ),
                     ),
@@ -534,7 +564,8 @@ class _ProductDetailScreenState extends ConsumerState<ProductDetailScreen>
                               'Tổng',
                               style: TextStyle(
                                 color: AppTheme.textMuted,
-                                fontSize: 12,
+                                fontSize: 13,
+                                fontWeight: FontWeight.w500,
                               ),
                             ),
                             product!.displayPrice > 0
@@ -704,16 +735,6 @@ class _ProductDetailScreenState extends ConsumerState<ProductDetailScreen>
 
   Widget _buildInfoSection(bool isDark) {
     final p = product!;
-    final specs = <Map<String, String>>[
-      if (p.type != null && p.type!.isNotEmpty)
-        {'icon': '🍃', 'label': 'Loại sản phẩm', 'value': p.type!},
-      if (p.code != null && p.code!.isNotEmpty)
-        {'icon': '📦', 'label': 'Mã sản phẩm', 'value': p.code!},
-      {'icon': '🏔️', 'label': 'Nguồn gốc', 'value': 'Hà Giang, Việt Nam'},
-      {'icon': '🌿', 'label': 'Chất lượng', 'value': 'Hữu cơ tự nhiên'},
-    ];
-
-    if (specs.isEmpty) return const SizedBox.shrink();
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -724,7 +745,11 @@ class _ProductDetailScreenState extends ConsumerState<ProductDetailScreen>
               width: 4,
               height: 22,
               decoration: BoxDecoration(
-                color: AppTheme.accentGold,
+                gradient: const LinearGradient(
+                  begin: Alignment.topCenter,
+                  end: Alignment.bottomCenter,
+                  colors: [AppTheme.accentGold, AppTheme.primaryDark],
+                ),
                 borderRadius: BorderRadius.circular(2),
               ),
             ),
@@ -740,71 +765,94 @@ class _ProductDetailScreenState extends ConsumerState<ProductDetailScreen>
             ),
           ],
         ),
-        const SizedBox(height: 14),
-        Container(
-          padding: const EdgeInsets.all(16),
-          decoration: BoxDecoration(
-            color: isDark
-                ? AppTheme.darkSurface.withValues(alpha: 0.5)
-                : AppTheme.groupedBg,
-            borderRadius: BorderRadius.circular(14),
-            border: Border.all(
-              color: isDark
-                  ? AppTheme.darkSeparator.withValues(alpha: 0.2)
-                  : AppTheme.separator.withValues(alpha: 0.3),
-            ),
-          ),
-          child: Column(
-            children: [
-              for (int i = 0; i < specs.length; i++) ...[
-                if (i > 0)
-                  Divider(
-                    color: isDark
-                        ? AppTheme.darkSeparator.withValues(alpha: 0.15)
-                        : AppTheme.separator.withValues(alpha: 0.3),
-                    height: 20,
-                  ),
-                Row(
-                  children: [
-                    Text(
-                      specs[i]['icon']!,
-                      style: const TextStyle(fontSize: 18),
-                    ),
-                    const SizedBox(width: 12),
-                    Expanded(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            specs[i]['label']!,
-                            style: TextStyle(
-                              fontSize: 12,
-                              color: isDark
-                                  ? AppTheme.darkTextSecondary
-                                  : AppTheme.textMuted,
-                            ),
-                          ),
-                          const SizedBox(height: 2),
-                          Text(
-                            specs[i]['value']!,
-                            style: TextStyle(
-                              fontSize: 15,
-                              fontWeight: FontWeight.w600,
-                              color: isDark
-                                  ? AppTheme.darkTextPrimary
-                                  : AppTheme.textPrimary,
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                  ],
-                ),
-              ],
-            ],
-          ),
-        ),
+        const SizedBox(height: 16),
+        // 2-column specs grid
+        _buildSpecsGrid(isDark, p),
       ],
     );
   }
+
+  Widget _buildSpecsGrid(bool isDark, Product p) {
+    final specs = [
+      _SpecItem(CupertinoIcons.tag, 'Loại SP', p.type ?? 'Trà & Ấm'),
+      _SpecItem(CupertinoIcons.barcode, 'Mã SP', p.code ?? '—'),
+      _SpecItem(CupertinoIcons.location, 'Nguồn gốc', 'Hà Giang'),
+      _SpecItem(CupertinoIcons.leaf_arrow_circlepath, 'Chất lượng', 'Hữu cơ'),
+      _SpecItem(CupertinoIcons.shield_lefthalf_fill, 'Chứng nhận', 'ATTP'),
+      _SpecItem(CupertinoIcons.cube_box, 'Bảo quản', 'Khô, thoáng'),
+    ];
+
+    return GridView.builder(
+      shrinkWrap: true,
+      physics: const NeverScrollableScrollPhysics(),
+      gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+        crossAxisCount: 2,
+        childAspectRatio: 2.8,
+        crossAxisSpacing: 10,
+        mainAxisSpacing: 10,
+      ),
+      itemCount: specs.length,
+      itemBuilder: (context, index) {
+        final spec = specs[index];
+        return Container(
+          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+          decoration: BoxDecoration(
+            color: isDark
+                ? AppTheme.darkSurface.withValues(alpha: 0.6)
+                : const Color(0xFFFAF7F2),
+            borderRadius: BorderRadius.circular(12),
+            border: Border.all(
+              color: isDark
+                  ? AppTheme.darkSeparator.withValues(alpha: 0.15)
+                  : AppTheme.accentGold.withValues(alpha: 0.15),
+            ),
+          ),
+          child: Row(
+            children: [
+              Icon(spec.icon, size: 18, color: AppTheme.accentGold),
+              const SizedBox(width: 8),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Text(
+                      spec.label,
+                      style: TextStyle(
+                        fontSize: 10,
+                        fontWeight: FontWeight.w500,
+                        color: isDark
+                            ? AppTheme.darkTextSecondary
+                            : AppTheme.textMuted,
+                        letterSpacing: 0.3,
+                      ),
+                    ),
+                    Text(
+                      spec.value,
+                      style: TextStyle(
+                        fontSize: 13,
+                        fontWeight: FontWeight.w600,
+                        color: isDark
+                            ? AppTheme.darkTextPrimary
+                            : AppTheme.textPrimary,
+                      ),
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
+        );
+      },
+    );
+  }
+}
+
+class _SpecItem {
+  final IconData icon;
+  final String label;
+  final String value;
+  const _SpecItem(this.icon, this.label, this.value);
 }

@@ -1,4 +1,5 @@
 import 'package:flutter/cupertino.dart';
+import 'package:intl/intl.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -145,6 +146,10 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
 
                     // ── Quick Category Access ──
                     SliverToBoxAdapter(child: _buildCategoryGrid()),
+
+                    // ── Featured Products Carousel ──
+                    if (productsAmTuSa.isNotEmpty || productsTra.isNotEmpty)
+                      SliverToBoxAdapter(child: _buildFeaturedCarousel()),
 
                     // ── Daily Tea Wisdom ──
                     const SliverToBoxAdapter(child: DailyTeaWisdom()),
@@ -430,6 +435,200 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
           );
         }).toList(),
       ),
+    );
+  }
+
+  Widget _buildFeaturedCarousel() {
+    final isDark = CupertinoTheme.brightnessOf(context) == Brightness.dark;
+    final allProducts = [...productsAmTuSa, ...productsTra];
+    final featured = allProducts.take(5).toList();
+    if (featured.isEmpty) return const SizedBox.shrink();
+
+    final formatter = NumberFormat.currency(locale: 'vi_VN', symbol: '₫');
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Padding(
+          padding: const EdgeInsets.fromLTRB(16, 16, 16, 12),
+          child: Row(
+            children: [
+              Container(
+                width: 4,
+                height: 20,
+                decoration: BoxDecoration(
+                  gradient: const LinearGradient(
+                    begin: Alignment.topCenter,
+                    end: Alignment.bottomCenter,
+                    colors: [AppTheme.accentGold, AppTheme.primaryDark],
+                  ),
+                  borderRadius: BorderRadius.circular(2),
+                ),
+              ),
+              const SizedBox(width: 8),
+              Text(
+                'Sản Phẩm Nổi Bật',
+                style: TextStyle(
+                  fontSize: 20,
+                  fontWeight: FontWeight.bold,
+                  color: isDark
+                      ? AppTheme.darkTextPrimary
+                      : AppTheme.textPrimary,
+                  letterSpacing: -0.3,
+                ),
+              ),
+            ],
+          ),
+        ),
+        CarouselSlider(
+          items: featured.map((product) {
+            final imgUrl = ApiService.getImageUrl(product.photo, 'product');
+            return GestureDetector(
+              onTap: () {
+                HapticFeedback.mediumImpact();
+                context.push('/product/${product.id}');
+              },
+              child: Container(
+                margin: const EdgeInsets.symmetric(horizontal: 4),
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(16),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.black.withValues(
+                        alpha: isDark ? 0.3 : 0.12,
+                      ),
+                      blurRadius: 16,
+                      offset: const Offset(0, 6),
+                    ),
+                  ],
+                ),
+                child: ClipRRect(
+                  borderRadius: BorderRadius.circular(16),
+                  child: Stack(
+                    fit: StackFit.expand,
+                    children: [
+                      // Product image
+                      Hero(
+                        tag: 'product-${product.id}',
+                        child: CachedNetworkImage(
+                          imageUrl: imgUrl,
+                          fit: BoxFit.cover,
+                          errorWidget: (_, _a, _b) => Container(
+                            color: isDark
+                                ? AppTheme.darkSurface
+                                : AppTheme.groupedBg,
+                            child: Center(
+                              child: Icon(
+                                CupertinoIcons.photo,
+                                size: 40,
+                                color: isDark
+                                    ? AppTheme.darkTextSecondary
+                                    : AppTheme.textMuted,
+                              ),
+                            ),
+                          ),
+                        ),
+                      ),
+                      // Gradient overlay
+                      Positioned(
+                        bottom: 0,
+                        left: 0,
+                        right: 0,
+                        child: Container(
+                          padding: const EdgeInsets.fromLTRB(16, 32, 16, 14),
+                          decoration: BoxDecoration(
+                            gradient: LinearGradient(
+                              begin: Alignment.topCenter,
+                              end: Alignment.bottomCenter,
+                              colors: [
+                                Colors.transparent,
+                                Colors.black.withValues(alpha: 0.7),
+                              ],
+                            ),
+                          ),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                product.namevi ?? '',
+                                maxLines: 1,
+                                overflow: TextOverflow.ellipsis,
+                                style: const TextStyle(
+                                  color: CupertinoColors.white,
+                                  fontSize: 16,
+                                  fontWeight: FontWeight.bold,
+                                  letterSpacing: -0.3,
+                                ),
+                              ),
+                              const SizedBox(height: 4),
+                              Row(
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceBetween,
+                                children: [
+                                  product.displayPrice > 0
+                                      ? Text(
+                                          formatter.format(
+                                            product.displayPrice,
+                                          ),
+                                          style: const TextStyle(
+                                            color: AppTheme.accentGold,
+                                            fontSize: 15,
+                                            fontWeight: FontWeight.w700,
+                                          ),
+                                        )
+                                      : const Text(
+                                          'Liên hệ',
+                                          style: TextStyle(
+                                            color: AppTheme.accentGold,
+                                            fontSize: 14,
+                                            fontWeight: FontWeight.w600,
+                                            fontStyle: FontStyle.italic,
+                                          ),
+                                        ),
+                                  Container(
+                                    padding: const EdgeInsets.symmetric(
+                                      horizontal: 10,
+                                      vertical: 4,
+                                    ),
+                                    decoration: BoxDecoration(
+                                      color: AppTheme.accentGold.withValues(
+                                        alpha: 0.9,
+                                      ),
+                                      borderRadius: BorderRadius.circular(12),
+                                    ),
+                                    child: const Text(
+                                      'Xem ngay',
+                                      style: TextStyle(
+                                        color: CupertinoColors.white,
+                                        fontSize: 11,
+                                        fontWeight: FontWeight.w600,
+                                      ),
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            );
+          }).toList(),
+          options: CarouselOptions(
+            height: 220,
+            viewportFraction: 0.85,
+            autoPlay: true,
+            autoPlayInterval: const Duration(seconds: 5),
+            autoPlayAnimationDuration: const Duration(milliseconds: 800),
+            autoPlayCurve: Curves.easeInOutCubic,
+            enlargeCenterPage: true,
+            enlargeFactor: 0.12,
+          ),
+        ),
+      ],
     );
   }
 
