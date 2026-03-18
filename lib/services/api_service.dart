@@ -153,6 +153,42 @@ class ApiService {
     return res.data['data'] as Map<String, dynamic>;
   }
 
+  // ── Reviews ──
+
+  Future<({List<ProductReview> reviews, int total, double avgRating})>
+  getReviews(int productId, {int page = 1, int limit = 10}) async {
+    final res = await _dio.get(
+      '/products/$productId/reviews',
+      queryParameters: {'page': page, 'limit': limit},
+    );
+    final data = res.data['data'];
+    return (
+      reviews: (data['reviews'] as List)
+          .map((e) => ProductReview.fromJson(e))
+          .toList(),
+      total: data['total'] as int,
+      avgRating: (data['avgRating'] as num?)?.toDouble() ?? 0,
+    );
+  }
+
+  Future<void> submitReview(
+    int productId, {
+    required String authorName,
+    required int rating,
+    String? content,
+    String? authorPhone,
+  }) async {
+    await _dio.post(
+      '/products/$productId/reviews',
+      data: {
+        'author_name': authorName,
+        'rating': rating,
+        'content': content ?? '',
+        'author_phone': authorPhone ?? '',
+      },
+    );
+  }
+
   // ── Contacts ──
 
   Future<void> sendContact({

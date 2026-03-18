@@ -20,6 +20,12 @@ class Product {
   final int? view;
   final String? status;
   final String? type;
+  final int? dateCreated;
+  final Map<String, String> specs;
+  final List<GalleryImage> gallery;
+  final int commentsCount;
+  final double avgRating;
+  final int reviewsCount;
 
   Product({
     required this.id,
@@ -42,6 +48,12 @@ class Product {
     this.view,
     this.status,
     this.type,
+    this.dateCreated,
+    this.specs = const {},
+    this.gallery = const [],
+    this.commentsCount = 0,
+    this.avgRating = 0,
+    this.reviewsCount = 0,
   });
 
   factory Product.fromJson(Map<String, dynamic> json) {
@@ -66,6 +78,22 @@ class Product {
       view: json['view'] as int?,
       status: json['status'] as String?,
       type: json['type'] as String?,
+      dateCreated: json['date_created'] as int?,
+      specs: json['specs'] != null && json['specs'] is Map
+          ? Map<String, String>.from(
+              (json['specs'] as Map).map(
+                (k, v) => MapEntry(k.toString(), v?.toString() ?? ''),
+              ),
+            )
+          : const {},
+      gallery: json['gallery'] != null && json['gallery'] is List
+          ? (json['gallery'] as List)
+                .map((g) => GalleryImage.fromJson(g as Map<String, dynamic>))
+                .toList()
+          : const [],
+      commentsCount: json['commentsCount'] as int? ?? 0,
+      avgRating: (json['avgRating'] as num?)?.toDouble() ?? 0,
+      reviewsCount: json['reviewsCount'] as int? ?? 0,
     );
   }
 
@@ -79,6 +107,50 @@ class Product {
       salePrice! > 0 &&
       regularPrice != null &&
       regularPrice! > salePrice!;
+}
+
+/// Gallery image model — maps to table_gallery
+class GalleryImage {
+  final int id;
+  final String? photo;
+  final String? namevi;
+
+  GalleryImage({required this.id, this.photo, this.namevi});
+
+  factory GalleryImage.fromJson(Map<String, dynamic> json) {
+    return GalleryImage(
+      id: json['id'] as int,
+      photo: json['photo'] as String?,
+      namevi: json['namevi'] as String?,
+    );
+  }
+}
+
+/// Product Review model — maps to table_product_reviews
+class ProductReview {
+  final int id;
+  final String authorName;
+  final int rating;
+  final String? content;
+  final int dateCreated;
+
+  ProductReview({
+    required this.id,
+    required this.authorName,
+    required this.rating,
+    this.content,
+    this.dateCreated = 0,
+  });
+
+  factory ProductReview.fromJson(Map<String, dynamic> json) {
+    return ProductReview(
+      id: json['id'] as int,
+      authorName: json['author_name'] as String? ?? 'Ẩn danh',
+      rating: json['rating'] as int? ?? 5,
+      content: json['content'] as String?,
+      dateCreated: json['date_created'] as int? ?? 0,
+    );
+  }
 }
 
 /// Product category tree node

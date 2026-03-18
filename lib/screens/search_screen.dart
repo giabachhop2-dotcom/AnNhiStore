@@ -160,9 +160,7 @@ class _SearchScreenState extends ConsumerState<SearchScreen>
       decoration: BoxDecoration(
         color: CupertinoColors.systemBackground.resolveFrom(context),
         border: Border(
-          bottom: BorderSide(
-            color: AppTheme.separator.withValues(alpha: 0.2),
-          ),
+          bottom: BorderSide(color: AppTheme.separator.withValues(alpha: 0.2)),
         ),
       ),
       child: Row(
@@ -192,10 +190,7 @@ class _SearchScreenState extends ConsumerState<SearchScreen>
             },
             child: const Text(
               'Hủy',
-              style: TextStyle(
-                fontSize: 16,
-                color: AppTheme.primaryDark,
-              ),
+              style: TextStyle(fontSize: 16, color: AppTheme.primaryDark),
             ),
           ),
         ],
@@ -241,10 +236,8 @@ class _SearchScreenState extends ConsumerState<SearchScreen>
           padding: const EdgeInsets.all(16),
           sliver: SliverGrid(
             delegate: SliverChildBuilderDelegate(
-              (context, index) => AnimatedProductCard(
-                product: _results[index],
-                index: index,
-              ),
+              (context, index) =>
+                  AnimatedProductCard(product: _results[index], index: index),
               childCount: _results.length,
             ),
             gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
@@ -261,92 +254,143 @@ class _SearchScreenState extends ConsumerState<SearchScreen>
   }
 
   Widget _buildRecentSearches() {
-    if (_recentSearches.isEmpty) {
-      return Center(
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Icon(
-              CupertinoIcons.search,
-              size: 48,
-              color: AppTheme.textMuted.withValues(alpha: 0.4),
-            ),
-            const SizedBox(height: 16),
-            Text(
-              'Tìm kiếm sản phẩm',
-              style: TextStyle(
-                fontSize: 16,
-                color: AppTheme.textMuted.withValues(alpha: 0.6),
-                fontWeight: FontWeight.w500,
-              ),
-            ),
-          ],
-        ),
-      );
-    }
+    const popularTags = [
+      'Trà Shan Tuyết',
+      'Ấm Tử Sa',
+      'Trà Ô Long',
+      'Ấm Đất',
+      'Bạch Trà',
+      'Trà Cụ',
+      'Hồng Trà',
+      'Chén Kiến Thủy',
+      'Trà Phổ Nhĩ',
+      'Trà Xanh',
+    ];
 
     return ListView(
       physics: const BouncingScrollPhysics(),
       children: [
+        // Popular tags
         Padding(
           padding: const EdgeInsets.fromLTRB(16, 16, 16, 8),
           child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
+              const Icon(
+                CupertinoIcons.flame_fill,
+                size: 16,
+                color: Color(0xFFFF6B35),
+              ),
+              const SizedBox(width: 6),
               const Text(
-                'Tìm kiếm gần đây',
+                'Tìm kiếm phổ biến',
                 style: TextStyle(
                   fontSize: 15,
                   fontWeight: FontWeight.w600,
                   color: AppTheme.textPrimary,
                 ),
               ),
-              CupertinoButton(
-                padding: EdgeInsets.zero,
-                minimumSize: Size.zero,
-                onPressed: _clearRecentSearches,
-                child: const Text(
-                  'Xóa tất cả',
-                  style: TextStyle(
-                    fontSize: 13,
-                    color: AppTheme.priceRed,
-                  ),
-                ),
-              ),
             ],
           ),
         ),
-        ..._recentSearches.map((query) {
-          return CupertinoListTile(
-            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
-            leading: const Icon(
-              CupertinoIcons.clock,
-              size: 18,
-              color: AppTheme.textMuted,
+        Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 16),
+          child: Wrap(
+            spacing: 8,
+            runSpacing: 8,
+            children: popularTags.map((tag) {
+              return GestureDetector(
+                onTap: () {
+                  HapticFeedback.selectionClick();
+                  _searchFromRecent(tag);
+                },
+                child: Container(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 14,
+                    vertical: 8,
+                  ),
+                  decoration: BoxDecoration(
+                    gradient: LinearGradient(
+                      colors: [
+                        AppTheme.primaryDark.withValues(alpha: 0.08),
+                        AppTheme.accentGold.withValues(alpha: 0.05),
+                      ],
+                    ),
+                    borderRadius: BorderRadius.circular(20),
+                    border: Border.all(
+                      color: AppTheme.primaryDark.withValues(alpha: 0.15),
+                    ),
+                  ),
+                  child: Text(
+                    tag,
+                    style: TextStyle(
+                      fontSize: 13,
+                      fontWeight: FontWeight.w500,
+                      color: AppTheme.primaryDark,
+                    ),
+                  ),
+                ),
+              );
+            }).toList(),
+          ),
+        ),
+        const SizedBox(height: 20),
+
+        // Recent searches
+        if (_recentSearches.isNotEmpty) ...[
+          Padding(
+            padding: const EdgeInsets.fromLTRB(16, 0, 16, 8),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                const Text(
+                  'Tìm kiếm gần đây',
+                  style: TextStyle(
+                    fontSize: 15,
+                    fontWeight: FontWeight.w600,
+                    color: AppTheme.textPrimary,
+                  ),
+                ),
+                CupertinoButton(
+                  padding: EdgeInsets.zero,
+                  minimumSize: Size.zero,
+                  onPressed: _clearRecentSearches,
+                  child: const Text(
+                    'Xóa tất cả',
+                    style: TextStyle(fontSize: 13, color: AppTheme.priceRed),
+                  ),
+                ),
+              ],
             ),
-            title: Text(
-              query,
-              style: const TextStyle(fontSize: 15),
-            ),
-            trailing: CupertinoButton(
-              padding: EdgeInsets.zero,
-              minimumSize: Size.zero,
-              onPressed: () {
-                setState(() => _recentSearches.remove(query));
-                SharedPreferences.getInstance().then(
-                  (prefs) => prefs.setStringList(
-                      'recent_searches', _recentSearches),
-                );
-              },
-              child: const Icon(
-                CupertinoIcons.xmark,
-                size: 14,
+          ),
+          ..._recentSearches.map((query) {
+            return CupertinoListTile(
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+              leading: const Icon(
+                CupertinoIcons.clock,
+                size: 18,
                 color: AppTheme.textMuted,
               ),
-            ),
-            onTap: () => _searchFromRecent(query),
-          );
-        }),
+              title: Text(query, style: const TextStyle(fontSize: 15)),
+              trailing: CupertinoButton(
+                padding: EdgeInsets.zero,
+                minimumSize: Size.zero,
+                onPressed: () {
+                  setState(() => _recentSearches.remove(query));
+                  SharedPreferences.getInstance().then(
+                    (prefs) =>
+                        prefs.setStringList('recent_searches', _recentSearches),
+                  );
+                },
+                child: const Icon(
+                  CupertinoIcons.xmark,
+                  size: 14,
+                  color: AppTheme.textMuted,
+                ),
+              ),
+              onTap: () => _searchFromRecent(query),
+            );
+          }),
+        ],
       ],
     );
   }

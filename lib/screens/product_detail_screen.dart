@@ -29,6 +29,9 @@ class _ProductDetailScreenState extends ConsumerState<ProductDetailScreen>
     with SingleTickerProviderStateMixin {
   Product? product;
   List<Product> relatedProducts = [];
+  List<ProductReview> reviews = [];
+  int reviewsTotal = 0;
+  bool reviewsLoading = false;
   bool isLoading = true;
   int quantity = 1;
   late AnimationController _cartAnimController;
@@ -71,8 +74,28 @@ class _ProductDetailScreenState extends ConsumerState<ProductDetailScreen>
           relatedProducts = related;
           isLoading = false;
         });
+      // Load reviews in background
+      _loadReviews();
     } catch (e) {
       if (mounted) setState(() => isLoading = false);
+    }
+  }
+
+  Future<void> _loadReviews() async {
+    if (product == null) return;
+    setState(() => reviewsLoading = true);
+    try {
+      final api = ref.read(apiServiceProvider);
+      final result = await api.getReviews(product!.id, limit: 5);
+      if (mounted) {
+        setState(() {
+          reviews = result.reviews;
+          reviewsTotal = result.total;
+          reviewsLoading = false;
+        });
+      }
+    } catch (_) {
+      if (mounted) setState(() => reviewsLoading = false);
     }
   }
 
@@ -532,6 +555,9 @@ class _ProductDetailScreenState extends ConsumerState<ProductDetailScreen>
                       ),
                     ],
 
+                    // Reviews section
+                    SliverToBoxAdapter(child: _buildReviewsSection(isDark)),
+
                     const SliverToBoxAdapter(child: SizedBox(height: 100)),
                   ],
                 ),
@@ -675,7 +701,7 @@ class _ProductDetailScreenState extends ConsumerState<ProductDetailScreen>
     );
   }
 
-  /// Bottom CTA for CONTACT products — show Zalo + Phone buttons
+  /// Bottom CTA for CONTACT products — show "Liên hệ báo giá" + quick Zalo
   Widget _buildContactCTA(bool isDark) {
     final settingsAsync = ref.watch(settingsProvider);
     final opts =
@@ -685,45 +711,124 @@ class _ProductDetailScreenState extends ConsumerState<ProductDetailScreen>
         {};
     final phone = (opts['hotline'] ?? opts['phone'] ?? '0827626962').toString();
     final zalo = (opts['zalo'] ?? phone).toString();
+    final productName = product?.namevi ?? 'sản phẩm';
 
     return Row(
       children: [
-        // Zalo button
+        // Quick Zalo button
+        CupertinoButton(
+          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+          color: const Color(0xFF0068FF),
+          borderRadius: BorderRadius.circular(12),
+          minSize: 0,
+          onPressed: () {
+            HapticFeedback.mediumImpact();
+            _launchExternalUrl('https://zalo.me/$zalo');
+          },
+          child: const Icon(
+            CupertinoIcons.chat_bubble_fill,
+            size: 20,
+            color: CupertinoColors.white,
+          ),
+        ),
+        const SizedBox(width: 10),
+        // Main CTA — "Liên hệ báo giá" opens action sheet
         Expanded(
-          flex: 3,
-          child: CupertinoButton(
-            padding: const EdgeInsets.symmetric(vertical: 12),
-            color: const Color(0xFF0068FF),
-            borderRadius: BorderRadius.circular(12),
+          child: GoldCTAButton(
+            label: 'Liên hệ báo giá',
+            icon: CupertinoIcons.phone_circle_fill,
+            compact: true,
             onPressed: () {
               HapticFeedback.mediumImpact();
-              final productName = product?.namevi ?? '';
-              final zaloUrl = 'https://zalo.me/$zalo';
-              _launchExternalUrl(zaloUrl);
-              // Also show a toast with the product name for reference
+              _showContactSheet(phone, zalo, productName);
+            },
+          ),
+        ),
+      ],
+    );
+  }
+
+  void _showContactSheet(String phone, String zalo, String productName) {
+    showCupertinoModalPopup(
+      context: context,
+      builder: (ctx) => CupertinoActionSheet(
+        title: const Text('Liên hệ báo giá'),
+        message: Text(productName, style: const TextStyle(fontSize: 13)),
+        actions: [
+          CupertinoActionSheetAction(
+            onPressed: () {
+              Navigator.pop(ctx);
+              _launchExternalUrl('https://zalo.me/$zalo');
+            },
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                const Icon(
+                  CupertinoIcons.chat_bubble_fill,
+                  size: 20,
+                  color: Color(0xFF0068FF),
+                ),
+                const SizedBox(width: 8),
+                Text(
+                  'Nhắn tin Zalo ($zalo)',
+                  style: const TextStyle(color: Color(0xFF0068FF)),
+                ),
+              ],
+            ),
+          ),
+          CupertinoActionSheetAction(
+            onPressed: () {
+              Navigator.pop(ctx);
+              _launchExternalUrl('tel:$phone');
+            },
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                const Icon(
+                  CupertinoIcons.phone_fill,
+                  size: 20,
+                  color: Color(0xFF2D8B4E),
+                ),
+                const SizedBox(width: 8),
+                Text(
+                  'Gọi điện ($phone)',
+                  style: const TextStyle(color: Color(0xFF2D8B4E)),
+                ),
+              ],
+            ),
+          ),
+          CupertinoActionSheetAction(
+            onPressed: () {
+              Navigator.pop(ctx);
+              _launchExternalUrl(
+                'sms:$phone?body=Xin chào, tôi muốn hỏi giá $productName',
+              );
+            },
+            child: const Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Icon(
+                  CupertinoIcons.bubble_left_fill,
+                  size: 20,
+                  color: Color(0xFF8B6914),
+                ),
+                SizedBox(width: 8),
+                Text(
+                  'Nhắn tin SMS',
+                  style: TextStyle(color: Color(0xFF8B6914)),
+                ),
+              ],
+            ),
+          ),
+          CupertinoActionSheetAction(
+            onPressed: () {
+              Clipboard.setData(ClipboardData(text: phone));
+              Navigator.pop(ctx);
               if (mounted) {
-                showCupertinoDialog(
-                  context: context,
-                  builder: (_) => CupertinoAlertDialog(
-                    title: const Text('Liên hệ qua Zalo'),
-                    content: Text(
-                      'Nhắn tin Zalo: $zalo\nSản phẩm: $productName',
-                    ),
-                    actions: [
-                      CupertinoDialogAction(
-                        child: const Text('Sao chép SĐT'),
-                        onPressed: () {
-                          Clipboard.setData(ClipboardData(text: zalo));
-                          Navigator.pop(context);
-                        },
-                      ),
-                      CupertinoDialogAction(
-                        isDefaultAction: true,
-                        child: const Text('Đóng'),
-                        onPressed: () => Navigator.pop(context),
-                      ),
-                    ],
-                  ),
+                AnimatedToast.show(
+                  context,
+                  icon: CupertinoIcons.checkmark_circle_fill,
+                  message: 'Đã sao chép SĐT: $phone',
                 );
               }
             },
@@ -731,57 +836,25 @@ class _ProductDetailScreenState extends ConsumerState<ProductDetailScreen>
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 Icon(
-                  CupertinoIcons.chat_bubble_fill,
-                  size: 18,
-                  color: CupertinoColors.white,
+                  CupertinoIcons.doc_on_clipboard,
+                  size: 20,
+                  color: CupertinoColors.systemGrey,
                 ),
-                SizedBox(width: 6),
+                SizedBox(width: 8),
                 Text(
-                  'Nhắn Zalo',
-                  style: TextStyle(
-                    fontSize: 14,
-                    fontWeight: FontWeight.w700,
-                    color: CupertinoColors.white,
-                  ),
+                  'Sao chép số điện thoại',
+                  style: TextStyle(color: CupertinoColors.systemGrey),
                 ),
               ],
             ),
           ),
+        ],
+        cancelButton: CupertinoActionSheetAction(
+          isDefaultAction: true,
+          onPressed: () => Navigator.pop(ctx),
+          child: const Text('Đóng'),
         ),
-        const SizedBox(width: 10),
-        // Call button
-        Expanded(
-          flex: 2,
-          child: CupertinoButton(
-            padding: const EdgeInsets.symmetric(vertical: 12),
-            color: const Color(0xFF2D8B4E),
-            borderRadius: BorderRadius.circular(12),
-            onPressed: () {
-              HapticFeedback.mediumImpact();
-              _launchExternalUrl('tel:$phone');
-            },
-            child: const Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Icon(
-                  CupertinoIcons.phone_fill,
-                  size: 18,
-                  color: CupertinoColors.white,
-                ),
-                SizedBox(width: 6),
-                Text(
-                  'Gọi ngay',
-                  style: TextStyle(
-                    fontSize: 14,
-                    fontWeight: FontWeight.w700,
-                    color: CupertinoColors.white,
-                  ),
-                ),
-              ],
-            ),
-          ),
-        ),
-      ],
+      ),
     );
   }
 
@@ -893,14 +966,40 @@ class _ProductDetailScreenState extends ConsumerState<ProductDetailScreen>
   }
 
   Widget _buildSpecsGrid(bool isDark, Product p) {
-    final specs = [
+    // Meta key → icon + label mapping
+    const metaConfig = <String, ({IconData icon, String label})>{
+      'origin': (icon: CupertinoIcons.location, label: 'Nguồn gốc'),
+      'material': (icon: CupertinoIcons.paintbrush, label: 'Chất liệu'),
+      'volume': (icon: CupertinoIcons.drop, label: 'Dung tích / KL'),
+      'quality': (
+        icon: CupertinoIcons.leaf_arrow_circlepath,
+        label: 'Chất lượng',
+      ),
+      'certification': (
+        icon: CupertinoIcons.shield_lefthalf_fill,
+        label: 'Chứng nhận',
+      ),
+      'storage': (icon: CupertinoIcons.cube_box, label: 'Bảo quản'),
+      'artisan_level': (icon: CupertinoIcons.star, label: 'Cấp nghệ nhân'),
+      'year': (icon: CupertinoIcons.calendar, label: 'Năm thu hoạch'),
+      'brewing_temp': (icon: CupertinoIcons.flame, label: 'Nhiệt độ pha'),
+      'brewing_time': (icon: CupertinoIcons.timer, label: 'Thời gian pha'),
+      'stock_status': (icon: CupertinoIcons.archivebox, label: 'Tình trạng'),
+      'weight': (icon: CupertinoIcons.gauge, label: 'Trọng lượng'),
+    };
+
+    // Always show type + code, then dynamic specs from DB
+    final specs = <_SpecItem>[
       _SpecItem(CupertinoIcons.tag, 'Loại SP', p.type ?? 'Trà & Ấm'),
       _SpecItem(CupertinoIcons.barcode, 'Mã SP', p.code ?? '—'),
-      _SpecItem(CupertinoIcons.location, 'Nguồn gốc', 'Hà Giang'),
-      _SpecItem(CupertinoIcons.leaf_arrow_circlepath, 'Chất lượng', 'Hữu cơ'),
-      _SpecItem(CupertinoIcons.shield_lefthalf_fill, 'Chứng nhận', 'ATTP'),
-      _SpecItem(CupertinoIcons.cube_box, 'Bảo quản', 'Khô, thoáng'),
     ];
+
+    for (final entry in p.specs.entries) {
+      final config = metaConfig[entry.key];
+      if (config != null && entry.value.isNotEmpty) {
+        specs.add(_SpecItem(config.icon, config.label, entry.value));
+      }
+    }
 
     return GridView.builder(
       shrinkWrap: true,
@@ -966,6 +1065,426 @@ class _ProductDetailScreenState extends ConsumerState<ProductDetailScreen>
           ),
         );
       },
+    );
+  }
+
+  // ── Reviews Section ────────────────────────────────
+  Widget _buildReviewsSection(bool isDark) {
+    final avg = product?.avgRating ?? 0;
+    final total = product?.reviewsCount ?? reviewsTotal;
+
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(16, 16, 16, 0),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          // Header
+          Row(
+            children: [
+              Icon(
+                CupertinoIcons.star_fill,
+                size: 20,
+                color: const Color(0xFFFFB800),
+              ),
+              const SizedBox(width: 6),
+              Text(
+                avg > 0 ? avg.toStringAsFixed(1) : '—',
+                style: const TextStyle(
+                  fontSize: 20,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+              const SizedBox(width: 6),
+              Text(
+                '($total đánh giá)',
+                style: TextStyle(
+                  fontSize: 14,
+                  color: isDark
+                      ? AppTheme.darkTextSecondary
+                      : AppTheme.textMuted,
+                ),
+              ),
+              const Spacer(),
+              CupertinoButton(
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 12,
+                  vertical: 6,
+                ),
+                color: AppTheme.primaryDark,
+                borderRadius: BorderRadius.circular(8),
+                minSize: 0,
+                onPressed: () => _showReviewForm(),
+                child: const Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Icon(
+                      CupertinoIcons.pencil,
+                      size: 14,
+                      color: CupertinoColors.white,
+                    ),
+                    SizedBox(width: 4),
+                    Text(
+                      'Viết đánh giá',
+                      style: TextStyle(
+                        fontSize: 13,
+                        fontWeight: FontWeight.w600,
+                        color: CupertinoColors.white,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 12),
+
+          // Star distribution bars
+          if (total > 0 && reviews.isNotEmpty) ...[
+            ...List.generate(5, (i) {
+              final star = 5 - i;
+              final count = reviews.where((r) => r.rating == star).length;
+              final pct = total > 0 ? count / total : 0.0;
+              return Padding(
+                padding: const EdgeInsets.symmetric(vertical: 2),
+                child: Row(
+                  children: [
+                    SizedBox(
+                      width: 14,
+                      child: Text(
+                        '$star',
+                        style: const TextStyle(
+                          fontSize: 12,
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
+                    ),
+                    const Icon(
+                      CupertinoIcons.star_fill,
+                      size: 12,
+                      color: Color(0xFFFFB800),
+                    ),
+                    const SizedBox(width: 6),
+                    Expanded(
+                      child: Container(
+                        height: 6,
+                        decoration: BoxDecoration(
+                          color: isDark
+                              ? AppTheme.darkSeparator
+                              : AppTheme.groupedBg,
+                          borderRadius: BorderRadius.circular(3),
+                        ),
+                        child: FractionallySizedBox(
+                          alignment: Alignment.centerLeft,
+                          widthFactor: pct,
+                          child: Container(
+                            decoration: BoxDecoration(
+                              color: const Color(0xFFFFB800),
+                              borderRadius: BorderRadius.circular(3),
+                            ),
+                          ),
+                        ),
+                      ),
+                    ),
+                    const SizedBox(width: 8),
+                    SizedBox(
+                      width: 24,
+                      child: Text(
+                        '$count',
+                        textAlign: TextAlign.right,
+                        style: TextStyle(
+                          fontSize: 11,
+                          color: isDark
+                              ? AppTheme.darkTextSecondary
+                              : AppTheme.textMuted,
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              );
+            }),
+            const SizedBox(height: 16),
+          ],
+
+          // Review cards
+          if (reviewsLoading)
+            const Center(
+              child: Padding(
+                padding: EdgeInsets.all(20),
+                child: CupertinoActivityIndicator(),
+              ),
+            )
+          else if (reviews.isEmpty)
+            Container(
+              padding: const EdgeInsets.all(20),
+              decoration: BoxDecoration(
+                color: isDark ? AppTheme.darkElevated : AppTheme.surfaceWhite,
+                borderRadius: BorderRadius.circular(12),
+              ),
+              child: Center(
+                child: Text(
+                  'Chưa có đánh giá nào.\nHãy là người đầu tiên! ⭐',
+                  textAlign: TextAlign.center,
+                  style: TextStyle(
+                    color: isDark
+                        ? AppTheme.darkTextSecondary
+                        : AppTheme.textMuted,
+                    fontSize: 14,
+                  ),
+                ),
+              ),
+            )
+          else
+            ...reviews.map((review) {
+              final date = review.dateCreated > 0
+                  ? DateTime.fromMillisecondsSinceEpoch(
+                      review.dateCreated * 1000,
+                    )
+                  : null;
+              final dateStr = date != null
+                  ? '${date.day}/${date.month}/${date.year}'
+                  : '';
+              final initial = review.authorName.isNotEmpty
+                  ? review.authorName[0].toUpperCase()
+                  : '?';
+              return Container(
+                margin: const EdgeInsets.only(bottom: 10),
+                padding: const EdgeInsets.all(14),
+                decoration: BoxDecoration(
+                  color: isDark ? AppTheme.darkElevated : AppTheme.surfaceWhite,
+                  borderRadius: BorderRadius.circular(12),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.black.withValues(alpha: 0.03),
+                      blurRadius: 6,
+                      offset: const Offset(0, 2),
+                    ),
+                  ],
+                ),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Row(
+                      children: [
+                        // Avatar
+                        Container(
+                          width: 36,
+                          height: 36,
+                          decoration: BoxDecoration(
+                            gradient: LinearGradient(
+                              colors: [
+                                AppTheme.primaryDark.withValues(alpha: 0.8),
+                                AppTheme.accentGold.withValues(alpha: 0.6),
+                              ],
+                            ),
+                            shape: BoxShape.circle,
+                          ),
+                          child: Center(
+                            child: Text(
+                              initial,
+                              style: const TextStyle(
+                                color: CupertinoColors.white,
+                                fontWeight: FontWeight.bold,
+                                fontSize: 16,
+                              ),
+                            ),
+                          ),
+                        ),
+                        const SizedBox(width: 10),
+                        Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                review.authorName,
+                                style: TextStyle(
+                                  fontWeight: FontWeight.w600,
+                                  fontSize: 14,
+                                  color: isDark
+                                      ? AppTheme.darkTextPrimary
+                                      : AppTheme.textPrimary,
+                                ),
+                              ),
+                              Text(
+                                dateStr,
+                                style: TextStyle(
+                                  fontSize: 12,
+                                  color: isDark
+                                      ? AppTheme.darkTextSecondary
+                                      : AppTheme.textMuted,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                        // Stars
+                        Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: List.generate(
+                            5,
+                            (i) => Icon(
+                              i < review.rating
+                                  ? CupertinoIcons.star_fill
+                                  : CupertinoIcons.star,
+                              size: 14,
+                              color: const Color(0xFFFFB800),
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                    if (review.content != null &&
+                        review.content!.isNotEmpty) ...[
+                      const SizedBox(height: 8),
+                      Text(
+                        review.content!,
+                        style: TextStyle(
+                          fontSize: 14,
+                          color: isDark
+                              ? AppTheme.darkTextPrimary
+                              : AppTheme.textPrimary,
+                          height: 1.4,
+                        ),
+                      ),
+                    ],
+                  ],
+                ),
+              );
+            }),
+        ],
+      ),
+    );
+  }
+
+  void _showReviewForm() {
+    final nameCtrl = TextEditingController();
+    final contentCtrl = TextEditingController();
+    int selectedRating = 5;
+
+    showCupertinoModalPopup(
+      context: context,
+      builder: (ctx) => StatefulBuilder(
+        builder: (ctx2, setModalState) => Container(
+          padding: EdgeInsets.fromLTRB(
+            20,
+            20,
+            20,
+            MediaQuery.of(ctx2).viewInsets.bottom + 20,
+          ),
+          decoration: BoxDecoration(
+            color: CupertinoTheme.brightnessOf(ctx2) == Brightness.dark
+                ? AppTheme.darkElevated
+                : CupertinoColors.white,
+            borderRadius: const BorderRadius.vertical(top: Radius.circular(20)),
+          ),
+          child: SafeArea(
+            top: false,
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                const Center(
+                  child: Text(
+                    'Viết đánh giá',
+                    style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                  ),
+                ),
+                const SizedBox(height: 16),
+                // Star picker
+                Center(
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: List.generate(5, (i) {
+                      return CupertinoButton(
+                        padding: const EdgeInsets.all(4),
+                        minSize: 0,
+                        onPressed: () {
+                          HapticFeedback.selectionClick();
+                          setModalState(() => selectedRating = i + 1);
+                        },
+                        child: Icon(
+                          i < selectedRating
+                              ? CupertinoIcons.star_fill
+                              : CupertinoIcons.star,
+                          size: 32,
+                          color: const Color(0xFFFFB800),
+                        ),
+                      );
+                    }),
+                  ),
+                ),
+                const SizedBox(height: 12),
+                CupertinoTextField(
+                  controller: nameCtrl,
+                  placeholder: 'Tên của bạn *',
+                  padding: const EdgeInsets.all(12),
+                  decoration: BoxDecoration(
+                    color: AppTheme.groupedBg,
+                    borderRadius: BorderRadius.circular(10),
+                  ),
+                ),
+                const SizedBox(height: 10),
+                CupertinoTextField(
+                  controller: contentCtrl,
+                  placeholder: 'Nhận xét của bạn...',
+                  maxLines: 3,
+                  padding: const EdgeInsets.all(12),
+                  decoration: BoxDecoration(
+                    color: AppTheme.groupedBg,
+                    borderRadius: BorderRadius.circular(10),
+                  ),
+                ),
+                const SizedBox(height: 16),
+                SizedBox(
+                  width: double.infinity,
+                  child: CupertinoButton.filled(
+                    borderRadius: BorderRadius.circular(12),
+                    onPressed: () async {
+                      if (nameCtrl.text.trim().length < 2) {
+                        return;
+                      }
+                      HapticFeedback.mediumImpact();
+                      Navigator.pop(ctx);
+                      try {
+                        final api = ref.read(apiServiceProvider);
+                        await api.submitReview(
+                          product!.id,
+                          authorName: nameCtrl.text.trim(),
+                          rating: selectedRating,
+                          content: contentCtrl.text.trim(),
+                        );
+                        _loadReviews();
+                        if (mounted) {
+                          AnimatedToast.show(
+                            context,
+                            icon: CupertinoIcons.checkmark_circle_fill,
+                            message: 'Cảm ơn bạn đã đánh giá!',
+                          );
+                        }
+                      } catch (_) {
+                        if (mounted) {
+                          AnimatedToast.show(
+                            context,
+                            icon: CupertinoIcons.exclamationmark_circle,
+                            message: 'Không thể gửi đánh giá',
+                          );
+                        }
+                      }
+                    },
+                    child: const Text(
+                      'Gửi đánh giá',
+                      style: TextStyle(
+                        fontWeight: FontWeight.w600,
+                        fontSize: 16,
+                      ),
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
+      ),
     );
   }
 }

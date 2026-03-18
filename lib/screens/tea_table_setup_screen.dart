@@ -1,5 +1,6 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import '../config/theme.dart';
 
 /// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
@@ -43,20 +44,32 @@ class TeaTableSetupScreen extends StatelessWidget {
                 ),
                 child: Column(
                   children: [
-                    const Text('🫖', style: TextStyle(fontSize: 40)),
+                    const Icon(
+                      Icons.emoji_food_beverage_rounded,
+                      size: 40,
+                      color: AppTheme.accentGold,
+                    ),
                     const SizedBox(height: 10),
-                    Text('Nghệ Thuật Bày Bàn Trà',
-                        style: TextStyle(
-                          fontSize: 22, fontWeight: FontWeight.bold,
-                          color: isDark ? AppTheme.darkTextPrimary : AppTheme.textPrimary,
-                        )),
+                    Text(
+                      'Nghệ Thuật Bày Bàn Trà',
+                      style: TextStyle(
+                        fontSize: 22,
+                        fontWeight: FontWeight.bold,
+                        color: isDark
+                            ? AppTheme.darkTextPrimary
+                            : AppTheme.textPrimary,
+                      ),
+                    ),
                     const SizedBox(height: 6),
                     Text(
                       'Hướng dẫn từ cơ bản đến nâng cao\ntheo phong cách trà đạo Việt',
                       textAlign: TextAlign.center,
                       style: TextStyle(
-                        fontSize: 13, height: 1.4,
-                        color: isDark ? AppTheme.darkTextSecondary : AppTheme.textMuted,
+                        fontSize: 13,
+                        height: 1.4,
+                        color: isDark
+                            ? AppTheme.darkTextSecondary
+                            : AppTheme.textMuted,
                       ),
                     ),
                   ],
@@ -68,32 +81,66 @@ class TeaTableSetupScreen extends StatelessWidget {
               // ── ESSENTIAL TOOLS ──
               _SectionTitle(title: 'Dụng Cụ Cần Thiết', isDark: isDark),
               const SizedBox(height: 12),
-              _ToolGrid(isDark: isDark, tools: const [
-                _TeaTool('🫖', 'Ấm tử sa', 'Chọn theo loại trà'),
-                _TeaTool('🍵', 'Chén tống', 'Chia đều nước trà'),
-                _TeaTool('☕', 'Chén quân', '4-6 chén nhỏ'),
-                _TeaTool('🪣', 'Thuyền trà', 'Hứng nước thừa'),
-                _TeaTool('🥄', 'Trà trúc', 'Múc trà vào ấm'),
-                _TeaTool('🔥', 'Ấm đun nước', 'Kiểm soát nhiệt'),
-                _TeaTool('🧽', 'Khăn trà', 'Lau ấm, lau bàn'),
-                _TeaTool('🫙', 'Hũ đựng trà', 'Bảo quản kín'),
-              ]),
+              _ToolGrid(
+                isDark: isDark,
+                tools: const [
+                  _TeaTool(
+                    Icons.emoji_food_beverage,
+                    'Ấm tử sa',
+                    'Chọn theo loại trà',
+                  ),
+                  _TeaTool(
+                    CupertinoIcons.drop,
+                    'Chén tống',
+                    'Chia đều nước trà',
+                  ),
+                  _TeaTool(Icons.coffee_rounded, 'Chén quân', '4-6 chén nhỏ'),
+                  _TeaTool(
+                    Icons.water_damage_outlined,
+                    'Thuyền trà',
+                    'Hứng nước thừa',
+                  ),
+                  _TeaTool(
+                    Icons.restaurant_rounded,
+                    'Trà trúc',
+                    'Múc trà vào ấm',
+                  ),
+                  _TeaTool(
+                    CupertinoIcons.flame,
+                    'Ấm đun nước',
+                    'Kiểm soát nhiệt',
+                  ),
+                  _TeaTool(
+                    Icons.dry_cleaning_rounded,
+                    'Khăn trà',
+                    'Lau ấm, lau bàn',
+                  ),
+                  _TeaTool(
+                    Icons.inventory_2_rounded,
+                    'Hũ đựng trà',
+                    'Bảo quản kín',
+                  ),
+                ],
+              ),
 
               const SizedBox(height: 28),
 
               // ── SETUP STEPS ──
               _SectionTitle(title: 'Các Bước Bày Bàn', isDark: isDark),
               const SizedBox(height: 12),
-              ..._steps.asMap().entries.map((e) =>
-                  _StepCard(index: e.key + 1, step: e.value, isDark: isDark)),
+              ..._steps.asMap().entries.map(
+                (e) =>
+                    _StepCard(index: e.key + 1, step: e.value, isDark: isDark),
+              ),
 
               const SizedBox(height: 28),
 
               // ── TEA CEREMONY ETIQUETTE ──
               _SectionTitle(title: 'Lễ Nghi Trà Đạo', isDark: isDark),
               const SizedBox(height: 12),
-              ..._etiquettes.map((e) =>
-                  _EtiquetteCard(etiquette: e, isDark: isDark)),
+              ..._etiquettes.map(
+                (e) => _EtiquetteCard(etiquette: e, isDark: isDark),
+              ),
 
               const SizedBox(height: 28),
 
@@ -113,60 +160,66 @@ class TeaTableSetupScreen extends StatelessWidget {
   static const _steps = [
     _SetupStep(
       title: 'Chuẩn bị không gian',
-      detail: 'Chọn nơi yên tĩnh, thoáng. Bàn trà nên hướng ra sáng hoặc cửa sổ. '
+      detail:
+          'Chọn nơi yên tĩnh, thoáng. Bàn trà nên hướng ra sáng hoặc cửa sổ. '
           'Trải khăn trà sạch lên mặt bàn.',
-      icon: '🏡',
+      icon: CupertinoIcons.house_fill,
     ),
     _SetupStep(
       title: 'Sắp xếp dụng cụ',
-      detail: 'Ấm tử sa đặt giữa thuyền trà. Chén tống bên phải. '
+      detail:
+          'Ấm tử sa đặt giữa thuyền trà. Chén tống bên phải. '
           'Chén quân xếp thành hàng phía trước. Trà trúc + trà hồ bên trái.',
-      icon: '📐',
+      icon: CupertinoIcons.square_grid_2x2_fill,
     ),
     _SetupStep(
       title: 'Ôn ấm, ôn chén',
-      detail: 'Đổ nước sôi qua ấm và chén để làm nóng, khử tạp chất. '
+      detail:
+          'Đổ nước sôi qua ấm và chén để làm nóng, khử tạp chất. '
           'Nước này đổ bỏ qua thuyền trà.',
-      icon: '♨️',
+      icon: CupertinoIcons.flame_fill,
     ),
     _SetupStep(
       title: 'Cho trà vào ấm',
-      detail: 'Dùng trà trúc múc trà. Lượng trà: 1/3 thể tích ấm cho trà Ô Long, '
+      detail:
+          'Dùng trà trúc múc trà. Lượng trà: 1/3 thể tích ấm cho trà Ô Long, '
           '1/5 cho trà xanh. Ngửi hương trà khô trước khi pha.',
-      icon: '🍃',
+      icon: CupertinoIcons.leaf_arrow_circlepath,
     ),
     _SetupStep(
       title: 'Pha nước đầu tiên',
-      detail: 'Rót nước từ cao xuống (cao sơn lưu thuỷ). '
+      detail:
+          'Rót nước từ cao xuống (cao sơn lưu thuỷ). '
           'Nước đầu gọi là "rửa trà" — rót bỏ sau 5 giây để kích hoạt lá trà.',
-      icon: '💧',
+      icon: CupertinoIcons.drop_fill,
     ),
     _SetupStep(
       title: 'Pha và thưởng thức',
-      detail: 'Nước thứ 2 mới là nước uống chính. Hãm đúng thời gian theo loại trà. '
+      detail:
+          'Nước thứ 2 mới là nước uống chính. Hãm đúng thời gian theo loại trà. '
           'Rót qua chén tống trước, rồi chia đều vào chén quân.',
-      icon: '🫖',
+      icon: Icons.emoji_food_beverage_rounded,
     ),
   ];
 
   static const _etiquettes = [
     _Etiquette(
-      '🤲',
+      CupertinoIcons.hand_raised_fill,
       'Mời trà bằng hai tay',
       'Đưa chén trà bằng cả hai tay thể hiện sự tôn trọng. Người lớn tuổi được mời trước.',
     ),
     _Etiquette(
-      '👃',
+      CupertinoIcons.wind,
       'Ngửi trước, uống sau',
       'Nâng chén lên mũi, hít nhẹ hương trà. Nhấp ngụm nhỏ đầu tiên, cảm nhận vị trà.',
     ),
     _Etiquette(
-      '🤫',
+      CupertinoIcons.moon_fill,
       'Giữ không gian tĩnh lặng',
       'Trà đạo là thiền. Hạn chế nói chuyện ồn ào, không sử dụng điện thoại.',
     ),
     _Etiquette(
-      '🔄',
+      CupertinoIcons.arrow_2_circlepath,
       'Pha nhiều lần',
       'Trà ngon pha được 3-8 nước. Mỗi nước có hương vị khác nhau. Tăng thời gian hãm mỗi nước.',
     ),
@@ -174,17 +227,20 @@ class TeaTableSetupScreen extends StatelessWidget {
 
   static const _proTips = [
     _ProTip(
-      '🌡️ Nhiệt độ nước',
+      CupertinoIcons.thermometer,
+      'Nhiệt độ nước',
       'Dùng nhiệt kế hoặc đợi 2 phút sau sôi cho trà xanh (75°C), '
           '30 giây cho trà ô long (90°C). Nước quá nóng sẽ chát.',
     ),
     _ProTip(
-      '💎 Nuôi ấm tử sa',
+      CupertinoIcons.sparkles,
+      'Nuôi ấm tử sa',
       'Sau mỗi lần dùng, rửa ấm bằng nước nóng (không dùng xà phòng). '
           'Lau khô bằng khăn mềm. Ấm càng dùng càng bóng.',
     ),
     _ProTip(
-      '🧊 Trà lạnh cao cấp',
+      CupertinoIcons.snow,
+      'Trà lạnh cao cấp',
       'Hãm trà đặc gấp 3 bình thường, đổ qua đá viên. '
           'Hương trà được giữ nguyên mà không bị phai.',
     ),
@@ -201,7 +257,8 @@ class _SectionTitle extends StatelessWidget {
     return Row(
       children: [
         Container(
-          width: 4, height: 20,
+          width: 4,
+          height: 20,
           decoration: BoxDecoration(
             gradient: const LinearGradient(
               begin: Alignment.topCenter,
@@ -212,18 +269,23 @@ class _SectionTitle extends StatelessWidget {
           ),
         ),
         const SizedBox(width: 10),
-        Text(title, style: TextStyle(
-          fontSize: 18, fontWeight: FontWeight.bold,
-          color: isDark ? AppTheme.darkTextPrimary : AppTheme.textPrimary,
-        )),
+        Text(
+          title,
+          style: TextStyle(
+            fontSize: 18,
+            fontWeight: FontWeight.bold,
+            color: isDark ? AppTheme.darkTextPrimary : AppTheme.textPrimary,
+          ),
+        ),
       ],
     );
   }
 }
 
 class _TeaTool {
-  final String emoji, name, desc;
-  const _TeaTool(this.emoji, this.name, this.desc);
+  final IconData icon;
+  final String name, desc;
+  const _TeaTool(this.icon, this.name, this.desc);
 }
 
 class _ToolGrid extends StatelessWidget {
@@ -240,46 +302,75 @@ class _ToolGrid extends StatelessWidget {
       mainAxisSpacing: 8,
       crossAxisSpacing: 8,
       childAspectRatio: 0.85,
-      children: tools.map((t) => Container(
-        padding: const EdgeInsets.all(8),
-        decoration: BoxDecoration(
-          color: isDark ? AppTheme.darkElevated : AppTheme.surfaceWhite,
-          borderRadius: BorderRadius.circular(12),
-          boxShadow: [
-            BoxShadow(
-              color: Colors.black.withValues(alpha: isDark ? 0.15 : 0.04),
-              blurRadius: 6, offset: const Offset(0, 2),
+      children: tools
+          .map(
+            (t) => Container(
+              padding: const EdgeInsets.all(8),
+              decoration: BoxDecoration(
+                color: isDark ? AppTheme.darkElevated : AppTheme.surfaceWhite,
+                borderRadius: BorderRadius.circular(12),
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.black.withValues(alpha: isDark ? 0.15 : 0.04),
+                    blurRadius: 6,
+                    offset: const Offset(0, 2),
+                  ),
+                ],
+              ),
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Icon(t.icon, size: 24, color: AppTheme.accentGold),
+                  const SizedBox(height: 4),
+                  Text(
+                    t.name,
+                    textAlign: TextAlign.center,
+                    style: TextStyle(
+                      fontSize: 11,
+                      fontWeight: FontWeight.w600,
+                      color: isDark
+                          ? AppTheme.darkTextPrimary
+                          : AppTheme.textPrimary,
+                    ),
+                  ),
+                  Text(
+                    t.desc,
+                    textAlign: TextAlign.center,
+                    style: TextStyle(
+                      fontSize: 9,
+                      color: isDark
+                          ? AppTheme.darkTextSecondary
+                          : AppTheme.textMuted,
+                    ),
+                  ),
+                ],
+              ),
             ),
-          ],
-        ),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Text(t.emoji, style: const TextStyle(fontSize: 24)),
-            const SizedBox(height: 4),
-            Text(t.name, textAlign: TextAlign.center,
-                style: TextStyle(fontSize: 11, fontWeight: FontWeight.w600,
-                  color: isDark ? AppTheme.darkTextPrimary : AppTheme.textPrimary)),
-            Text(t.desc, textAlign: TextAlign.center,
-                style: TextStyle(fontSize: 9,
-                  color: isDark ? AppTheme.darkTextSecondary : AppTheme.textMuted)),
-          ],
-        ),
-      )).toList(),
+          )
+          .toList(),
     );
   }
 }
 
 class _SetupStep {
-  final String title, detail, icon;
-  const _SetupStep({required this.title, required this.detail, required this.icon});
+  final String title, detail;
+  final IconData icon;
+  const _SetupStep({
+    required this.title,
+    required this.detail,
+    required this.icon,
+  });
 }
 
 class _StepCard extends StatelessWidget {
   final int index;
   final _SetupStep step;
   final bool isDark;
-  const _StepCard({required this.index, required this.step, required this.isDark});
+  const _StepCard({
+    required this.index,
+    required this.step,
+    required this.isDark,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -290,11 +381,13 @@ class _StepCard extends StatelessWidget {
         color: isDark ? AppTheme.darkElevated : AppTheme.surfaceWhite,
         borderRadius: BorderRadius.circular(14),
         border: Border.all(
-          color: AppTheme.accentGold.withValues(alpha: isDark ? 0.1 : 0.12)),
+          color: AppTheme.accentGold.withValues(alpha: isDark ? 0.1 : 0.12),
+        ),
         boxShadow: [
           BoxShadow(
             color: Colors.black.withValues(alpha: isDark ? 0.12 : 0.03),
-            blurRadius: 8, offset: const Offset(0, 2),
+            blurRadius: 8,
+            offset: const Offset(0, 2),
           ),
         ],
       ),
@@ -302,38 +395,60 @@ class _StepCard extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Container(
-            width: 36, height: 36,
+            width: 36,
+            height: 36,
             decoration: BoxDecoration(
               gradient: const LinearGradient(
                 colors: [Color(0xFF1A3C28), Color(0xFF2D5E3E)],
               ),
               borderRadius: BorderRadius.circular(10),
             ),
-            child: Center(child: Text('$index',
-                style: const TextStyle(color: AppTheme.accentGold,
-                    fontWeight: FontWeight.bold, fontSize: 15))),
+            child: Center(
+              child: Text(
+                '$index',
+                style: const TextStyle(
+                  color: AppTheme.accentGold,
+                  fontWeight: FontWeight.bold,
+                  fontSize: 15,
+                ),
+              ),
+            ),
           ),
           const SizedBox(width: 14),
-          Expanded(child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Row(
-                children: [
-                  Text(step.icon, style: const TextStyle(fontSize: 16)),
-                  const SizedBox(width: 6),
-                  Text(step.title, style: TextStyle(
-                    fontWeight: FontWeight.w600, fontSize: 15,
-                    color: isDark ? AppTheme.darkTextPrimary : AppTheme.textPrimary,
-                  )),
-                ],
-              ),
-              const SizedBox(height: 6),
-              Text(step.detail, style: TextStyle(
-                fontSize: 13, height: 1.5,
-                color: isDark ? AppTheme.darkTextSecondary : AppTheme.textSecondary,
-              )),
-            ],
-          )),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Row(
+                  children: [
+                    Icon(step.icon, size: 16, color: AppTheme.accentGold),
+                    const SizedBox(width: 6),
+                    Text(
+                      step.title,
+                      style: TextStyle(
+                        fontWeight: FontWeight.w600,
+                        fontSize: 15,
+                        color: isDark
+                            ? AppTheme.darkTextPrimary
+                            : AppTheme.textPrimary,
+                      ),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 6),
+                Text(
+                  step.detail,
+                  style: TextStyle(
+                    fontSize: 13,
+                    height: 1.5,
+                    color: isDark
+                        ? AppTheme.darkTextSecondary
+                        : AppTheme.textSecondary,
+                  ),
+                ),
+              ],
+            ),
+          ),
         ],
       ),
     );
@@ -341,8 +456,9 @@ class _StepCard extends StatelessWidget {
 }
 
 class _Etiquette {
-  final String emoji, title, detail;
-  const _Etiquette(this.emoji, this.title, this.detail);
+  final IconData icon;
+  final String title, detail;
+  const _Etiquette(this.icon, this.title, this.detail);
 }
 
 class _EtiquetteCard extends StatelessWidget {
@@ -364,22 +480,36 @@ class _EtiquetteCard extends StatelessWidget {
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(etiquette.emoji, style: const TextStyle(fontSize: 22)),
+          Icon(etiquette.icon, size: 22, color: AppTheme.accentGold),
           const SizedBox(width: 12),
-          Expanded(child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(etiquette.title, style: TextStyle(
-                fontWeight: FontWeight.w600, fontSize: 14,
-                color: isDark ? AppTheme.darkTextPrimary : AppTheme.textPrimary,
-              )),
-              const SizedBox(height: 4),
-              Text(etiquette.detail, style: TextStyle(
-                fontSize: 13, height: 1.4,
-                color: isDark ? AppTheme.darkTextSecondary : AppTheme.textSecondary,
-              )),
-            ],
-          )),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  etiquette.title,
+                  style: TextStyle(
+                    fontWeight: FontWeight.w600,
+                    fontSize: 14,
+                    color: isDark
+                        ? AppTheme.darkTextPrimary
+                        : AppTheme.textPrimary,
+                  ),
+                ),
+                const SizedBox(height: 4),
+                Text(
+                  etiquette.detail,
+                  style: TextStyle(
+                    fontSize: 13,
+                    height: 1.4,
+                    color: isDark
+                        ? AppTheme.darkTextSecondary
+                        : AppTheme.textSecondary,
+                  ),
+                ),
+              ],
+            ),
+          ),
         ],
       ),
     );
@@ -387,8 +517,9 @@ class _EtiquetteCard extends StatelessWidget {
 }
 
 class _ProTip {
+  final IconData icon;
   final String title, detail;
-  const _ProTip(this.title, this.detail);
+  const _ProTip(this.icon, this.title, this.detail);
 }
 
 class _ProTipCard extends StatelessWidget {
@@ -408,15 +539,35 @@ class _ProTipCard extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(tip.title, style: TextStyle(
-            fontWeight: FontWeight.w600, fontSize: 14,
-            color: isDark ? AppTheme.darkTextPrimary : AppTheme.textPrimary,
-          )),
+          Row(
+            children: [
+              Icon(tip.icon, size: 16, color: AppTheme.accentGold),
+              const SizedBox(width: 8),
+              Expanded(
+                child: Text(
+                  tip.title,
+                  style: TextStyle(
+                    fontWeight: FontWeight.w600,
+                    fontSize: 14,
+                    color: isDark
+                        ? AppTheme.darkTextPrimary
+                        : AppTheme.textPrimary,
+                  ),
+                ),
+              ),
+            ],
+          ),
           const SizedBox(height: 4),
-          Text(tip.detail, style: TextStyle(
-            fontSize: 13, height: 1.4,
-            color: isDark ? AppTheme.darkTextSecondary : AppTheme.textSecondary,
-          )),
+          Text(
+            tip.detail,
+            style: TextStyle(
+              fontSize: 13,
+              height: 1.4,
+              color: isDark
+                  ? AppTheme.darkTextSecondary
+                  : AppTheme.textSecondary,
+            ),
+          ),
         ],
       ),
     );
