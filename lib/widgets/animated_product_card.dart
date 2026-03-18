@@ -435,47 +435,112 @@ class _AnimatedProductCardState extends ConsumerState<AnimatedProductCard>
   }
 
   Widget _buildPrice(NumberFormat formatter, bool isDark) {
+    const goldPrice = Color(0xFFC8A96E);
+    const goldBright = Color(0xFFD4B876);
     final p = widget.product;
+
     if (p.isOnSale) {
+      // ── ON SALE: Gold bordered badge with struck-through original ──
       return Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         mainAxisSize: MainAxisSize.min,
         children: [
-          Text(
-            formatter.format(p.salePrice),
-            style: const TextStyle(
-              color: Color(0xFFC8A96E),
-              fontWeight: FontWeight.bold,
-              fontSize: 15,
+          Container(
+            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+            decoration: BoxDecoration(
+              border: Border.all(
+                color: goldPrice.withValues(alpha: 0.7),
+                width: 1.2,
+              ),
+              borderRadius: BorderRadius.circular(8),
+              color: goldPrice.withValues(alpha: isDark ? 0.1 : 0.06),
+              boxShadow: [
+                BoxShadow(
+                  color: goldPrice.withValues(alpha: 0.15),
+                  blurRadius: 6,
+                  offset: const Offset(0, 1),
+                ),
+              ],
+            ),
+            child: Text(
+              formatter.format(p.salePrice),
+              style: const TextStyle(
+                color: goldBright,
+                fontWeight: FontWeight.bold,
+                fontSize: 13,
+                height: 1.2,
+              ),
             ),
           ),
-          Text(
-            formatter.format(p.regularPrice),
-            style: const TextStyle(
-              decoration: TextDecoration.lineThrough,
-              color: AppTheme.textMuted,
-              fontSize: 11,
+          const SizedBox(height: 3),
+          Padding(
+            padding: const EdgeInsets.only(left: 2),
+            child: Text(
+              formatter.format(p.regularPrice),
+              style: TextStyle(
+                decoration: TextDecoration.lineThrough,
+                color: AppTheme.textMuted.withValues(alpha: 0.7),
+                fontSize: 10,
+              ),
             ),
           ),
         ],
       );
     } else if (p.regularPrice != null && p.regularPrice! > 0) {
-      return Text(
-        formatter.format(p.regularPrice),
-        style: const TextStyle(
-          color: Color(0xFFC8A96E),
-          fontWeight: FontWeight.bold,
-          fontSize: 15,
+      // ── HAS PRICE: Gold bordered badge ──
+      return Container(
+        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+        decoration: BoxDecoration(
+          border: Border.all(
+            color: goldPrice.withValues(alpha: 0.6),
+            width: 1.2,
+          ),
+          borderRadius: BorderRadius.circular(8),
+          color: goldPrice.withValues(alpha: isDark ? 0.08 : 0.04),
+        ),
+        child: Text(
+          formatter.format(p.regularPrice),
+          style: const TextStyle(
+            color: goldBright,
+            fontWeight: FontWeight.bold,
+            fontSize: 13,
+            height: 1.2,
+          ),
         ),
       );
     } else {
-      return const Text(
-        'Liên hệ',
-        style: TextStyle(
-          color: AppTheme.accentGold,
-          fontWeight: FontWeight.w600,
-          fontSize: 13,
-          fontStyle: FontStyle.italic,
+      // ── CONTACT: Dashed border badge with envelope icon ──
+      return Container(
+        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(8),
+          border: Border.all(
+            color: goldPrice.withValues(alpha: 0.35),
+            width: 1,
+            strokeAlign: BorderSide.strokeAlignInside,
+          ),
+          color: goldPrice.withValues(alpha: isDark ? 0.06 : 0.03),
+        ),
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Icon(
+              CupertinoIcons.envelope,
+              size: 11,
+              color: goldPrice.withValues(alpha: 0.8),
+            ),
+            const SizedBox(width: 4),
+            Text(
+              'Liên hệ',
+              style: TextStyle(
+                color: goldPrice,
+                fontWeight: FontWeight.w600,
+                fontSize: 12,
+                fontStyle: FontStyle.italic,
+                height: 1.2,
+              ),
+            ),
+          ],
         ),
       );
     }
