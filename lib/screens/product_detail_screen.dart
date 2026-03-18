@@ -20,7 +20,8 @@ class ProductDetailScreen extends ConsumerStatefulWidget {
   const ProductDetailScreen({super.key, required this.productId});
 
   @override
-  ConsumerState<ProductDetailScreen> createState() => _ProductDetailScreenState();
+  ConsumerState<ProductDetailScreen> createState() =>
+      _ProductDetailScreenState();
 }
 
 class _ProductDetailScreenState extends ConsumerState<ProductDetailScreen>
@@ -63,7 +64,12 @@ class _ProductDetailScreenState extends ConsumerState<ProductDetailScreen>
           related = result.items.where((r) => r.id != p.id).take(4).toList();
         } catch (_) {}
       }
-      if (mounted) setState(() { product = p; relatedProducts = related; isLoading = false; });
+      if (mounted)
+        setState(() {
+          product = p;
+          relatedProducts = related;
+          isLoading = false;
+        });
     } catch (e) {
       if (mounted) setState(() => isLoading = false);
     }
@@ -84,10 +90,7 @@ class _ProductDetailScreenState extends ConsumerState<ProductDetailScreen>
     FlyToCartAnimation.fly(
       context: context,
       imageWidget: CachedNetworkImage(imageUrl: imgUrl, fit: BoxFit.cover),
-      startGlobalOffset: Offset(
-        MediaQuery.of(context).size.width / 2,
-        280,
-      ),
+      startGlobalOffset: Offset(MediaQuery.of(context).size.width / 2, 280),
     );
   }
 
@@ -138,7 +141,11 @@ class _ProductDetailScreenState extends ConsumerState<ProductDetailScreen>
                       color: Colors.black.withValues(alpha: 0.5),
                       shape: BoxShape.circle,
                     ),
-                    child: const Icon(CupertinoIcons.xmark, color: Colors.white, size: 20),
+                    child: const Icon(
+                      CupertinoIcons.xmark,
+                      color: Colors.white,
+                      size: 20,
+                    ),
                   ),
                 ),
               ),
@@ -165,6 +172,7 @@ class _ProductDetailScreenState extends ConsumerState<ProductDetailScreen>
   Widget build(BuildContext context) {
     final formatter = NumberFormat.currency(locale: 'vi_VN', symbol: '₫');
     final heroTag = 'product-${widget.productId}';
+    final isDark = CupertinoTheme.brightnessOf(context) == Brightness.dark;
 
     return CupertinoPageScaffold(
       navigationBar: CupertinoNavigationBar(
@@ -180,12 +188,15 @@ class _ProductDetailScreenState extends ConsumerState<ProductDetailScreen>
               padding: EdgeInsets.zero,
               child: AnimatedSwitcher(
                 duration: const Duration(milliseconds: 200),
-                transitionBuilder: (child, anim) => ScaleTransition(scale: anim, child: child),
+                transitionBuilder: (child, anim) =>
+                    ScaleTransition(scale: anim, child: child),
                 child: Icon(
                   ref.watch(favoritesProvider).contains(widget.productId)
                       ? CupertinoIcons.heart_fill
                       : CupertinoIcons.heart,
-                  key: ValueKey(ref.watch(favoritesProvider).contains(widget.productId)),
+                  key: ValueKey(
+                    ref.watch(favoritesProvider).contains(widget.productId),
+                  ),
                   color: ref.watch(favoritesProvider).contains(widget.productId)
                       ? AppTheme.priceRed
                       : null,
@@ -213,252 +224,347 @@ class _ProductDetailScreenState extends ConsumerState<ProductDetailScreen>
       child: isLoading
           ? const Center(child: CupertinoActivityIndicator(radius: 14))
           : product == null
-              ? const Center(child: Text('Không tìm thấy sản phẩm'))
-              : Stack(
-                  children: [
-                    CustomScrollView(
-                      physics: const BouncingScrollPhysics(),
-                      slivers: [
-                        SliverToBoxAdapter(
-                          child: GestureDetector(
-                            onTap: () => _openImageViewer(context),
-                            child: Hero(
-                              tag: heroTag,
-                              child: CachedNetworkImage(
-                                imageUrl: ApiService.getImageUrl(product!.photo, 'product'),
-                                width: double.infinity,
-                                height: 380,
-                                fit: BoxFit.cover,
-                                errorWidget: (_, _a, _b) => Container(
-                                  height: 380,
-                                  color: AppTheme.groupedBg,
-                                  child: const Center(
-                                    child: Icon(CupertinoIcons.photo, size: 48, color: AppTheme.textMuted),
-                                  ),
+          ? const Center(child: Text('Không tìm thấy sản phẩm'))
+          : Stack(
+              children: [
+                CustomScrollView(
+                  physics: const BouncingScrollPhysics(),
+                  slivers: [
+                    SliverToBoxAdapter(
+                      child: GestureDetector(
+                        onTap: () => _openImageViewer(context),
+                        child: Hero(
+                          tag: heroTag,
+                          child: CachedNetworkImage(
+                            imageUrl: ApiService.getImageUrl(
+                              product!.photo,
+                              'product',
+                            ),
+                            width: double.infinity,
+                            height: 380,
+                            fit: BoxFit.cover,
+                            errorWidget: (_, _a, _b) => Container(
+                              height: 380,
+                              color: AppTheme.groupedBg,
+                              child: const Center(
+                                child: Icon(
+                                  CupertinoIcons.photo,
+                                  size: 48,
+                                  color: AppTheme.textMuted,
                                 ),
                               ),
                             ),
                           ),
                         ),
-                        SliverToBoxAdapter(
-                          child: Container(
-                            decoration: BoxDecoration(
-                              color: CupertinoColors.systemBackground.resolveFrom(context),
-                              borderRadius: const BorderRadius.vertical(top: Radius.circular(20)),
-                            ),
-                            transform: Matrix4.translationValues(0, -20, 0),
-                            padding: const EdgeInsets.fromLTRB(20, 24, 20, 0),
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                // Name
-                                Text(
-                                  product!.namevi ?? '',
-                                  style: const TextStyle(
-                                    fontSize: 24,
-                                    fontWeight: FontWeight.bold,
-                                    color: AppTheme.textPrimary,
-                                    letterSpacing: -0.5,
-                                  ),
-                                ),
-                                const SizedBox(height: 6),
-
-                                // Code
-                                if (product!.code != null && product!.code!.isNotEmpty)
-                                  Text(
-                                    'Mã SP: ${product!.code}',
-                                    style: const TextStyle(
-                                      color: AppTheme.textMuted,
-                                      fontSize: 14,
-                                    ),
-                                  ),
-
-                                const SizedBox(height: 16),
-
-                                // Price
-                                _buildPriceSection(formatter),
-
-                                const SizedBox(height: 20),
-
-                                // Quantity selector
-                                _buildQuantitySelector(),
-
-                                const SizedBox(height: 24),
-
-                                // Description
-                                if (product!.contentvi != null && product!.contentvi!.isNotEmpty) ...[
-                                  const Text(
-                                    'Mô tả sản phẩm',
-                                    style: TextStyle(
-                                      fontSize: 20,
-                                      fontWeight: FontWeight.bold,
-                                      color: AppTheme.textPrimary,
-                                      letterSpacing: -0.3,
-                                    ),
-                                  ),
-                                  const SizedBox(height: 12),
-                                  HtmlWidget(product!.contentvi ?? ''),
-                                ],
-                              ],
-                            ),
-                          ),
-                        ),
-
-                        // Related products
-                        if (relatedProducts.isNotEmpty) ...[
-                          SliverToBoxAdapter(
-                            child: Padding(
-                              padding: const EdgeInsets.fromLTRB(20, 24, 20, 12),
-                              child: Row(
-                                children: [
-                                  Container(
-                                    width: 4, height: 22,
-                                    decoration: BoxDecoration(
-                                      color: AppTheme.accentGold,
-                                      borderRadius: BorderRadius.circular(2),
-                                    ),
-                                  ),
-                                  const SizedBox(width: 10),
-                                  const Text('Sản phẩm liên quan',
-                                    style: TextStyle(
-                                      fontSize: 20, fontWeight: FontWeight.bold,
-                                      color: AppTheme.textPrimary, letterSpacing: -0.3,
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            ),
-                          ),
-                          SliverToBoxAdapter(
-                            child: SizedBox(
-                              height: 220,
-                              child: ListView.separated(
-                                scrollDirection: Axis.horizontal,
-                                physics: const BouncingScrollPhysics(),
-                                padding: const EdgeInsets.symmetric(horizontal: 20),
-                                itemCount: relatedProducts.length,
-                                separatorBuilder: (_, __) => const SizedBox(width: 12),
-                                itemBuilder: (context, index) {
-                                  final rp = relatedProducts[index];
-                                  final rpImage = ApiService.getImageUrl(rp.photo, 'product');
-                                  return GestureDetector(
-                                    onTap: () => context.push('/product/${rp.id}'),
-                                    child: Container(
-                                      width: 150,
-                                      decoration: BoxDecoration(
-                                        color: CupertinoColors.systemBackground.resolveFrom(context),
-                                        borderRadius: BorderRadius.circular(12),
-                                        boxShadow: [
-                                          BoxShadow(
-                                            color: Colors.black.withValues(alpha: 0.06),
-                                            blurRadius: 8, offset: const Offset(0, 2),
-                                          ),
-                                        ],
-                                      ),
-                                      child: Column(
-                                        crossAxisAlignment: CrossAxisAlignment.start,
-                                        children: [
-                                          ClipRRect(
-                                            borderRadius: const BorderRadius.vertical(top: Radius.circular(12)),
-                                            child: CachedNetworkImage(
-                                              imageUrl: rpImage, height: 130, width: 150,
-                                              fit: BoxFit.cover,
-                                              errorWidget: (_, _a, _b) => Container(height: 130, color: AppTheme.groupedBg),
-                                            ),
-                                          ),
-                                          Padding(
-                                            padding: const EdgeInsets.all(8),
-                                            child: Column(
-                                              crossAxisAlignment: CrossAxisAlignment.start,
-                                              children: [
-                                                Text(rp.namevi ?? '', maxLines: 2, overflow: TextOverflow.ellipsis,
-                                                  style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w600, color: AppTheme.textPrimary)),
-                                                const SizedBox(height: 4),
-                                                rp.displayPrice > 0
-                                                  ? Text(formatter.format(rp.displayPrice),
-                                                      style: const TextStyle(fontSize: 13, fontWeight: FontWeight.bold, color: AppTheme.priceRed))
-                                                  : const Text('Liên hệ',
-                                                      style: TextStyle(fontSize: 12, fontWeight: FontWeight.w600, color: AppTheme.accentGold, fontStyle: FontStyle.italic)),
-                                              ],
-                                            ),
-                                          ),
-                                        ],
-                                      ),
-                                    ),
-                                  );
-                                },
-                              ),
-                            ),
-                          ),
-                        ],
-
-                        const SliverToBoxAdapter(child: SizedBox(height: 100)),
-                      ],
+                      ),
                     ),
-
-                    // Bottom CTA bar
-                    Positioned(
-                      left: 0,
-                      right: 0,
-                      bottom: 0,
+                    SliverToBoxAdapter(
                       child: Container(
-                        padding: EdgeInsets.fromLTRB(
-                          20, 12, 20,
-                          MediaQuery.of(context).padding.bottom + 12,
-                        ),
                         decoration: BoxDecoration(
-                          color: CupertinoColors.systemBackground.resolveFrom(context),
-                          border: Border(
-                            top: BorderSide(
-                              color: AppTheme.separator.withValues(alpha: 0.3),
-                            ),
+                          color: isDark
+                              ? AppTheme.darkElevated
+                              : AppTheme.surfaceWhite,
+                          borderRadius: const BorderRadius.vertical(
+                            top: Radius.circular(20),
                           ),
                         ),
-                        child: Row(
+                        transform: Matrix4.translationValues(0, -20, 0),
+                        padding: const EdgeInsets.fromLTRB(20, 24, 20, 0),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              mainAxisSize: MainAxisSize.min,
-                              children: [
-                                const Text('Tổng', style: TextStyle(color: AppTheme.textMuted, fontSize: 12)),
-                                product!.displayPrice > 0
-                                    ? Text(
-                                        formatter.format(product!.displayPrice * quantity),
-                                        style: const TextStyle(
-                                          fontSize: 20,
-                                          fontWeight: FontWeight.bold,
-                                          color: AppTheme.priceRed,
-                                        ),
-                                      )
-                                    : const Text(
-                                        'Liên hệ',
-                                        style: TextStyle(
-                                          fontSize: 18,
-                                          fontWeight: FontWeight.w600,
-                                          color: AppTheme.accentGold,
-                                          fontStyle: FontStyle.italic,
-                                        ),
-                                      ),
-                              ],
-                            ),
-                            const SizedBox(width: 16),
-                            Expanded(
-                              child: ScaleTransition(
-                                scale: _cartBounce,
-                                child: GoldCTAButton(
-                                  label: 'Thêm vào giỏ',
-                                  icon: CupertinoIcons.cart_badge_plus,
-                                  compact: true,
-                                  onPressed: _addToCart,
-                                ),
+                            // Name
+                            Text(
+                              product!.namevi ?? '',
+                              style: TextStyle(
+                                fontSize: 24,
+                                fontWeight: FontWeight.bold,
+                                color: isDark
+                                    ? AppTheme.darkTextPrimary
+                                    : AppTheme.textPrimary,
+                                letterSpacing: -0.5,
                               ),
                             ),
+                            const SizedBox(height: 6),
+
+                            // Code
+                            if (product!.code != null &&
+                                product!.code!.isNotEmpty)
+                              Text(
+                                'Mã SP: ${product!.code}',
+                                style: TextStyle(
+                                  color: isDark
+                                      ? AppTheme.darkTextSecondary
+                                      : AppTheme.textMuted,
+                                  fontSize: 14,
+                                ),
+                              ),
+
+                            const SizedBox(height: 16),
+
+                            // Price
+                            _buildPriceSection(formatter),
+
+                            const SizedBox(height: 20),
+
+                            // Quantity selector
+                            _buildQuantitySelector(),
+
+                            const SizedBox(height: 24),
+
+                            // ── Product Info Specs ──
+                            _buildInfoSection(isDark),
+
+                            const SizedBox(height: 24),
+
+                            // Description
+                            if (product!.contentvi != null &&
+                                product!.contentvi!.isNotEmpty) ...[
+                              Text(
+                                'Mô tả sản phẩm',
+                                style: TextStyle(
+                                  fontSize: 20,
+                                  fontWeight: FontWeight.bold,
+                                  color: isDark
+                                      ? AppTheme.darkTextPrimary
+                                      : AppTheme.textPrimary,
+                                  letterSpacing: -0.3,
+                                ),
+                              ),
+                              const SizedBox(height: 12),
+                              HtmlWidget(product!.contentvi ?? ''),
+                            ],
                           ],
                         ),
                       ),
                     ),
+
+                    // Related products
+                    if (relatedProducts.isNotEmpty) ...[
+                      SliverToBoxAdapter(
+                        child: Padding(
+                          padding: const EdgeInsets.fromLTRB(20, 24, 20, 12),
+                          child: Row(
+                            children: [
+                              Container(
+                                width: 4,
+                                height: 22,
+                                decoration: BoxDecoration(
+                                  color: AppTheme.accentGold,
+                                  borderRadius: BorderRadius.circular(2),
+                                ),
+                              ),
+                              const SizedBox(width: 10),
+                              const Text(
+                                'Sản phẩm liên quan',
+                                style: TextStyle(
+                                  fontSize: 20,
+                                  fontWeight: FontWeight.bold,
+                                  color: AppTheme.textPrimary,
+                                  letterSpacing: -0.3,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+                      SliverToBoxAdapter(
+                        child: SizedBox(
+                          height: 220,
+                          child: ListView.separated(
+                            scrollDirection: Axis.horizontal,
+                            physics: const BouncingScrollPhysics(),
+                            padding: const EdgeInsets.symmetric(horizontal: 20),
+                            itemCount: relatedProducts.length,
+                            separatorBuilder: (_, __) =>
+                                const SizedBox(width: 12),
+                            itemBuilder: (context, index) {
+                              final rp = relatedProducts[index];
+                              final rpImage = ApiService.getImageUrl(
+                                rp.photo,
+                                'product',
+                              );
+                              return GestureDetector(
+                                onTap: () => context.push('/product/${rp.id}'),
+                                child: Container(
+                                  width: 150,
+                                  decoration: BoxDecoration(
+                                    color: isDark
+                                        ? AppTheme.darkElevated
+                                        : AppTheme.surfaceWhite,
+                                    borderRadius: BorderRadius.circular(12),
+                                    border: Border.all(
+                                      color: isDark
+                                          ? AppTheme.darkSeparator.withValues(
+                                              alpha: 0.2,
+                                            )
+                                          : AppTheme.separator.withValues(
+                                              alpha: 0.4,
+                                            ),
+                                    ),
+                                    boxShadow: [
+                                      BoxShadow(
+                                        color: Colors.black.withValues(
+                                          alpha: isDark ? 0.15 : 0.05,
+                                        ),
+                                        blurRadius: 8,
+                                        offset: const Offset(0, 2),
+                                      ),
+                                    ],
+                                  ),
+                                  child: Column(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
+                                    children: [
+                                      ClipRRect(
+                                        borderRadius:
+                                            const BorderRadius.vertical(
+                                              top: Radius.circular(12),
+                                            ),
+                                        child: CachedNetworkImage(
+                                          imageUrl: rpImage,
+                                          height: 130,
+                                          width: 150,
+                                          fit: BoxFit.cover,
+                                          errorWidget: (_, _a, _b) => Container(
+                                            height: 130,
+                                            color: AppTheme.groupedBg,
+                                          ),
+                                        ),
+                                      ),
+                                      Padding(
+                                        padding: const EdgeInsets.all(8),
+                                        child: Column(
+                                          crossAxisAlignment:
+                                              CrossAxisAlignment.start,
+                                          children: [
+                                            Text(
+                                              rp.namevi ?? '',
+                                              maxLines: 2,
+                                              overflow: TextOverflow.ellipsis,
+                                              style: const TextStyle(
+                                                fontSize: 12,
+                                                fontWeight: FontWeight.w600,
+                                                color: AppTheme.textPrimary,
+                                              ),
+                                            ),
+                                            const SizedBox(height: 4),
+                                            rp.displayPrice > 0
+                                                ? Text(
+                                                    formatter.format(
+                                                      rp.displayPrice,
+                                                    ),
+                                                    style: const TextStyle(
+                                                      fontSize: 13,
+                                                      fontWeight:
+                                                          FontWeight.bold,
+                                                      color: AppTheme.priceRed,
+                                                    ),
+                                                  )
+                                                : const Text(
+                                                    'Liên hệ',
+                                                    style: TextStyle(
+                                                      fontSize: 12,
+                                                      fontWeight:
+                                                          FontWeight.w600,
+                                                      color:
+                                                          AppTheme.accentGold,
+                                                      fontStyle:
+                                                          FontStyle.italic,
+                                                    ),
+                                                  ),
+                                          ],
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              );
+                            },
+                          ),
+                        ),
+                      ),
+                    ],
+
+                    const SliverToBoxAdapter(child: SizedBox(height: 100)),
                   ],
                 ),
+
+                // Bottom CTA bar
+                Positioned(
+                  left: 0,
+                  right: 0,
+                  bottom: 0,
+                  child: Container(
+                    padding: EdgeInsets.fromLTRB(
+                      20,
+                      12,
+                      20,
+                      MediaQuery.of(context).padding.bottom + 12,
+                    ),
+                    decoration: BoxDecoration(
+                      color: CupertinoColors.systemBackground.resolveFrom(
+                        context,
+                      ),
+                      border: Border(
+                        top: BorderSide(
+                          color: AppTheme.separator.withValues(alpha: 0.3),
+                        ),
+                      ),
+                    ),
+                    child: Row(
+                      children: [
+                        Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            const Text(
+                              'Tổng',
+                              style: TextStyle(
+                                color: AppTheme.textMuted,
+                                fontSize: 12,
+                              ),
+                            ),
+                            product!.displayPrice > 0
+                                ? Text(
+                                    formatter.format(
+                                      product!.displayPrice * quantity,
+                                    ),
+                                    style: const TextStyle(
+                                      fontSize: 20,
+                                      fontWeight: FontWeight.bold,
+                                      color: AppTheme.priceRed,
+                                    ),
+                                  )
+                                : const Text(
+                                    'Liên hệ',
+                                    style: TextStyle(
+                                      fontSize: 18,
+                                      fontWeight: FontWeight.w600,
+                                      color: AppTheme.accentGold,
+                                      fontStyle: FontStyle.italic,
+                                    ),
+                                  ),
+                          ],
+                        ),
+                        const SizedBox(width: 16),
+                        Expanded(
+                          child: ScaleTransition(
+                            scale: _cartBounce,
+                            child: GoldCTAButton(
+                              label: 'Thêm vào giỏ',
+                              icon: CupertinoIcons.cart_badge_plus,
+                              compact: true,
+                              onPressed: _addToCart,
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+              ],
+            ),
     );
   }
 
@@ -528,7 +634,10 @@ class _ProductDetailScreenState extends ConsumerState<ProductDetailScreen>
   Widget _buildQuantitySelector() {
     return Row(
       children: [
-        const Text('Số lượng:', style: TextStyle(fontSize: 15, fontWeight: FontWeight.w500)),
+        const Text(
+          'Số lượng:',
+          style: TextStyle(fontSize: 15, fontWeight: FontWeight.w500),
+        ),
         const SizedBox(width: 16),
         Container(
           decoration: BoxDecoration(
@@ -549,7 +658,9 @@ class _ProductDetailScreenState extends ConsumerState<ProductDetailScreen>
                 child: Icon(
                   CupertinoIcons.minus,
                   size: 16,
-                  color: quantity > 1 ? AppTheme.textPrimary : AppTheme.textMuted,
+                  color: quantity > 1
+                      ? AppTheme.textPrimary
+                      : AppTheme.textMuted,
                 ),
               ),
               SizedBox(
@@ -557,7 +668,10 @@ class _ProductDetailScreenState extends ConsumerState<ProductDetailScreen>
                 child: Text(
                   '$quantity',
                   textAlign: TextAlign.center,
-                  style: const TextStyle(fontSize: 17, fontWeight: FontWeight.w600),
+                  style: const TextStyle(
+                    fontSize: 17,
+                    fontWeight: FontWeight.w600,
+                  ),
                 ),
               ),
               CupertinoButton(
@@ -569,6 +683,112 @@ class _ProductDetailScreenState extends ConsumerState<ProductDetailScreen>
                 },
                 child: const Icon(CupertinoIcons.plus, size: 16),
               ),
+            ],
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildInfoSection(bool isDark) {
+    final p = product!;
+    final specs = <Map<String, String>>[
+      if (p.type != null && p.type!.isNotEmpty)
+        {'icon': '🍃', 'label': 'Loại sản phẩm', 'value': p.type!},
+      if (p.code != null && p.code!.isNotEmpty)
+        {'icon': '📦', 'label': 'Mã sản phẩm', 'value': p.code!},
+      {'icon': '🏔️', 'label': 'Nguồn gốc', 'value': 'Hà Giang, Việt Nam'},
+      {'icon': '🌿', 'label': 'Chất lượng', 'value': 'Hữu cơ tự nhiên'},
+    ];
+
+    if (specs.isEmpty) return const SizedBox.shrink();
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Row(
+          children: [
+            Container(
+              width: 4,
+              height: 22,
+              decoration: BoxDecoration(
+                color: AppTheme.accentGold,
+                borderRadius: BorderRadius.circular(2),
+              ),
+            ),
+            const SizedBox(width: 10),
+            Text(
+              'Thông tin sản phẩm',
+              style: TextStyle(
+                fontSize: 20,
+                fontWeight: FontWeight.bold,
+                color: isDark ? AppTheme.darkTextPrimary : AppTheme.textPrimary,
+                letterSpacing: -0.3,
+              ),
+            ),
+          ],
+        ),
+        const SizedBox(height: 14),
+        Container(
+          padding: const EdgeInsets.all(16),
+          decoration: BoxDecoration(
+            color: isDark
+                ? AppTheme.darkSurface.withValues(alpha: 0.5)
+                : AppTheme.groupedBg,
+            borderRadius: BorderRadius.circular(14),
+            border: Border.all(
+              color: isDark
+                  ? AppTheme.darkSeparator.withValues(alpha: 0.2)
+                  : AppTheme.separator.withValues(alpha: 0.3),
+            ),
+          ),
+          child: Column(
+            children: [
+              for (int i = 0; i < specs.length; i++) ...[
+                if (i > 0)
+                  Divider(
+                    color: isDark
+                        ? AppTheme.darkSeparator.withValues(alpha: 0.15)
+                        : AppTheme.separator.withValues(alpha: 0.3),
+                    height: 20,
+                  ),
+                Row(
+                  children: [
+                    Text(
+                      specs[i]['icon']!,
+                      style: const TextStyle(fontSize: 18),
+                    ),
+                    const SizedBox(width: 12),
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            specs[i]['label']!,
+                            style: TextStyle(
+                              fontSize: 12,
+                              color: isDark
+                                  ? AppTheme.darkTextSecondary
+                                  : AppTheme.textMuted,
+                            ),
+                          ),
+                          const SizedBox(height: 2),
+                          Text(
+                            specs[i]['value']!,
+                            style: TextStyle(
+                              fontSize: 15,
+                              fontWeight: FontWeight.w600,
+                              color: isDark
+                                  ? AppTheme.darkTextPrimary
+                                  : AppTheme.textPrimary,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
+              ],
             ],
           ),
         ),

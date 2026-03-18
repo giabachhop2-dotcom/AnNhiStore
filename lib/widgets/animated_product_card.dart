@@ -23,11 +23,7 @@ class AnimatedProductCard extends ConsumerStatefulWidget {
   final Product product;
   final int index;
 
-  const AnimatedProductCard({
-    super.key,
-    required this.product,
-    this.index = 0,
-  });
+  const AnimatedProductCard({super.key, required this.product, this.index = 0});
 
   @override
   ConsumerState<AnimatedProductCard> createState() =>
@@ -72,15 +68,14 @@ class _AnimatedProductCardState extends ConsumerState<AnimatedProductCard>
       duration: const Duration(milliseconds: 500),
       vsync: this,
     );
-    _entryFade = Tween<double>(begin: 0.0, end: 1.0).animate(
-      CurvedAnimation(parent: _entryController, curve: Curves.easeOut),
-    );
-    _entrySlide = Tween<Offset>(
-      begin: const Offset(0, 0.1),
-      end: Offset.zero,
-    ).animate(
-      CurvedAnimation(parent: _entryController, curve: Curves.easeOutCubic),
-    );
+    _entryFade = Tween<double>(
+      begin: 0.0,
+      end: 1.0,
+    ).animate(CurvedAnimation(parent: _entryController, curve: Curves.easeOut));
+    _entrySlide = Tween<Offset>(begin: const Offset(0, 0.1), end: Offset.zero)
+        .animate(
+          CurvedAnimation(parent: _entryController, curve: Curves.easeOutCubic),
+        );
 
     // Quick add bounce
     _addBounceController = AnimationController(
@@ -89,18 +84,24 @@ class _AnimatedProductCardState extends ConsumerState<AnimatedProductCard>
     );
     _addBounce = TweenSequence<double>([
       TweenSequenceItem(
-        tween: Tween(begin: 1.0, end: 0.85)
-            .chain(CurveTween(curve: Curves.easeIn)),
+        tween: Tween(
+          begin: 1.0,
+          end: 0.85,
+        ).chain(CurveTween(curve: Curves.easeIn)),
         weight: 30,
       ),
       TweenSequenceItem(
-        tween: Tween(begin: 0.85, end: 1.05)
-            .chain(CurveTween(curve: Curves.easeOut)),
+        tween: Tween(
+          begin: 0.85,
+          end: 1.05,
+        ).chain(CurveTween(curve: Curves.easeOut)),
         weight: 40,
       ),
       TweenSequenceItem(
-        tween: Tween(begin: 1.05, end: 1.0)
-            .chain(CurveTween(curve: Curves.easeInOut)),
+        tween: Tween(
+          begin: 1.05,
+          end: 1.0,
+        ).chain(CurveTween(curve: Curves.easeInOut)),
         weight: 30,
       ),
     ]).animate(_addBounceController);
@@ -152,7 +153,9 @@ class _AnimatedProductCardState extends ConsumerState<AnimatedProductCard>
     final imgUrl = ApiService.getImageUrl(widget.product.photo, 'product');
     final box = _imageKey.currentContext?.findRenderObject() as RenderBox?;
     if (box != null) {
-      final pos = box.localToGlobal(Offset(box.size.width / 2, box.size.height / 2));
+      final pos = box.localToGlobal(
+        Offset(box.size.width / 2, box.size.height / 2),
+      );
       FlyToCartAnimation.fly(
         context: context,
         imageWidget: CachedNetworkImage(imageUrl: imgUrl, fit: BoxFit.cover),
@@ -196,7 +199,9 @@ class _AnimatedProductCardState extends ConsumerState<AnimatedProductCard>
               CupertinoContextMenuAction(
                 onPressed: () {
                   Navigator.pop(context);
-                  ref.read(favoritesProvider.notifier).toggle(widget.product.id);
+                  ref
+                      .read(favoritesProvider.notifier)
+                      .toggle(widget.product.id);
                   HapticFeedback.selectionClick();
                 },
                 trailingIcon: CupertinoIcons.heart,
@@ -224,9 +229,7 @@ class _AnimatedProductCardState extends ConsumerState<AnimatedProductCard>
               onTap: _onTap,
               child: Container(
                 decoration: BoxDecoration(
-                  color: isDark
-                      ? AppTheme.darkElevated
-                      : AppTheme.surfaceWhite,
+                  color: isDark ? AppTheme.darkElevated : AppTheme.surfaceWhite,
                   borderRadius: BorderRadius.circular(14),
                   border: Border.all(
                     color: isDark
@@ -235,7 +238,9 @@ class _AnimatedProductCardState extends ConsumerState<AnimatedProductCard>
                   ),
                   boxShadow: [
                     BoxShadow(
-                      color: Colors.black.withValues(alpha: isDark ? 0.2 : 0.06),
+                      color: Colors.black.withValues(
+                        alpha: isDark ? 0.2 : 0.06,
+                      ),
                       blurRadius: 12,
                       offset: const Offset(0, 3),
                     ),
@@ -263,8 +268,11 @@ class _AnimatedProductCardState extends ConsumerState<AnimatedProductCard>
                                 errorWidget: (_, _a, _b) => Container(
                                   color: AppTheme.groupedBg,
                                   child: const Center(
-                                    child: Icon(CupertinoIcons.photo,
-                                        color: AppTheme.textMuted, size: 32),
+                                    child: Icon(
+                                      CupertinoIcons.photo,
+                                      color: AppTheme.textMuted,
+                                      size: 32,
+                                    ),
                                   ),
                                 ),
                               ),
@@ -278,7 +286,9 @@ class _AnimatedProductCardState extends ConsumerState<AnimatedProductCard>
                                 left: 8,
                                 child: Container(
                                   padding: const EdgeInsets.symmetric(
-                                      horizontal: 8, vertical: 4),
+                                    horizontal: 8,
+                                    vertical: 4,
+                                  ),
                                   decoration: BoxDecoration(
                                     gradient: const LinearGradient(
                                       colors: [
@@ -289,8 +299,9 @@ class _AnimatedProductCardState extends ConsumerState<AnimatedProductCard>
                                     borderRadius: BorderRadius.circular(8),
                                     boxShadow: [
                                       BoxShadow(
-                                        color: AppTheme.priceRed
-                                            .withValues(alpha: 0.3),
+                                        color: AppTheme.priceRed.withValues(
+                                          alpha: 0.3,
+                                        ),
                                         blurRadius: 6,
                                         offset: const Offset(0, 2),
                                       ),
@@ -306,56 +317,38 @@ class _AnimatedProductCardState extends ConsumerState<AnimatedProductCard>
                                   ),
                                 ),
                               ),
-                            // Social proof — real view count from API
-                            if ((widget.product.view ?? 0) > 10)
-                              Positioned(
-                                bottom: 8,
-                                left: 8,
-                                child: Container(
-                                  padding: const EdgeInsets.symmetric(
-                                      horizontal: 6, vertical: 3),
-                                  decoration: BoxDecoration(
-                                    color: Colors.black.withValues(alpha: 0.55),
-                                    borderRadius: BorderRadius.circular(6),
-                                  ),
-                                  child: Row(
-                                    mainAxisSize: MainAxisSize.min,
-                                    children: [
-                                      const Text('🔥',
-                                          style: TextStyle(fontSize: 10)),
-                                      const SizedBox(width: 3),
-                                      Text(
-                                        '${widget.product.view} lượt xem',
-                                        style: const TextStyle(
-                                          color: CupertinoColors.white,
-                                          fontSize: 9,
-                                          fontWeight: FontWeight.w500,
-                                        ),
-                                      ),
-                                    ],
-                                  ),
-                                ),
-                              ),
                             // Favorite heart icon with burst effect
                             Positioned(
                               top: 4,
                               right: 4,
                               child: HeartBurstEffect(
-                                isActive: ref.watch(favoritesProvider).contains(widget.product.id),
+                                isActive: ref
+                                    .watch(favoritesProvider)
+                                    .contains(widget.product.id),
                                 onTap: () {
                                   HapticFeedback.selectionClick();
-                                  ref.read(favoritesProvider.notifier).toggle(widget.product.id);
+                                  ref
+                                      .read(favoritesProvider.notifier)
+                                      .toggle(widget.product.id);
                                 },
                                 child: Icon(
-                                  ref.watch(favoritesProvider).contains(widget.product.id)
+                                  ref
+                                          .watch(favoritesProvider)
+                                          .contains(widget.product.id)
                                       ? CupertinoIcons.heart_fill
                                       : CupertinoIcons.heart,
-                                  color: ref.watch(favoritesProvider).contains(widget.product.id)
+                                  color:
+                                      ref
+                                          .watch(favoritesProvider)
+                                          .contains(widget.product.id)
                                       ? AppTheme.priceRed
                                       : CupertinoColors.white,
                                   size: 22,
                                   shadows: const [
-                                    Shadow(color: Colors.black38, blurRadius: 8),
+                                    Shadow(
+                                      color: Colors.black38,
+                                      blurRadius: 8,
+                                    ),
                                   ],
                                 ),
                               ),

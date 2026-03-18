@@ -75,12 +75,12 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
       if (mounted) {
         setState(() {
           slides = results[0] as List<PhotoItem>;
-          productsAmTuSa = (results[1]
-                  as ({List<Product> items, int total, int totalPages}))
-              .items;
-          productsTra = (results[2]
-                  as ({List<Product> items, int total, int totalPages}))
-              .items;
+          productsAmTuSa =
+              (results[1] as ({List<Product> items, int total, int totalPages}))
+                  .items;
+          productsTra =
+              (results[2] as ({List<Product> items, int total, int totalPages}))
+                  .items;
           newsItems =
               (results[3] as ({List<NewsArticle> items, int total})).items;
           certificates = results[4] as List<PhotoItem>;
@@ -113,138 +113,156 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
           : Stack(
               children: [
                 CustomScrollView(
-              controller: _scrollController,
-              physics: const BouncingScrollPhysics(
-                parent: AlwaysScrollableScrollPhysics(),
-              ),
-              slivers: [
-                // ── iOS Large Title Navigation Bar ──
-                CupertinoSliverNavigationBar(
-                  largeTitle: Row(
-                    children: [
-                      Image.asset('assets/images/logo.png', height: 28),
-                      const SizedBox(width: 8),
-                      const Text('An Nhi Trà'),
-                    ],
+                  controller: _scrollController,
+                  physics: const BouncingScrollPhysics(
+                    parent: AlwaysScrollableScrollPhysics(),
                   ),
-                  trailing: CupertinoButton(
-                    padding: EdgeInsets.zero,
-                    child: const Icon(CupertinoIcons.search),
-                    onPressed: () => context.push('/search'),
-                  ),
-                  backgroundColor: CupertinoColors.systemBackground,
-                  border: null,
-                ),
-
-                // ── Pull to Refresh ──
-                CupertinoSliverRefreshControl(onRefresh: _loadData),
-
-                // ── Parallax Hero Banner ──
-                if (slides.isNotEmpty)
-                  SliverToBoxAdapter(child: _buildBanner()),
-
-                // ── Daily Tea Wisdom ──
-                const SliverToBoxAdapter(child: DailyTeaWisdom()),
-
-                // ── Featured Ấm Tử Sa — Horizontal Showcase ──
-                if (productsAmTuSa.isNotEmpty) ...[
-                  SliverToBoxAdapter(
-                    child: TeaCeremonyHeader(
-                      title: 'Ấm Tử Sa Nghệ Thuật',
-                      subtitle: 'Nghệ nhân hàng đầu Nghi Hưng',
-                      onSeeAll: () => context.push('/products'),
+                  slivers: [
+                    // ── iOS Large Title Navigation Bar ──
+                    CupertinoSliverNavigationBar(
+                      largeTitle: Row(
+                        children: [
+                          Image.asset('assets/images/logo.png', height: 28),
+                          const SizedBox(width: 8),
+                          const Text('An Nhi Trà'),
+                        ],
+                      ),
+                      trailing: CupertinoButton(
+                        padding: EdgeInsets.zero,
+                        child: const Icon(CupertinoIcons.search),
+                        onPressed: () => context.push('/search'),
+                      ),
+                      backgroundColor: CupertinoColors.systemBackground,
+                      border: null,
                     ),
-                  ),
-                  SliverToBoxAdapter(
-                    child: SizedBox(
-                      height: 280,
-                      child: ListView.builder(
-                        scrollDirection: Axis.horizontal,
-                        physics: const BouncingScrollPhysics(),
-                        padding: const EdgeInsets.symmetric(horizontal: 12),
-                        itemCount: productsAmTuSa.length,
-                        itemBuilder: (context, index) {
-                          return SizedBox(
-                            width: 200,
-                            child: Padding(
-                              padding: const EdgeInsets.symmetric(horizontal: 4),
-                              child: AnimatedProductCard(
-                                product: productsAmTuSa[index],
-                                index: index,
-                              ),
-                            ),
+
+                    // ── Pull to Refresh ──
+                    CupertinoSliverRefreshControl(onRefresh: _loadData),
+
+                    // ── Parallax Hero Banner ──
+                    if (slides.isNotEmpty)
+                      SliverToBoxAdapter(child: _buildBanner()),
+
+                    // ── Quick Category Access ──
+                    SliverToBoxAdapter(child: _buildCategoryGrid()),
+
+                    // ── Daily Tea Wisdom ──
+                    const SliverToBoxAdapter(child: DailyTeaWisdom()),
+
+                    // ── Featured Ấm Tử Sa — Horizontal Showcase ──
+                    if (productsAmTuSa.isNotEmpty) ...[
+                      SliverToBoxAdapter(
+                        child: TeaCeremonyHeader(
+                          title: 'Ấm Tử Sa Nghệ Thuật',
+                          subtitle: 'Nghệ nhân hàng đầu Nghi Hưng',
+                          onSeeAll: () => context.push('/products'),
+                        ),
+                      ),
+                      SliverToBoxAdapter(
+                        child: SizedBox(
+                          height: 280,
+                          child: ListView.builder(
+                            scrollDirection: Axis.horizontal,
+                            physics: const BouncingScrollPhysics(),
+                            padding: const EdgeInsets.symmetric(horizontal: 12),
+                            itemCount: productsAmTuSa.length,
+                            itemBuilder: (context, index) {
+                              return SizedBox(
+                                width: 200,
+                                child: Padding(
+                                  padding: const EdgeInsets.symmetric(
+                                    horizontal: 4,
+                                  ),
+                                  child: AnimatedProductCard(
+                                    product: productsAmTuSa[index],
+                                    index: index,
+                                  ),
+                                ),
+                              );
+                            },
+                          ),
+                        ),
+                      ),
+                    ],
+
+                    // ── Trà Shan Tuyết — Grid Layout ──
+                    if (productsTra.isNotEmpty) ...[
+                      SliverToBoxAdapter(
+                        child: TeaCeremonyHeader(
+                          title: 'Trà Shan Tuyết Cổ Thụ',
+                          subtitle: 'Hương vị đỉnh núi 1500m',
+                          onSeeAll: () => context.push('/products'),
+                        ),
+                      ),
+                      _buildProductGrid(
+                        productsTra,
+                        indexOffset: productsAmTuSa.length,
+                      ),
+                    ],
+
+                    // ── Testimonials (Cảm nhận) ──
+                    if (testimonials.isNotEmpty)
+                      SliverToBoxAdapter(child: _buildTestimonials()),
+
+                    // ── News ──
+                    if (newsItems.isNotEmpty) ...[
+                      SliverToBoxAdapter(
+                        child: TeaCeremonyHeader(
+                          title: 'Tin Tức & Sự Kiện',
+                          subtitle: 'Cập nhật từ An Nhi Trà',
+                          onSeeAll: () => context.go('/news'),
+                        ),
+                      ),
+                      SliverPadding(
+                        padding: const EdgeInsets.symmetric(horizontal: 16),
+                        sliver: SliverList.builder(
+                          itemCount: newsItems.length > 3
+                              ? 3
+                              : newsItems.length,
+                          itemBuilder: (context, index) =>
+                              _NewsCard(item: newsItems[index]),
+                        ),
+                      ),
+                    ],
+
+                    // ── Certificates ──
+                    if (certificates.isNotEmpty)
+                      SliverToBoxAdapter(child: _buildCertificates()),
+
+                    const SliverToBoxAdapter(child: SizedBox(height: 32)),
+                  ],
+                ),
+                ScrollToTopFab(scrollController: _scrollController),
+                // Floating Zalo/Phone CTA
+                Positioned(
+                  right: 16,
+                  bottom: MediaQuery.of(context).padding.bottom + 80,
+                  child: Consumer(
+                    builder: (context, ref, _) {
+                      final settingsAsync = ref.watch(settingsProvider);
+                      return settingsAsync.when(
+                        data: (s) {
+                          final opts =
+                              s['optionsParsed'] as Map<String, dynamic>? ?? {};
+                          final phone =
+                              opts['hotline'] ?? opts['phone'] ?? '0827626962';
+                          final zalo = opts['zalo'] ?? phone;
+                          return FloatingContactCta(
+                            phone: phone.toString(),
+                            zalo: zalo.toString(),
                           );
                         },
-                      ),
-                    ),
+                        loading: () => const SizedBox.shrink(),
+                        error: (_, __) => const FloatingContactCta(
+                          phone: '0827626962',
+                          zalo: '0827626962',
+                        ),
+                      );
+                    },
                   ),
-                ],
-
-                // ── Trà Shan Tuyết — Grid Layout ──
-                if (productsTra.isNotEmpty) ...[
-                  SliverToBoxAdapter(
-                    child: TeaCeremonyHeader(
-                      title: 'Trà Shan Tuyết Cổ Thụ',
-                      subtitle: 'Hương vị đỉnh núi 1500m',
-                      onSeeAll: () => context.push('/products'),
-                    ),
-                  ),
-                  _buildProductGrid(productsTra, indexOffset: productsAmTuSa.length),
-                ],
-
-                // ── Testimonials (Cảm nhận) ──
-                if (testimonials.isNotEmpty)
-                  SliverToBoxAdapter(child: _buildTestimonials()),
-
-                // ── News ──
-                if (newsItems.isNotEmpty) ...[
-                  SliverToBoxAdapter(
-                    child: TeaCeremonyHeader(
-                      title: 'Tin Tức & Sự Kiện',
-                      subtitle: 'Cập nhật từ An Nhi Trà',
-                      onSeeAll: () => context.go('/news'),
-                    ),
-                  ),
-                  SliverPadding(
-                    padding: const EdgeInsets.symmetric(horizontal: 16),
-                    sliver: SliverList.builder(
-                      itemCount: newsItems.length > 3 ? 3 : newsItems.length,
-                      itemBuilder: (context, index) =>
-                          _NewsCard(item: newsItems[index]),
-                    ),
-                  ),
-                ],
-
-                // ── Certificates ──
-                if (certificates.isNotEmpty)
-                  SliverToBoxAdapter(child: _buildCertificates()),
-
-                const SliverToBoxAdapter(child: SizedBox(height: 32)),
+                ),
               ],
             ),
-            ScrollToTopFab(scrollController: _scrollController),
-            // Floating Zalo/Phone CTA
-            Positioned(
-              right: 16,
-              bottom: MediaQuery.of(context).padding.bottom + 80,
-              child: Consumer(
-                builder: (context, ref, _) {
-                  final settingsAsync = ref.watch(settingsProvider);
-                  return settingsAsync.when(
-                    data: (s) {
-                      final opts = s['optionsParsed'] as Map<String, dynamic>? ?? {};
-                      final phone = opts['hotline'] ?? opts['phone'] ?? '0827626962';
-                      final zalo = opts['zalo'] ?? phone;
-                      return FloatingContactCta(phone: phone.toString(), zalo: zalo.toString());
-                    },
-                    loading: () => const SizedBox.shrink(),
-                    error: (_, __) => const FloatingContactCta(phone: '0827626962', zalo: '0827626962'),
-                  );
-                },
-              ),
-            ),
-          ],
-        ),
     );
   }
 
@@ -341,6 +359,75 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
     );
   }
 
+  Widget _buildCategoryGrid() {
+    final isDark = CupertinoTheme.brightnessOf(context) == Brightness.dark;
+    const categories = [
+      {'icon': '🫖', 'label': 'Ấm Tử Sa'},
+      {'icon': '🍵', 'label': 'Trà Shan'},
+      {'icon': '🏺', 'label': 'Phụ Kiện'},
+      {'icon': '🎁', 'label': 'Quà Tặng'},
+    ];
+
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(16, 20, 16, 8),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceAround,
+        children: categories.map((cat) {
+          return GestureDetector(
+            onTap: () {
+              HapticFeedback.selectionClick();
+              context.push('/products');
+            },
+            child: Column(
+              children: [
+                Container(
+                  width: 64,
+                  height: 64,
+                  decoration: BoxDecoration(
+                    shape: BoxShape.circle,
+                    color: isDark
+                        ? AppTheme.darkElevated
+                        : AppTheme.surfaceWhite,
+                    border: Border.all(
+                      color: AppTheme.accentGold.withValues(alpha: 0.4),
+                      width: 1.5,
+                    ),
+                    boxShadow: [
+                      BoxShadow(
+                        color: AppTheme.accentGold.withValues(
+                          alpha: isDark ? 0.1 : 0.15,
+                        ),
+                        blurRadius: 10,
+                        offset: const Offset(0, 3),
+                      ),
+                    ],
+                  ),
+                  child: Center(
+                    child: Text(
+                      cat['icon']!,
+                      style: const TextStyle(fontSize: 28),
+                    ),
+                  ),
+                ),
+                const SizedBox(height: 8),
+                Text(
+                  cat['label']!,
+                  style: TextStyle(
+                    fontSize: 12,
+                    fontWeight: FontWeight.w600,
+                    color: isDark
+                        ? AppTheme.darkTextPrimary
+                        : AppTheme.textPrimary,
+                  ),
+                ),
+              ],
+            ),
+          );
+        }).toList(),
+      ),
+    );
+  }
+
   Widget _buildProductGrid(List<Product> products, {int indexOffset = 0}) {
     return SliverPadding(
       padding: const EdgeInsets.symmetric(horizontal: 16),
@@ -416,16 +503,31 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                       mainAxisAlignment: MainAxisAlignment.center,
                       mainAxisSize: MainAxisSize.min,
                       children: [
-                        Icon(CupertinoIcons.star_fill,
-                            color: AppTheme.accentGold, size: 14),
-                        Icon(CupertinoIcons.star_fill,
-                            color: AppTheme.accentGold, size: 14),
-                        Icon(CupertinoIcons.star_fill,
-                            color: AppTheme.accentGold, size: 14),
-                        Icon(CupertinoIcons.star_fill,
-                            color: AppTheme.accentGold, size: 14),
-                        Icon(CupertinoIcons.star_fill,
-                            color: AppTheme.accentGold, size: 14),
+                        Icon(
+                          CupertinoIcons.star_fill,
+                          color: AppTheme.accentGold,
+                          size: 14,
+                        ),
+                        Icon(
+                          CupertinoIcons.star_fill,
+                          color: AppTheme.accentGold,
+                          size: 14,
+                        ),
+                        Icon(
+                          CupertinoIcons.star_fill,
+                          color: AppTheme.accentGold,
+                          size: 14,
+                        ),
+                        Icon(
+                          CupertinoIcons.star_fill,
+                          color: AppTheme.accentGold,
+                          size: 14,
+                        ),
+                        Icon(
+                          CupertinoIcons.star_fill,
+                          color: AppTheme.accentGold,
+                          size: 14,
+                        ),
                       ],
                     ),
                     const SizedBox(height: 12),
@@ -597,17 +699,22 @@ class _NewsCard extends StatelessWidget {
             children: [
               ClipRRect(
                 borderRadius: const BorderRadius.horizontal(
-                    left: Radius.circular(14)),
+                  left: Radius.circular(14),
+                ),
                 child: CachedNetworkImage(
                   imageUrl: ApiService.getImageUrl(item.photo, 'news'),
                   width: 100,
                   height: 85,
                   fit: BoxFit.cover,
                   errorWidget: (_, _a, _b) => Container(
-                    width: 100, height: 85,
+                    width: 100,
+                    height: 85,
                     color: isDark ? AppTheme.darkSurface : AppTheme.groupedBg,
-                    child: const Icon(CupertinoIcons.news,
-                        color: AppTheme.accentGold, size: 24),
+                    child: const Icon(
+                      CupertinoIcons.news,
+                      color: AppTheme.accentGold,
+                      size: 24,
+                    ),
                   ),
                 ),
               ),
@@ -632,12 +739,23 @@ class _NewsCard extends StatelessWidget {
                       const SizedBox(height: 6),
                       Row(
                         children: [
-                          Icon(CupertinoIcons.eye, size: 12,
-                              color: isDark ? AppTheme.darkTextSecondary : AppTheme.textMuted),
+                          Icon(
+                            CupertinoIcons.eye,
+                            size: 12,
+                            color: isDark
+                                ? AppTheme.darkTextSecondary
+                                : AppTheme.textMuted,
+                          ),
                           const SizedBox(width: 3),
-                          Text('${item.view ?? 0}',
-                              style: TextStyle(fontSize: 11,
-                                color: isDark ? AppTheme.darkTextSecondary : AppTheme.textMuted)),
+                          Text(
+                            '${item.view ?? 0}',
+                            style: TextStyle(
+                              fontSize: 11,
+                              color: isDark
+                                  ? AppTheme.darkTextSecondary
+                                  : AppTheme.textMuted,
+                            ),
+                          ),
                         ],
                       ),
                     ],
@@ -646,9 +764,13 @@ class _NewsCard extends StatelessWidget {
               ),
               Padding(
                 padding: const EdgeInsets.only(right: 12),
-                child: Icon(CupertinoIcons.chevron_right,
-                    size: 16,
-                    color: isDark ? AppTheme.darkTextSecondary : AppTheme.textMuted),
+                child: Icon(
+                  CupertinoIcons.chevron_right,
+                  size: 16,
+                  color: isDark
+                      ? AppTheme.darkTextSecondary
+                      : AppTheme.textMuted,
+                ),
               ),
             ],
           ),
