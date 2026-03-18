@@ -180,7 +180,7 @@ class _ProductListScreenState extends ConsumerState<ProductListScreen> {
           if (lists.isNotEmpty)
             SliverToBoxAdapter(
               child: SizedBox(
-                height: 40,
+                height: 46,
                 child: ListView(
                   scrollDirection: Axis.horizontal,
                   physics: const BouncingScrollPhysics(),
@@ -332,6 +332,7 @@ class _CatChipState extends State<_CatChip> with SingleTickerProviderStateMixin 
 
   @override
   Widget build(BuildContext context) {
+    final isDark = CupertinoTheme.brightnessOf(context) == Brightness.dark;
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 4),
       child: GestureDetector(
@@ -344,23 +345,34 @@ class _CatChipState extends State<_CatChip> with SingleTickerProviderStateMixin 
           child: AnimatedContainer(
             duration: const Duration(milliseconds: 250),
             curve: Curves.easeOutCubic,
-            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+            padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 10),
             decoration: BoxDecoration(
-              color: widget.selected ? AppTheme.primaryDark : CupertinoColors.white,
-              borderRadius: BorderRadius.circular(20),
+              gradient: widget.selected
+                  ? const LinearGradient(
+                      begin: Alignment.topLeft,
+                      end: Alignment.bottomRight,
+                      colors: [AppTheme.primaryDark, Color(0xFF2D5E3E)],
+                    )
+                  : null,
+              color: widget.selected
+                  ? null
+                  : (isDark ? AppTheme.darkElevated : AppTheme.surfaceWhite),
+              borderRadius: BorderRadius.circular(22),
               border: Border.all(
-                color: widget.selected ? AppTheme.primaryDark : AppTheme.separator,
-                width: 1,
+                color: widget.selected
+                    ? AppTheme.accentGold.withValues(alpha: 0.5)
+                    : (isDark ? AppTheme.darkSeparator : AppTheme.separator),
+                width: widget.selected ? 1.5 : 1,
               ),
               boxShadow: widget.selected ? [
                 BoxShadow(
-                  color: AppTheme.primaryDark.withValues(alpha: 0.25),
-                  blurRadius: 8,
+                  color: AppTheme.primaryDark.withValues(alpha: 0.3),
+                  blurRadius: 10,
                   offset: const Offset(0, 3),
                 ),
               ] : [
                 BoxShadow(
-                  color: Colors.black.withValues(alpha: 0.04),
+                  color: Colors.black.withValues(alpha: isDark ? 0.1 : 0.04),
                   blurRadius: 4,
                   offset: const Offset(0, 1),
                 ),
@@ -370,9 +382,11 @@ class _CatChipState extends State<_CatChip> with SingleTickerProviderStateMixin 
               duration: const Duration(milliseconds: 200),
               style: TextStyle(
                 fontSize: 13,
-                fontWeight: widget.selected ? FontWeight.w600 : FontWeight.w500,
-                color: widget.selected ? CupertinoColors.white : AppTheme.textPrimary,
-                letterSpacing: widget.selected ? 0.2 : 0,
+                fontWeight: widget.selected ? FontWeight.w700 : FontWeight.w500,
+                color: widget.selected
+                    ? AppTheme.accentGold
+                    : (isDark ? AppTheme.darkTextPrimary : AppTheme.textPrimary),
+                letterSpacing: widget.selected ? 0.3 : 0,
               ),
               child: Text(widget.label),
             ),

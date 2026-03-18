@@ -566,14 +566,20 @@ class _NewsCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final isDark = CupertinoTheme.brightnessOf(context) == Brightness.dark;
     return Container(
       margin: const EdgeInsets.only(bottom: 12),
       decoration: BoxDecoration(
-        color: CupertinoColors.systemBackground.resolveFrom(context),
-        borderRadius: BorderRadius.circular(12),
+        color: isDark ? AppTheme.darkElevated : AppTheme.surfaceWhite,
+        borderRadius: BorderRadius.circular(14),
+        border: Border.all(
+          color: isDark
+              ? AppTheme.darkSeparator.withValues(alpha: 0.2)
+              : AppTheme.separator.withValues(alpha: 0.4),
+        ),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withValues(alpha: 0.06),
+            color: Colors.black.withValues(alpha: isDark ? 0.15 : 0.05),
             blurRadius: 8,
             offset: const Offset(0, 2),
           ),
@@ -586,19 +592,23 @@ class _NewsCard extends StatelessWidget {
           context.push('/news/${item.id}');
         },
         child: ClipRRect(
-          borderRadius: BorderRadius.circular(12),
+          borderRadius: BorderRadius.circular(14),
           child: Row(
             children: [
               ClipRRect(
                 borderRadius: const BorderRadius.horizontal(
-                    left: Radius.circular(12)),
+                    left: Radius.circular(14)),
                 child: CachedNetworkImage(
                   imageUrl: ApiService.getImageUrl(item.photo, 'news'),
-                  width: 110,
-                  height: 90,
+                  width: 100,
+                  height: 85,
                   fit: BoxFit.cover,
-                  errorWidget: (_, _a, _b) =>
-                      Container(width: 110, height: 90, color: AppTheme.primaryBg),
+                  errorWidget: (_, _a, _b) => Container(
+                    width: 100, height: 85,
+                    color: isDark ? AppTheme.darkSurface : AppTheme.groupedBg,
+                    child: const Icon(CupertinoIcons.news,
+                        color: AppTheme.accentGold, size: 24),
+                  ),
                 ),
               ),
               Expanded(
@@ -611,30 +621,34 @@ class _NewsCard extends StatelessWidget {
                         item.namevi ?? '',
                         maxLines: 2,
                         overflow: TextOverflow.ellipsis,
-                        style: const TextStyle(
+                        style: TextStyle(
                           fontWeight: FontWeight.w600,
                           fontSize: 14,
-                          color: AppTheme.textPrimary,
+                          color: isDark
+                              ? AppTheme.darkTextPrimary
+                              : AppTheme.textPrimary,
                         ),
                       ),
-                      const SizedBox(height: 4),
-                      Text(
-                        item.descvi ?? '',
-                        maxLines: 2,
-                        overflow: TextOverflow.ellipsis,
-                        style: const TextStyle(
-                          fontSize: 12,
-                          color: AppTheme.textMuted,
-                        ),
+                      const SizedBox(height: 6),
+                      Row(
+                        children: [
+                          Icon(CupertinoIcons.eye, size: 12,
+                              color: isDark ? AppTheme.darkTextSecondary : AppTheme.textMuted),
+                          const SizedBox(width: 3),
+                          Text('${item.view ?? 0}',
+                              style: TextStyle(fontSize: 11,
+                                color: isDark ? AppTheme.darkTextSecondary : AppTheme.textMuted)),
+                        ],
                       ),
                     ],
                   ),
                 ),
               ),
-              const Padding(
-                padding: EdgeInsets.only(right: 12),
+              Padding(
+                padding: const EdgeInsets.only(right: 12),
                 child: Icon(CupertinoIcons.chevron_right,
-                    size: 16, color: AppTheme.textMuted),
+                    size: 16,
+                    color: isDark ? AppTheme.darkTextSecondary : AppTheme.textMuted),
               ),
             ],
           ),

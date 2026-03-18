@@ -17,11 +17,11 @@ class AnimatedNavBar extends StatefulWidget {
   });
 
   static const tabs = [
-    ('/', CupertinoIcons.home, 'Trang chủ'),
-    ('/products', CupertinoIcons.cube_box, 'Sản phẩm'),
-    ('/news', CupertinoIcons.news, 'Tin tức'),
+    ('/', CupertinoIcons.house_fill, 'Trang chủ'),
+    ('/products', CupertinoIcons.leaf_arrow_circlepath, 'Sản phẩm'),
+    ('/news', CupertinoIcons.doc_text, 'Tin tức'),
     ('/cart', CupertinoIcons.cart, 'Giỏ hàng'),
-    ('/more', CupertinoIcons.ellipsis, 'Thêm'),
+    ('/more', CupertinoIcons.ellipsis_circle, 'Thêm'),
   ];
 
   @override

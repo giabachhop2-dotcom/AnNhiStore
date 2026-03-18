@@ -72,14 +72,20 @@ class _NewsListScreenState extends ConsumerState<NewsListScreen> {
                 itemCount: articles.length,
                 itemBuilder: (context, index) {
                   final item = articles[index];
+                  final isDark = CupertinoTheme.brightnessOf(context) == Brightness.dark;
                   return Container(
                     margin: const EdgeInsets.only(bottom: 14),
                     decoration: BoxDecoration(
-                      color: CupertinoColors.systemBackground.resolveFrom(context),
+                      color: isDark ? AppTheme.darkElevated : AppTheme.surfaceWhite,
                       borderRadius: BorderRadius.circular(14),
+                      border: Border.all(
+                        color: isDark
+                            ? AppTheme.darkSeparator.withValues(alpha: 0.2)
+                            : AppTheme.separator.withValues(alpha: 0.4),
+                      ),
                       boxShadow: [
                         BoxShadow(
-                          color: Colors.black.withValues(alpha: 0.06),
+                          color: Colors.black.withValues(alpha: isDark ? 0.15 : 0.05),
                           blurRadius: 10,
                           offset: const Offset(0, 3),
                         ),
@@ -101,8 +107,14 @@ class _NewsListScreenState extends ConsumerState<NewsListScreen> {
                               height: 180,
                               width: double.infinity,
                               fit: BoxFit.cover,
-                              errorWidget: (_, _a, _b) =>
-                                  Container(height: 180, color: AppTheme.groupedBg),
+                              errorWidget: (_, _a, _b) => Container(
+                                height: 180,
+                                color: isDark ? AppTheme.darkSurface : AppTheme.groupedBg,
+                                child: const Center(
+                                  child: Icon(CupertinoIcons.news,
+                                      color: AppTheme.accentGold, size: 32),
+                                ),
+                              ),
                             ),
                             Padding(
                               padding: const EdgeInsets.all(14),
@@ -113,10 +125,12 @@ class _NewsListScreenState extends ConsumerState<NewsListScreen> {
                                     item.namevi ?? '',
                                     maxLines: 2,
                                     overflow: TextOverflow.ellipsis,
-                                    style: const TextStyle(
+                                    style: TextStyle(
                                       fontWeight: FontWeight.w600,
                                       fontSize: 16,
-                                      color: AppTheme.textPrimary,
+                                      color: isDark
+                                          ? AppTheme.darkTextPrimary
+                                          : AppTheme.textPrimary,
                                       letterSpacing: -0.3,
                                     ),
                                   ),
@@ -125,8 +139,10 @@ class _NewsListScreenState extends ConsumerState<NewsListScreen> {
                                     item.descvi ?? '',
                                     maxLines: 3,
                                     overflow: TextOverflow.ellipsis,
-                                    style: const TextStyle(
-                                      color: AppTheme.textMuted,
+                                    style: TextStyle(
+                                      color: isDark
+                                          ? AppTheme.darkTextSecondary
+                                          : AppTheme.textMuted,
                                       fontSize: 13,
                                       height: 1.4,
                                     ),
@@ -134,14 +150,18 @@ class _NewsListScreenState extends ConsumerState<NewsListScreen> {
                                   const SizedBox(height: 8),
                                   Row(
                                     children: [
-                                      const Icon(CupertinoIcons.eye, size: 14, color: AppTheme.textMuted),
+                                      Icon(CupertinoIcons.eye, size: 14,
+                                          color: isDark ? AppTheme.darkTextSecondary : AppTheme.textMuted),
                                       const SizedBox(width: 4),
                                       Text('${item.view ?? 0}',
-                                          style: const TextStyle(color: AppTheme.textMuted, fontSize: 12)),
-                                      const Spacer(),
-                                      const Text('Đọc tiếp ›',
                                           style: TextStyle(
-                                            color: AppTheme.primaryDark,
+                                            color: isDark ? AppTheme.darkTextSecondary : AppTheme.textMuted,
+                                            fontSize: 12,
+                                          )),
+                                      const Spacer(),
+                                      Text('Đọc tiếp ›',
+                                          style: TextStyle(
+                                            color: isDark ? AppTheme.accentGold : AppTheme.primaryDark,
                                             fontSize: 13,
                                             fontWeight: FontWeight.w500,
                                           )),

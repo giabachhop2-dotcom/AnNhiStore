@@ -166,6 +166,7 @@ class _AnimatedProductCardState extends ConsumerState<AnimatedProductCard>
     final imageUrl = ApiService.getImageUrl(widget.product.photo, 'product');
     final formatter = NumberFormat.currency(locale: 'vi_VN', symbol: '₫');
     final heroTag = 'product-${widget.product.id}';
+    final isDark = CupertinoTheme.brightnessOf(context) == Brightness.dark;
 
     return FadeTransition(
       opacity: _entryFade,
@@ -223,12 +224,18 @@ class _AnimatedProductCardState extends ConsumerState<AnimatedProductCard>
               onTap: _onTap,
               child: Container(
                 decoration: BoxDecoration(
-                  color:
-                      CupertinoColors.systemBackground.resolveFrom(context),
+                  color: isDark
+                      ? AppTheme.darkElevated
+                      : AppTheme.surfaceWhite,
                   borderRadius: BorderRadius.circular(14),
+                  border: Border.all(
+                    color: isDark
+                        ? AppTheme.darkSeparator.withValues(alpha: 0.3)
+                        : AppTheme.separator.withValues(alpha: 0.4),
+                  ),
                   boxShadow: [
                     BoxShadow(
-                      color: Colors.black.withValues(alpha: 0.07),
+                      color: Colors.black.withValues(alpha: isDark ? 0.2 : 0.06),
                       blurRadius: 12,
                       offset: const Offset(0, 3),
                     ),
@@ -399,7 +406,7 @@ class _AnimatedProductCardState extends ConsumerState<AnimatedProductCard>
                       Expanded(
                         flex: 2,
                         child: Padding(
-                          padding: const EdgeInsets.all(10),
+                          padding: const EdgeInsets.fromLTRB(12, 10, 12, 10),
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
@@ -409,13 +416,16 @@ class _AnimatedProductCardState extends ConsumerState<AnimatedProductCard>
                                 overflow: TextOverflow.ellipsis,
                                 style: TextStyle(
                                   fontWeight: FontWeight.w600,
-                                  fontSize: 13,
-                                  color: CupertinoColors.label.resolveFrom(context),
+                                  fontSize: 15,
+                                  height: 1.3,
+                                  color: isDark
+                                      ? AppTheme.darkTextPrimary
+                                      : AppTheme.textPrimary,
                                   letterSpacing: -0.2,
                                 ),
                               ),
                               const Spacer(),
-                              _buildPrice(formatter),
+                              _buildPrice(formatter, isDark),
                             ],
                           ),
                         ),
@@ -431,7 +441,7 @@ class _AnimatedProductCardState extends ConsumerState<AnimatedProductCard>
     );
   }
 
-  Widget _buildPrice(NumberFormat formatter) {
+  Widget _buildPrice(NumberFormat formatter, bool isDark) {
     final p = widget.product;
     if (p.isOnSale) {
       return Column(
