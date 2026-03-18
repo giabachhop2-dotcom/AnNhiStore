@@ -115,8 +115,11 @@ class _TeaTraceabilityScreenState extends State<TeaTraceabilityScreen>
                           ),
                         ],
                       ),
-                      child: const Icon(CupertinoIcons.qrcode_viewfinder,
-                          size: 32, color: AppTheme.accentGold),
+                      child: const Icon(
+                        CupertinoIcons.qrcode_viewfinder,
+                        size: 32,
+                        color: AppTheme.accentGold,
+                      ),
                     ),
                     const SizedBox(height: 16),
                     Text(
@@ -159,8 +162,10 @@ class _TeaTraceabilityScreenState extends State<TeaTraceabilityScreen>
                       ? AppTheme.darkTextPrimary
                       : AppTheme.textPrimary,
                 ),
-                padding:
-                    const EdgeInsets.symmetric(horizontal: 20, vertical: 14),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 20,
+                  vertical: 14,
+                ),
                 decoration: BoxDecoration(
                   color: isDark ? AppTheme.darkElevated : AppTheme.surfaceWhite,
                   borderRadius: BorderRadius.circular(14),
@@ -195,7 +200,6 @@ class _TeaTraceabilityScreenState extends State<TeaTraceabilityScreen>
                     style: TextStyle(
                       fontSize: 12,
                       color: AppTheme.accentGold.withValues(alpha: 0.7),
-                      decoration: TextDecoration.underline,
                     ),
                   ),
                 ),
@@ -213,8 +217,11 @@ class _TeaTraceabilityScreenState extends State<TeaTraceabilityScreen>
                   ),
                   child: Column(
                     children: [
-                      const Icon(CupertinoIcons.xmark_circle,
-                          size: 40, color: AppTheme.priceRed),
+                      const Icon(
+                        CupertinoIcons.xmark_circle,
+                        size: 40,
+                        color: AppTheme.priceRed,
+                      ),
                       const SizedBox(height: 10),
                       Text(
                         'Không tìm thấy mã lô trà',
@@ -259,199 +266,235 @@ class _TeaTraceabilityScreenState extends State<TeaTraceabilityScreen>
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
             // Verification badge
-            _buildRevealItem(0, Container(
-              padding: const EdgeInsets.all(16),
-              decoration: BoxDecoration(
-                gradient: const LinearGradient(
-                  colors: [Color(0xFF1A3C28), Color(0xFF2D5E3E)],
-                ),
-                borderRadius: BorderRadius.circular(16),
-                border: Border.all(
-                  color: AppTheme.accentGold.withValues(alpha: 0.3),
-                ),
-              ),
-              child: Row(
-                children: [
-                  Container(
-                    width: 48,
-                    height: 48,
-                    decoration: BoxDecoration(
-                      color: AppTheme.accentGold.withValues(alpha: 0.15),
-                      borderRadius: BorderRadius.circular(14),
-                    ),
-                    child: const Icon(CupertinoIcons.checkmark_seal_fill,
-                        color: AppTheme.accentGold, size: 26),
+            _buildRevealItem(
+              0,
+              Container(
+                padding: const EdgeInsets.all(16),
+                decoration: BoxDecoration(
+                  gradient: const LinearGradient(
+                    colors: [Color(0xFF1A3C28), Color(0xFF2D5E3E)],
                   ),
-                  const SizedBox(width: 14),
-                  Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        const Text('Sản phẩm chính hãng',
+                  borderRadius: BorderRadius.circular(16),
+                  border: Border.all(
+                    color: AppTheme.accentGold.withValues(alpha: 0.3),
+                  ),
+                ),
+                child: Row(
+                  children: [
+                    Container(
+                      width: 48,
+                      height: 48,
+                      decoration: BoxDecoration(
+                        color: AppTheme.accentGold.withValues(alpha: 0.15),
+                        borderRadius: BorderRadius.circular(14),
+                      ),
+                      child: const Icon(
+                        CupertinoIcons.checkmark_seal_fill,
+                        color: AppTheme.accentGold,
+                        size: 26,
+                      ),
+                    ),
+                    const SizedBox(width: 14),
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          const Text(
+                            'Sản phẩm chính hãng',
                             style: TextStyle(
                               color: AppTheme.accentGold,
                               fontWeight: FontWeight.bold,
                               fontSize: 15,
-                            )),
-                        Text('Xác minh bởi An Nhi Trà',
+                            ),
+                          ),
+                          Text(
+                            'Xác minh bởi An Nhi Trà',
                             style: TextStyle(
-                              color: CupertinoColors.white.withValues(alpha: 0.7),
+                              color: CupertinoColors.white.withValues(
+                                alpha: 0.7,
+                              ),
                               fontSize: 12,
-                            )),
-                      ],
+                            ),
+                          ),
+                        ],
+                      ),
                     ),
-                  ),
-                ],
+                  ],
+                ),
               ),
-            )),
+            ),
 
             const SizedBox(height: 16),
 
             // Product name
-            _buildRevealItem(1, _InfoCard(
-              isDark: isDark,
-              icon: CupertinoIcons.leaf_arrow_circlepath,
-              iconColor: const Color(0xFF4A7C5C),
-              label: 'Tên sản phẩm',
-              value: batch.productName,
-            )),
+            _buildRevealItem(
+              1,
+              _InfoCard(
+                isDark: isDark,
+                icon: CupertinoIcons.leaf_arrow_circlepath,
+                iconColor: const Color(0xFF4A7C5C),
+                label: 'Tên sản phẩm',
+                value: batch.productName,
+              ),
+            ),
 
             const SizedBox(height: 10),
 
             // Origin + Region
-            _buildRevealItem(2, Row(
-              children: [
-                Expanded(
-                  child: _InfoCard(
-                    isDark: isDark,
-                    icon: CupertinoIcons.map_pin_ellipse,
-                    iconColor: const Color(0xFFE57373),
-                    label: 'Vùng trồng',
-                    value: batch.region,
+            _buildRevealItem(
+              2,
+              Row(
+                children: [
+                  Expanded(
+                    child: _InfoCard(
+                      isDark: isDark,
+                      icon: CupertinoIcons.map_pin_ellipse,
+                      iconColor: const Color(0xFFE57373),
+                      label: 'Vùng trồng',
+                      value: batch.region,
+                    ),
                   ),
-                ),
-                const SizedBox(width: 10),
-                Expanded(
-                  child: _InfoCard(
-                    isDark: isDark,
-                    icon: CupertinoIcons.arrow_up_right_diamond,
-                    iconColor: const Color(0xFF64B5F6),
-                    label: 'Độ cao',
-                    value: batch.altitude,
+                  const SizedBox(width: 10),
+                  Expanded(
+                    child: _InfoCard(
+                      isDark: isDark,
+                      icon: CupertinoIcons.arrow_up_right_diamond,
+                      iconColor: const Color(0xFF64B5F6),
+                      label: 'Độ cao',
+                      value: batch.altitude,
+                    ),
                   ),
-                ),
-              ],
-            )),
+                ],
+              ),
+            ),
 
             const SizedBox(height: 10),
 
             // Batch + Harvest
-            _buildRevealItem(3, Row(
-              children: [
-                Expanded(
-                  child: _InfoCard(
-                    isDark: isDark,
-                    icon: CupertinoIcons.barcode,
-                    iconColor: AppTheme.accentGold,
-                    label: 'Mã lô',
-                    value: batch.batchCode,
+            _buildRevealItem(
+              3,
+              Row(
+                children: [
+                  Expanded(
+                    child: _InfoCard(
+                      isDark: isDark,
+                      icon: CupertinoIcons.barcode,
+                      iconColor: AppTheme.accentGold,
+                      label: 'Mã lô',
+                      value: batch.batchCode,
+                    ),
                   ),
-                ),
-                const SizedBox(width: 10),
-                Expanded(
-                  child: _InfoCard(
-                    isDark: isDark,
-                    icon: CupertinoIcons.calendar,
-                    iconColor: const Color(0xFF81C784),
-                    label: 'Thu hoạch',
-                    value: batch.harvestDate,
+                  const SizedBox(width: 10),
+                  Expanded(
+                    child: _InfoCard(
+                      isDark: isDark,
+                      icon: CupertinoIcons.calendar,
+                      iconColor: const Color(0xFF81C784),
+                      label: 'Thu hoạch',
+                      value: batch.harvestDate,
+                    ),
                   ),
-                ),
-              ],
-            )),
+                ],
+              ),
+            ),
 
             const SizedBox(height: 10),
 
             // Type + Aging
-            _buildRevealItem(4, Row(
-              children: [
-                Expanded(
-                  child: _InfoCard(
-                    isDark: isDark,
-                    icon: CupertinoIcons.cube_box,
-                    iconColor: const Color(0xFFBA68C8),
-                    label: 'Loại trà',
-                    value: batch.teaType,
+            _buildRevealItem(
+              4,
+              Row(
+                children: [
+                  Expanded(
+                    child: _InfoCard(
+                      isDark: isDark,
+                      icon: CupertinoIcons.cube_box,
+                      iconColor: const Color(0xFFBA68C8),
+                      label: 'Loại trà',
+                      value: batch.teaType,
+                    ),
                   ),
-                ),
-                const SizedBox(width: 10),
-                Expanded(
-                  child: _InfoCard(
-                    isDark: isDark,
-                    icon: CupertinoIcons.timer,
-                    iconColor: const Color(0xFFFFB74D),
-                    label: 'Thời gian ủ',
-                    value: batch.agingTime,
+                  const SizedBox(width: 10),
+                  Expanded(
+                    child: _InfoCard(
+                      isDark: isDark,
+                      icon: CupertinoIcons.timer,
+                      iconColor: const Color(0xFFFFB74D),
+                      label: 'Thời gian ủ',
+                      value: batch.agingTime,
+                    ),
                   ),
-                ),
-              ],
-            )),
+                ],
+              ),
+            ),
 
             const SizedBox(height: 10),
 
             // Process
-            _buildRevealItem(5, _InfoCard(
-              isDark: isDark,
-              icon: CupertinoIcons.lab_flask,
-              iconColor: const Color(0xFF4DB6AC),
-              label: 'Quy trình sản xuất',
-              value: batch.process,
-            )),
+            _buildRevealItem(
+              5,
+              _InfoCard(
+                isDark: isDark,
+                icon: CupertinoIcons.lab_flask,
+                iconColor: const Color(0xFF4DB6AC),
+                label: 'Quy trình sản xuất',
+                value: batch.process,
+              ),
+            ),
 
             const SizedBox(height: 10),
 
             // Farmer
-            _buildRevealItem(6, _InfoCard(
-              isDark: isDark,
-              icon: CupertinoIcons.person_crop_circle,
-              iconColor: const Color(0xFF7986CB),
-              label: 'Nông hộ / Đối tác',
-              value: batch.farmer,
-            )),
+            _buildRevealItem(
+              6,
+              _InfoCard(
+                isDark: isDark,
+                icon: CupertinoIcons.person_crop_circle,
+                iconColor: const Color(0xFF7986CB),
+                label: 'Nông hộ / Đối tác',
+                value: batch.farmer,
+              ),
+            ),
 
             const SizedBox(height: 10),
 
             // Certificate
             if (batch.certificate != null)
-              _buildRevealItem(7, Container(
-                padding: const EdgeInsets.all(14),
-                decoration: BoxDecoration(
-                  color: isDark ? AppTheme.darkElevated : AppTheme.groupedBg,
-                  borderRadius: BorderRadius.circular(14),
-                  border: Border.all(
-                    color: AppTheme.accentGold.withValues(alpha: 0.2),
+              _buildRevealItem(
+                7,
+                Container(
+                  padding: const EdgeInsets.all(14),
+                  decoration: BoxDecoration(
+                    color: isDark ? AppTheme.darkElevated : AppTheme.groupedBg,
+                    borderRadius: BorderRadius.circular(14),
+                    border: Border.all(
+                      color: AppTheme.accentGold.withValues(alpha: 0.2),
+                    ),
                   ),
-                ),
-                child: Row(
-                  children: [
-                    const Icon(CupertinoIcons.rosette,
-                        color: AppTheme.accentGold, size: 20),
-                    const SizedBox(width: 10),
-                    Expanded(
-                      child: Text(
-                        batch.certificate!,
-                        style: TextStyle(
-                          fontSize: 13,
-                          fontStyle: FontStyle.italic,
-                          color: isDark
-                              ? AppTheme.darkTextSecondary
-                              : AppTheme.textSecondary,
+                  child: Row(
+                    children: [
+                      const Icon(
+                        CupertinoIcons.rosette,
+                        color: AppTheme.accentGold,
+                        size: 20,
+                      ),
+                      const SizedBox(width: 10),
+                      Expanded(
+                        child: Text(
+                          batch.certificate!,
+                          style: TextStyle(
+                            fontSize: 13,
+                            fontStyle: FontStyle.italic,
+                            color: isDark
+                                ? AppTheme.darkTextSecondary
+                                : AppTheme.textSecondary,
+                          ),
                         ),
                       ),
-                    ),
-                  ],
+                    ],
+                  ),
                 ),
-              )),
+              ),
 
             const SizedBox(height: 24),
           ],
@@ -462,8 +505,10 @@ class _TeaTraceabilityScreenState extends State<TeaTraceabilityScreen>
 
   Widget _buildRevealItem(int index, Widget child) {
     final stagger = (index * 0.08).clamp(0.0, 0.5);
-    final t = ((_revealController.value - stagger) / (1 - stagger))
-        .clamp(0.0, 1.0);
+    final t = ((_revealController.value - stagger) / (1 - stagger)).clamp(
+      0.0,
+      1.0,
+    );
     final curve = Curves.easeOutCubic.transform(t);
 
     return Opacity(
@@ -513,24 +558,27 @@ class _InfoCard extends StatelessWidget {
             children: [
               Icon(icon, size: 14, color: iconColor),
               const SizedBox(width: 6),
-              Text(label,
-                  style: TextStyle(
-                    fontSize: 11,
-                    color: isDark
-                        ? AppTheme.darkTextSecondary
-                        : AppTheme.textMuted,
-                    fontWeight: FontWeight.w500,
-                  )),
+              Text(
+                label,
+                style: TextStyle(
+                  fontSize: 11,
+                  color: isDark
+                      ? AppTheme.darkTextSecondary
+                      : AppTheme.textMuted,
+                  fontWeight: FontWeight.w500,
+                ),
+              ),
             ],
           ),
           const SizedBox(height: 6),
-          Text(value,
-              style: TextStyle(
-                fontSize: 14,
-                fontWeight: FontWeight.w600,
-                color:
-                    isDark ? AppTheme.darkTextPrimary : AppTheme.textPrimary,
-              )),
+          Text(
+            value,
+            style: TextStyle(
+              fontSize: 14,
+              fontWeight: FontWeight.w600,
+              color: isDark ? AppTheme.darkTextPrimary : AppTheme.textPrimary,
+            ),
+          ),
         ],
       ),
     );
@@ -574,7 +622,8 @@ final Map<String, _TeaBatch> _mockDatabase = {
     altitude: '1.400 - 1.600m',
     harvestDate: 'Tháng 3/2025 (Xuân)',
     agingTime: '6 tháng ủ tự nhiên',
-    process: 'Hái thủ công → Héo nắng → Sao chảo gang → Vò → Phơi âm can → Ủ kho lạnh',
+    process:
+        'Hái thủ công → Héo nắng → Sao chảo gang → Vò → Phơi âm can → Ủ kho lạnh',
     farmer: 'HTX Trà Shan Tuyết Hoàng Su Phì',
     certificate: 'Chứng nhận VietGAP · Truy xuất TXNG Bộ NN&PTNT',
   ),
@@ -586,7 +635,8 @@ final Map<String, _TeaBatch> _mockDatabase = {
     altitude: '1.200 - 1.400m',
     harvestDate: 'Tháng 4/2025 (Xuân muộn)',
     agingTime: '3 tháng lên men tự nhiên',
-    process: 'Hái thủ công → Héo tự nhiên → Vò nén → Lên men 8h → Sấy than hoa → Ủ 3 tháng',
+    process:
+        'Hái thủ công → Héo tự nhiên → Vò nén → Lên men 8h → Sấy than hoa → Ủ 3 tháng',
     farmer: 'Nông hộ Giàng A Chải - bản Suối Giàng',
     certificate: 'Chứng nhận hữu cơ USDA Organic',
   ),
@@ -598,7 +648,8 @@ final Map<String, _TeaBatch> _mockDatabase = {
     altitude: '1.600 - 1.800m',
     harvestDate: 'Tháng 5/2025 (Hè sớm)',
     agingTime: '2 tháng ủ ổn định hương',
-    process: 'Hái búp 1 tôm 2 lá → Héo nắng → Rung lắc oxy hóa → Sao cố định → Vò → Sấy nhẹ → Ủ',
+    process:
+        'Hái búp 1 tôm 2 lá → Héo nắng → Rung lắc oxy hóa → Sao cố định → Vò → Sấy nhẹ → Ủ',
     farmer: 'Đối tác ANNSHAN - Vùng nguyên liệu Tà Xùa',
     certificate: 'Sản phẩm OCOP 4 sao · Bảo hộ chỉ dẫn địa lý',
   ),
@@ -610,7 +661,8 @@ final Map<String, _TeaBatch> _mockDatabase = {
     altitude: '1.500 - 1.700m',
     harvestDate: 'Tháng 9/2023 (Thu)',
     agingTime: '18 tháng (ủ ướt + ủ khô)',
-    process: 'Sao mao trà → Phơi dương → Ủ ướt 45 ngày → Lật giở → Sấy → Nén bánh → Ủ khô 12 tháng',
+    process:
+        'Sao mao trà → Phơi dương → Ủ ướt 45 ngày → Lật giở → Sấy → Nén bánh → Ủ khô 12 tháng',
     farmer: 'HTX Lũng Phìn - Cao nguyên đá Đồng Văn',
     certificate: 'Di sản Công viên Địa chất Toàn cầu UNESCO',
   ),
@@ -622,7 +674,8 @@ final Map<String, _TeaBatch> _mockDatabase = {
     altitude: '1.500m',
     harvestDate: 'Tháng 3/2025 (Xuân sớm)',
     agingTime: '1 tháng phơi âm can tự nhiên',
-    process: 'Hái búp non sáng sớm → Héo mát 48h → Phơi âm can 72h → Đóng gói chân không',
+    process:
+        'Hái búp non sáng sớm → Héo mát 48h → Phơi âm can 72h → Đóng gói chân không',
     farmer: 'Gia đình bà Vàng Thị Mỷ - bản Phìn Hồ',
     certificate: 'Chứng nhận An toàn thực phẩm · Sản phẩm OCOP 3 sao',
   ),

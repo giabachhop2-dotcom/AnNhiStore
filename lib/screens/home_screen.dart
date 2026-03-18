@@ -358,91 +358,95 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
     // Parallax factor: banner moves slower than scroll
     final parallaxOffset = _scrollOffset * 0.3;
 
-    return Transform.translate(
-      offset: Offset(0, parallaxOffset.clamp(0, 60)),
-      child: Column(
-        children: [
-          CarouselSlider(
-            items: slides.map((slide) {
-              final url = ApiService.getImageUrl(slide.photo, 'photo');
-              return Container(
-                margin: const EdgeInsets.symmetric(horizontal: 8),
-                decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(16),
-                  boxShadow: [
-                    BoxShadow(
-                      color: Colors.black.withValues(alpha: 0.15),
-                      blurRadius: 12,
-                      offset: const Offset(0, 4),
-                    ),
-                  ],
-                ),
-                child: ClipRRect(
-                  borderRadius: BorderRadius.circular(16),
-                  child: CachedNetworkImage(
-                    imageUrl: url,
-                    fit: BoxFit.cover,
-                    width: double.infinity,
-                    placeholder: (_, _a) => Shimmer.fromColors(
-                      baseColor: AppTheme.separator,
-                      highlightColor: AppTheme.groupedBg,
-                      child: Container(
-                        decoration: BoxDecoration(
-                          color: Colors.white,
-                          borderRadius: BorderRadius.circular(16),
+    return ClipRect(
+      child: Transform.translate(
+        offset: Offset(0, parallaxOffset.clamp(0, 60)),
+        child: Column(
+          children: [
+            CarouselSlider(
+              items: slides.map((slide) {
+                final url = ApiService.getImageUrl(slide.photo, 'photo');
+                return Container(
+                  margin: const EdgeInsets.symmetric(horizontal: 8),
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(16),
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.black.withValues(alpha: 0.15),
+                        blurRadius: 12,
+                        offset: const Offset(0, 4),
+                      ),
+                    ],
+                  ),
+                  child: ClipRRect(
+                    borderRadius: BorderRadius.circular(16),
+                    child: CachedNetworkImage(
+                      imageUrl: url,
+                      fit: BoxFit.cover,
+                      width: double.infinity,
+                      placeholder: (_, _a) => Shimmer.fromColors(
+                        baseColor: AppTheme.separator,
+                        highlightColor: AppTheme.groupedBg,
+                        child: Container(
+                          decoration: BoxDecoration(
+                            color: Colors.white,
+                            borderRadius: BorderRadius.circular(16),
+                          ),
                         ),
                       ),
+                      errorWidget: (_, _a, _b) =>
+                          Container(color: AppTheme.primaryBg),
                     ),
-                    errorWidget: (_, _a, _b) =>
-                        Container(color: AppTheme.primaryBg),
                   ),
-                ),
-              );
-            }).toList(),
-            options: CarouselOptions(
-              height: 200,
-              viewportFraction: 0.92,
-              autoPlay: true,
-              autoPlayInterval: const Duration(seconds: 4),
-              autoPlayAnimationDuration: const Duration(milliseconds: 800),
-              autoPlayCurve: Curves.easeInOutCubic,
-              enlargeCenterPage: true,
-              enlargeFactor: 0.15,
-              onPageChanged: (index, _) =>
-                  setState(() => _currentSlide = index),
+                );
+              }).toList(),
+              options: CarouselOptions(
+                height: 200,
+                viewportFraction: 0.92,
+                autoPlay: true,
+                autoPlayInterval: const Duration(seconds: 4),
+                autoPlayAnimationDuration: const Duration(milliseconds: 800),
+                autoPlayCurve: Curves.easeInOutCubic,
+                enlargeCenterPage: true,
+                enlargeFactor: 0.15,
+                onPageChanged: (index, _) =>
+                    setState(() => _currentSlide = index),
+              ),
             ),
-          ),
-          const SizedBox(height: 12),
-          // Animated page indicator dots
-          Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: List.generate(slides.length, (index) {
-              return AnimatedContainer(
-                duration: const Duration(milliseconds: 300),
-                curve: Curves.easeInOut,
-                margin: const EdgeInsets.symmetric(horizontal: 3),
-                width: _currentSlide == index ? 20 : 6,
-                height: 6,
-                decoration: BoxDecoration(
-                  color: _currentSlide == index
-                      ? AppTheme.primaryDark
-                      : AppTheme.textMuted.withValues(alpha: 0.3),
-                  borderRadius: BorderRadius.circular(3),
-                  boxShadow: _currentSlide == index
-                      ? [
-                          BoxShadow(
-                            color: AppTheme.primaryDark.withValues(alpha: 0.4),
-                            blurRadius: 6,
-                            spreadRadius: 1,
-                          ),
-                        ]
-                      : null,
-                ),
-              );
-            }),
-          ),
-          const SizedBox(height: 8),
-        ],
+            const SizedBox(height: 12),
+            // Animated page indicator dots
+            Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: List.generate(slides.length, (index) {
+                return AnimatedContainer(
+                  duration: const Duration(milliseconds: 300),
+                  curve: Curves.easeInOut,
+                  margin: const EdgeInsets.symmetric(horizontal: 3),
+                  width: _currentSlide == index ? 20 : 6,
+                  height: 6,
+                  decoration: BoxDecoration(
+                    color: _currentSlide == index
+                        ? AppTheme.primaryDark
+                        : AppTheme.textMuted.withValues(alpha: 0.3),
+                    borderRadius: BorderRadius.circular(3),
+                    boxShadow: _currentSlide == index
+                        ? [
+                            BoxShadow(
+                              color: AppTheme.primaryDark.withValues(
+                                alpha: 0.4,
+                              ),
+                              blurRadius: 6,
+                              spreadRadius: 1,
+                            ),
+                          ]
+                        : null,
+                  ),
+                );
+              }),
+            ),
+            const SizedBox(height: 8),
+          ],
+        ),
       ),
     );
   }

@@ -34,7 +34,7 @@ dependencies:
   shared_preferences: ^2.5.3
 
   # Utilities
-  url_launcher: ^6.3.1
+  url_launcher: ^6.3.2
   share_plus: ^10.1.4
   intl: ^0.20.2
   qr_flutter: ^4.1.0

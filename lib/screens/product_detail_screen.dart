@@ -6,6 +6,7 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter_widget_from_html_core/flutter_widget_from_html_core.dart';
 import 'package:intl/intl.dart';
 import 'package:share_plus/share_plus.dart';
+import 'package:url_launcher/url_launcher.dart';
 import 'package:go_router/go_router.dart';
 import '../providers/providers.dart';
 import '../models/models.dart';
@@ -559,56 +560,9 @@ class _ProductDetailScreenState extends ConsumerState<ProductDetailScreen>
                         ),
                       ),
                     ),
-                    child: Row(
-                      children: [
-                        Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            const Text(
-                              'Tổng',
-                              style: TextStyle(
-                                color: AppTheme.textMuted,
-                                fontSize: 13,
-                                fontWeight: FontWeight.w500,
-                              ),
-                            ),
-                            product!.displayPrice > 0
-                                ? Text(
-                                    formatter.format(
-                                      product!.displayPrice * quantity,
-                                    ),
-                                    style: const TextStyle(
-                                      fontSize: 20,
-                                      fontWeight: FontWeight.bold,
-                                      color: AppTheme.priceRed,
-                                    ),
-                                  )
-                                : const Text(
-                                    'Liên hệ',
-                                    style: TextStyle(
-                                      fontSize: 18,
-                                      fontWeight: FontWeight.w600,
-                                      color: AppTheme.accentGold,
-                                      fontStyle: FontStyle.italic,
-                                    ),
-                                  ),
-                          ],
-                        ),
-                        const SizedBox(width: 16),
-                        Expanded(
-                          child: ScaleTransition(
-                            scale: _cartBounce,
-                            child: GoldCTAButton(
-                              label: 'Thêm vào giỏ',
-                              icon: CupertinoIcons.cart_badge_plus,
-                              compact: true,
-                              onPressed: _addToCart,
-                            ),
-                          ),
-                        ),
-                      ],
-                    ),
+                    child: product!.displayPrice > 0
+                        ? _buildPricedCTA(formatter, isDark)
+                        : _buildContactCTA(isDark),
                   ),
                 ),
               ],
@@ -677,6 +631,167 @@ class _ProductDetailScreenState extends ConsumerState<ProductDetailScreen>
           ),
       ],
     );
+  }
+
+  /// Bottom CTA for products WITH a price — show price + cart button
+  Widget _buildPricedCTA(NumberFormat formatter, bool isDark) {
+    return Row(
+      children: [
+        Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Text(
+              'Tổng',
+              style: TextStyle(
+                color: isDark ? AppTheme.darkTextSecondary : AppTheme.textMuted,
+                fontSize: 13,
+                fontWeight: FontWeight.w500,
+              ),
+            ),
+            Text(
+              formatter.format(product!.displayPrice * quantity),
+              style: const TextStyle(
+                fontSize: 20,
+                fontWeight: FontWeight.bold,
+                color: Color(0xFFC8A96E),
+              ),
+            ),
+          ],
+        ),
+        const SizedBox(width: 16),
+        Expanded(
+          child: ScaleTransition(
+            scale: _cartBounce,
+            child: GoldCTAButton(
+              label: 'Thêm vào giỏ',
+              icon: CupertinoIcons.cart_badge_plus,
+              compact: true,
+              onPressed: _addToCart,
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+
+  /// Bottom CTA for CONTACT products — show Zalo + Phone buttons
+  Widget _buildContactCTA(bool isDark) {
+    final settingsAsync = ref.watch(settingsProvider);
+    final opts =
+        settingsAsync.whenOrNull(
+          data: (s) => s['optionsParsed'] as Map<String, dynamic>?,
+        ) ??
+        {};
+    final phone = (opts['hotline'] ?? opts['phone'] ?? '0827626962').toString();
+    final zalo = (opts['zalo'] ?? phone).toString();
+
+    return Row(
+      children: [
+        // Zalo button
+        Expanded(
+          flex: 3,
+          child: CupertinoButton(
+            padding: const EdgeInsets.symmetric(vertical: 12),
+            color: const Color(0xFF0068FF),
+            borderRadius: BorderRadius.circular(12),
+            onPressed: () {
+              HapticFeedback.mediumImpact();
+              final productName = product?.namevi ?? '';
+              final zaloUrl = 'https://zalo.me/$zalo';
+              _launchExternalUrl(zaloUrl);
+              // Also show a toast with the product name for reference
+              if (mounted) {
+                showCupertinoDialog(
+                  context: context,
+                  builder: (_) => CupertinoAlertDialog(
+                    title: const Text('Liên hệ qua Zalo'),
+                    content: Text(
+                      'Nhắn tin Zalo: $zalo\nSản phẩm: $productName',
+                    ),
+                    actions: [
+                      CupertinoDialogAction(
+                        child: const Text('Sao chép SĐT'),
+                        onPressed: () {
+                          Clipboard.setData(ClipboardData(text: zalo));
+                          Navigator.pop(context);
+                        },
+                      ),
+                      CupertinoDialogAction(
+                        isDefaultAction: true,
+                        child: const Text('Đóng'),
+                        onPressed: () => Navigator.pop(context),
+                      ),
+                    ],
+                  ),
+                );
+              }
+            },
+            child: const Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Icon(
+                  CupertinoIcons.chat_bubble_fill,
+                  size: 18,
+                  color: CupertinoColors.white,
+                ),
+                SizedBox(width: 6),
+                Text(
+                  'Nhắn Zalo',
+                  style: TextStyle(
+                    fontSize: 14,
+                    fontWeight: FontWeight.w700,
+                    color: CupertinoColors.white,
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
+        const SizedBox(width: 10),
+        // Call button
+        Expanded(
+          flex: 2,
+          child: CupertinoButton(
+            padding: const EdgeInsets.symmetric(vertical: 12),
+            color: const Color(0xFF2D8B4E),
+            borderRadius: BorderRadius.circular(12),
+            onPressed: () {
+              HapticFeedback.mediumImpact();
+              _launchExternalUrl('tel:$phone');
+            },
+            child: const Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Icon(
+                  CupertinoIcons.phone_fill,
+                  size: 18,
+                  color: CupertinoColors.white,
+                ),
+                SizedBox(width: 6),
+                Text(
+                  'Gọi ngay',
+                  style: TextStyle(
+                    fontSize: 14,
+                    fontWeight: FontWeight.w700,
+                    color: CupertinoColors.white,
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+
+  Future<void> _launchExternalUrl(String url) async {
+    try {
+      final uri = Uri.parse(url);
+      if (await canLaunchUrl(uri)) {
+        await launchUrl(uri, mode: LaunchMode.externalApplication);
+      }
+    } catch (_) {}
   }
 
   Widget _buildQuantitySelector() {
