@@ -332,7 +332,17 @@ class _ProductDetailScreenState extends ConsumerState<ProductDetailScreen>
                                 ),
                               ),
                               const SizedBox(height: 12),
-                              HtmlWidget(product!.contentvi ?? ''),
+                              HtmlWidget(
+                                product!.contentvi ?? '',
+                                textStyle: TextStyle(
+                                  decoration: TextDecoration.none,
+                                  color: isDark
+                                      ? AppTheme.darkTextPrimary
+                                      : AppTheme.textPrimary,
+                                  fontSize: 15,
+                                  height: 1.6,
+                                ),
+                              ),
                             ],
                           ],
                         ),
@@ -442,10 +452,12 @@ class _ProductDetailScreenState extends ConsumerState<ProductDetailScreen>
                                               rp.namevi ?? '',
                                               maxLines: 2,
                                               overflow: TextOverflow.ellipsis,
-                                              style: const TextStyle(
+                                              style: TextStyle(
                                                 fontSize: 12,
                                                 fontWeight: FontWeight.w600,
-                                                color: AppTheme.textPrimary,
+                                                color: isDark
+                                                    ? AppTheme.darkTextPrimary
+                                                    : AppTheme.textPrimary,
                                               ),
                                             ),
                                             const SizedBox(height: 4),

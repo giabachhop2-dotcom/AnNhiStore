@@ -67,7 +67,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
         api.getPhotos(type: 'slide'),
         api.getProducts(limit: 6, listId: 1),
         api.getProducts(limit: 6, listId: 2),
-        api.getNews(limit: 6),
+        api.getNews(limit: 6, type: 'baiviet'),
         api.getPhotos(type: 'chung-nhan'),
         api.getNews(limit: 6, type: 'camnhan'),
       ]);
@@ -208,8 +208,8 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                     if (newsItems.isNotEmpty) ...[
                       SliverToBoxAdapter(
                         child: TeaCeremonyHeader(
-                          title: 'Tin Tức & Sự Kiện',
-                          subtitle: 'Cập nhật từ An Nhi Trà',
+                          title: 'Kiến Thức Trà Đạo',
+                          subtitle: 'Câu chuyện về trà, ấm & sức khỏe',
                           onSeeAll: () => context.go('/news'),
                         ),
                       ),
@@ -361,11 +361,11 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
 
   Widget _buildCategoryGrid() {
     final isDark = CupertinoTheme.brightnessOf(context) == Brightness.dark;
-    const categories = [
-      {'icon': '🫖', 'label': 'Ấm Tử Sa'},
-      {'icon': '🍵', 'label': 'Trà Shan'},
-      {'icon': '🏺', 'label': 'Phụ Kiện'},
-      {'icon': '🎁', 'label': 'Quà Tặng'},
+    final categories = [
+      {'icon': CupertinoIcons.flame, 'label': 'Ấm Tử Sa'},
+      {'icon': CupertinoIcons.leaf_arrow_circlepath, 'label': 'Trà Shan'},
+      {'icon': CupertinoIcons.tray_2, 'label': 'Phụ Kiện'},
+      {'icon': CupertinoIcons.gift, 'label': 'Quà Tặng'},
     ];
 
     return Padding(
@@ -385,11 +385,15 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                   height: 64,
                   decoration: BoxDecoration(
                     shape: BoxShape.circle,
-                    color: isDark
-                        ? AppTheme.darkElevated
-                        : AppTheme.surfaceWhite,
+                    gradient: LinearGradient(
+                      begin: Alignment.topLeft,
+                      end: Alignment.bottomRight,
+                      colors: isDark
+                          ? [AppTheme.darkElevated, AppTheme.darkSurface]
+                          : [AppTheme.surfaceWhite, const Color(0xFFF5EFE3)],
+                    ),
                     border: Border.all(
-                      color: AppTheme.accentGold.withValues(alpha: 0.4),
+                      color: AppTheme.accentGold.withValues(alpha: 0.5),
                       width: 1.5,
                     ),
                     boxShadow: [
@@ -403,15 +407,16 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                     ],
                   ),
                   child: Center(
-                    child: Text(
-                      cat['icon']!,
-                      style: const TextStyle(fontSize: 28),
+                    child: Icon(
+                      cat['icon'] as IconData,
+                      size: 26,
+                      color: AppTheme.accentGold,
                     ),
                   ),
                 ),
                 const SizedBox(height: 8),
                 Text(
-                  cat['label']!,
+                  cat['label'] as String,
                   style: TextStyle(
                     fontSize: 12,
                     fontWeight: FontWeight.w600,
