@@ -251,9 +251,8 @@ class _AnimatedProductCardState extends ConsumerState<AnimatedProductCard>
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      // Product image
+                      // Product image — fills remaining space
                       Expanded(
-                        flex: 3,
                         child: Stack(
                           fit: StackFit.expand,
                           children: [
@@ -395,32 +394,30 @@ class _AnimatedProductCardState extends ConsumerState<AnimatedProductCard>
                           ],
                         ),
                       ),
-                      // Product info
-                      Expanded(
-                        flex: 2,
-                        child: Padding(
-                          padding: const EdgeInsets.fromLTRB(12, 10, 12, 10),
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Text(
-                                widget.product.namevi ?? '',
-                                maxLines: 2,
-                                overflow: TextOverflow.ellipsis,
-                                style: TextStyle(
-                                  fontWeight: FontWeight.w600,
-                                  fontSize: 15,
-                                  height: 1.3,
-                                  color: isDark
-                                      ? AppTheme.darkTextPrimary
-                                      : AppTheme.textPrimary,
-                                  letterSpacing: -0.2,
-                                ),
+                      // Product info — intrinsic height, no flex
+                      Padding(
+                        padding: const EdgeInsets.fromLTRB(10, 8, 10, 8),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Text(
+                              widget.product.namevi ?? '',
+                              maxLines: 2,
+                              overflow: TextOverflow.ellipsis,
+                              style: TextStyle(
+                                fontWeight: FontWeight.w600,
+                                fontSize: 13,
+                                height: 1.3,
+                                color: isDark
+                                    ? AppTheme.darkTextPrimary
+                                    : AppTheme.textPrimary,
+                                letterSpacing: -0.2,
                               ),
-                              const SizedBox(height: 6),
-                              _buildPrice(formatter, isDark),
-                            ],
-                          ),
+                            ),
+                            const SizedBox(height: 5),
+                            _buildPrice(formatter, isDark),
+                          ],
                         ),
                       ),
                     ],

@@ -10,12 +10,11 @@ import '../widgets/shimmer_grid.dart';
 import '../widgets/empty_state.dart';
 import '../config/theme.dart';
 
-/// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-/// PRODUCT LIST — 3-Layer Premium Browsing
-/// Layer 1: Type tabs (Ấm Tử Sa / Trà / Trà Cụ)
-/// Layer 2: Sub-category pills (filtered by type)
-/// Layer 3: Product grid with differentiated cards
-/// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+/// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+/// PRODUCT LIST — 2-Step Category-First Browsing
+/// Step 1: Beautiful category grid (shown first)
+/// Step 2: Product grid with compact category bar on top
+/// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
 class ProductListScreen extends ConsumerStatefulWidget {
   const ProductListScreen({super.key});
@@ -32,28 +31,33 @@ class _ProductListScreenState extends ConsumerState<ProductListScreen> {
       'Ấm Tử Sa',
       CupertinoIcons.flame,
       Color(0xFFC8A96E),
+      'Nghệ nhân Nghi Hưng',
     ),
     _ProductType(
       'tra',
       'Trà',
       CupertinoIcons.leaf_arrow_circlepath,
-      Color(0xFF4A7C5C),
+      Color(0xFF5A8F6B),
+      'Trà thượng hạng Trung Quốc',
     ),
     _ProductType(
       'tra-cu',
       'Trà Cụ',
       CupertinoIcons.tray_full,
       Color(0xFF8B6914),
+      'Dụng cụ trà đạo',
     ),
   ];
 
   // ── State ──
-  String? _selectedType; // null = all products
-  int? _selectedListId; // sub-category filter
+  bool _showingCategoryBrowse = true; // Start with category selection
+  String? _selectedType;
+  int? _selectedListId;
   int _currentPage = 1;
   List<Product> _products = [];
   List<ProductCategory> _allLists = [];
   bool _isLoading = true;
+  bool _categoriesLoading = true;
   int _totalPages = 1;
   int _totalProducts = 0;
   String _searchQuery = '';
@@ -61,7 +65,6 @@ class _ProductListScreenState extends ConsumerState<ProductListScreen> {
   final _searchCtrl = TextEditingController();
   Timer? _debounce;
 
-  // Filtered sub-categories for current type
   List<ProductCategory> get _filteredLists {
     if (_selectedType == null) return _allLists;
     return _allLists.where((c) => c.type == _selectedType).toList();
@@ -71,7 +74,6 @@ class _ProductListScreenState extends ConsumerState<ProductListScreen> {
   void initState() {
     super.initState();
     _loadCategories();
-    _loadProducts();
   }
 
   @override
@@ -88,13 +90,14 @@ class _ProductListScreenState extends ConsumerState<ProductListScreen> {
         setState(() {
           _allLists = (data['lists'] as List)
               .map((e) => ProductCategory.fromJson(e))
-              .where(
-                (c) => c.type != 'san-pham',
-              ) // Exclude legacy shoe categories
+              .where((c) => c.type != 'san-pham')
               .toList();
+          _categoriesLoading = false;
         });
       }
-    } catch (_) {}
+    } catch (_) {
+      if (mounted) setState(() => _categoriesLoading = false);
+    }
   }
 
   Future<void> _loadProducts() async {
@@ -105,8 +108,8 @@ class _ProductListScreenState extends ConsumerState<ProductListScreen> {
           .getProducts(
             page: _currentPage,
             listId: _selectedListId,
-            limit: 12,
-            search: _buildSearchQuery(),
+            limit: 20,
+            search: _searchQuery.isNotEmpty ? _searchQuery : null,
           );
       if (mounted) {
         setState(() {
@@ -121,25 +124,11 @@ class _ProductListScreenState extends ConsumerState<ProductListScreen> {
     }
   }
 
-  /// Build search query — combine user search with type filter
-  String? _buildSearchQuery() {
-    final parts = <String>[];
-    if (_searchQuery.isNotEmpty) parts.add(_searchQuery);
-    // If type selected but no specific listId, we filter client-side
-    if (parts.isEmpty) return null;
-    return parts.join(' ');
-  }
-
-  /// Get products filtered by type (client-side if needed)
   List<Product> get _displayProducts {
     var list = [..._products];
-
-    // Filter by type client-side when no listId is selected
     if (_selectedType != null && _selectedListId == null) {
       list = list.where((p) => p.type == _selectedType).toList();
     }
-
-    // Sort
     switch (_sortBy) {
       case 'price_asc':
         list.sort((a, b) => a.displayPrice.compareTo(b.displayPrice));
@@ -151,14 +140,39 @@ class _ProductListScreenState extends ConsumerState<ProductListScreen> {
     return list;
   }
 
-  void _selectType(String? type) {
-    HapticFeedback.selectionClick();
+  /// Enter a category type from the browse screen
+  void _enterType(String typeKey) {
+    HapticFeedback.mediumImpact();
     setState(() {
-      _selectedType = type;
+      _selectedType = typeKey;
       _selectedListId = null;
       _currentPage = 1;
+      _showingCategoryBrowse = false;
     });
     _loadProducts();
+  }
+
+  /// Enter a specific sub-category
+  void _enterSubCategory(String typeKey, int listId) {
+    HapticFeedback.mediumImpact();
+    setState(() {
+      _selectedType = typeKey;
+      _selectedListId = listId;
+      _currentPage = 1;
+      _showingCategoryBrowse = false;
+    });
+    _loadProducts();
+  }
+
+  /// Go back to category browse
+  void _backToCategories() {
+    HapticFeedback.selectionClick();
+    setState(() {
+      _showingCategoryBrowse = true;
+      _selectedType = null;
+      _selectedListId = null;
+      _products = [];
+    });
   }
 
   void _selectSubCategory(int? listId) {
@@ -215,6 +229,17 @@ class _ProductListScreenState extends ConsumerState<ProductListScreen> {
 
   @override
   Widget build(BuildContext context) {
+    if (_showingCategoryBrowse) {
+      return _buildCategoryBrowse();
+    }
+    return _buildProductGrid();
+  }
+
+  // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  // STEP 1: Category Browse — Beautiful, immersive grid
+  // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+  Widget _buildCategoryBrowse() {
     final isDark = CupertinoTheme.brightnessOf(context) == Brightness.dark;
 
     return CupertinoPageScaffold(
@@ -224,8 +249,276 @@ class _ProductListScreenState extends ConsumerState<ProductListScreen> {
         ),
         slivers: [
           CupertinoSliverNavigationBar(
-            largeTitle: const Text('Sản Phẩm'),
+            largeTitle: const Text('Bộ Sưu Tập'),
             border: null,
+          ),
+
+          // ── Hero Type Cards ──
+          SliverToBoxAdapter(
+            child: Padding(
+              padding: const EdgeInsets.fromLTRB(16, 8, 16, 0),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  // Title
+                  Padding(
+                    padding: const EdgeInsets.only(bottom: 16),
+                    child: Text(
+                      'Chọn dòng sản phẩm',
+                      style: TextStyle(
+                        fontSize: 14,
+                        color: isDark
+                            ? AppTheme.darkTextSecondary
+                            : AppTheme.textSecondary,
+                        letterSpacing: 0.3,
+                      ),
+                    ),
+                  ),
+                  // 3 type cards
+                  ..._productTypes.map((type) => _buildTypeCard(type, isDark)),
+                ],
+              ),
+            ),
+          ),
+
+          // ── Sub-category Grid ──
+          if (!_categoriesLoading && _allLists.isNotEmpty)
+            ..._productTypes.map((type) => _buildCategorySection(type, isDark)),
+
+          const SliverToBoxAdapter(child: SizedBox(height: 40)),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildTypeCard(_ProductType type, bool isDark) {
+    final subCats = _allLists.where((c) => c.type == type.key).toList();
+    final count = subCats.length;
+
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 12),
+      child: GestureDetector(
+        onTap: () => _enterType(type.key),
+        child: Container(
+          height: 90,
+          decoration: BoxDecoration(
+            gradient: LinearGradient(
+              begin: Alignment.topLeft,
+              end: Alignment.bottomRight,
+              colors: [
+                type.color.withValues(alpha: isDark ? 0.20 : 0.12),
+                type.color.withValues(alpha: isDark ? 0.08 : 0.04),
+              ],
+            ),
+            borderRadius: BorderRadius.circular(16),
+            border: Border.all(
+              color: type.color.withValues(alpha: 0.3),
+              width: 1,
+            ),
+            boxShadow: [
+              BoxShadow(
+                color: type.color.withValues(alpha: 0.1),
+                blurRadius: 12,
+                offset: const Offset(0, 4),
+              ),
+            ],
+          ),
+          child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 20),
+            child: Row(
+              children: [
+                // Icon
+                Container(
+                  width: 52,
+                  height: 52,
+                  decoration: BoxDecoration(
+                    color: type.color.withValues(alpha: isDark ? 0.25 : 0.15),
+                    borderRadius: BorderRadius.circular(14),
+                    border: Border.all(
+                      color: type.color.withValues(alpha: 0.3),
+                      width: 0.5,
+                    ),
+                  ),
+                  child: Icon(type.icon, size: 24, color: type.color),
+                ),
+                const SizedBox(width: 16),
+                // Info
+                Expanded(
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        type.label,
+                        style: TextStyle(
+                          fontSize: 18,
+                          fontWeight: FontWeight.bold,
+                          color: isDark
+                              ? AppTheme.darkTextPrimary
+                              : AppTheme.textPrimary,
+                          letterSpacing: -0.3,
+                        ),
+                      ),
+                      const SizedBox(height: 3),
+                      Text(
+                        type.subtitle,
+                        style: TextStyle(
+                          fontSize: 12,
+                          color: isDark
+                              ? AppTheme.darkTextSecondary
+                              : AppTheme.textSecondary,
+                        ),
+                      ),
+                      const SizedBox(height: 2),
+                      Text(
+                        '$count danh mục',
+                        style: TextStyle(
+                          fontSize: 11,
+                          color: type.color,
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                // Arrow
+                Icon(
+                  CupertinoIcons.chevron_right,
+                  size: 18,
+                  color: type.color.withValues(alpha: 0.7),
+                ),
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
+  /// Build a section of sub-categories for a given product type
+  SliverToBoxAdapter _buildCategorySection(_ProductType type, bool isDark) {
+    final subCats = _allLists.where((c) => c.type == type.key).toList();
+    if (subCats.isEmpty)
+      return const SliverToBoxAdapter(child: SizedBox.shrink());
+
+    return SliverToBoxAdapter(
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          // Section header
+          Padding(
+            padding: const EdgeInsets.fromLTRB(16, 24, 16, 10),
+            child: Row(
+              children: [
+                Container(
+                  width: 3,
+                  height: 18,
+                  decoration: BoxDecoration(
+                    color: type.color,
+                    borderRadius: BorderRadius.circular(2),
+                  ),
+                ),
+                const SizedBox(width: 8),
+                Text(
+                  type.label,
+                  style: TextStyle(
+                    fontSize: 15,
+                    fontWeight: FontWeight.w700,
+                    color: isDark
+                        ? AppTheme.darkTextPrimary
+                        : AppTheme.textPrimary,
+                  ),
+                ),
+                const Spacer(),
+                GestureDetector(
+                  onTap: () => _enterType(type.key),
+                  child: Text(
+                    'Xem tất cả →',
+                    style: TextStyle(
+                      fontSize: 12,
+                      fontWeight: FontWeight.w600,
+                      color: type.color,
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+          // Horizontal scrollable chips
+          SizedBox(
+            height: 38,
+            child: ListView.builder(
+              scrollDirection: Axis.horizontal,
+              physics: const BouncingScrollPhysics(),
+              padding: const EdgeInsets.symmetric(horizontal: 14),
+              itemCount: subCats.length,
+              itemBuilder: (_, i) {
+                final cat = subCats[i];
+                return Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 3),
+                  child: GestureDetector(
+                    onTap: () => _enterSubCategory(type.key, cat.id),
+                    child: Container(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 14,
+                        vertical: 8,
+                      ),
+                      decoration: BoxDecoration(
+                        color: isDark
+                            ? type.color.withValues(alpha: 0.10)
+                            : type.color.withValues(alpha: 0.06),
+                        borderRadius: BorderRadius.circular(20),
+                        border: Border.all(
+                          color: type.color.withValues(alpha: 0.3),
+                          width: 0.5,
+                        ),
+                      ),
+                      child: Text(
+                        cat.namevi ?? '',
+                        style: TextStyle(
+                          fontSize: 12,
+                          fontWeight: FontWeight.w500,
+                          color: isDark
+                              ? AppTheme.darkTextPrimary
+                              : AppTheme.textPrimary,
+                        ),
+                      ),
+                    ),
+                  ),
+                );
+              },
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  // STEP 2: Product Grid with compact category bar
+  // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+  Widget _buildProductGrid() {
+    final isDark = CupertinoTheme.brightnessOf(context) == Brightness.dark;
+    final currentType = _productTypes.firstWhere(
+      (t) => t.key == _selectedType,
+      orElse: () => _productTypes.first,
+    );
+
+    return CupertinoPageScaffold(
+      child: CustomScrollView(
+        physics: const BouncingScrollPhysics(
+          parent: AlwaysScrollableScrollPhysics(),
+        ),
+        slivers: [
+          CupertinoSliverNavigationBar(
+            largeTitle: Text(currentType.label),
+            border: null,
+            leading: CupertinoButton(
+              padding: EdgeInsets.zero,
+              onPressed: _backToCategories,
+              child: const Icon(CupertinoIcons.chevron_left, size: 22),
+            ),
             trailing: CupertinoButton(
               padding: EdgeInsets.zero,
               onPressed: _showSortOptions,
@@ -239,7 +532,7 @@ class _ProductListScreenState extends ConsumerState<ProductListScreen> {
               padding: const EdgeInsets.fromLTRB(16, 0, 16, 8),
               child: CupertinoSearchTextField(
                 controller: _searchCtrl,
-                placeholder: 'Tìm kiếm ấm, trà, phụ kiện...',
+                placeholder: 'Tìm kiếm ${currentType.label.toLowerCase()}...',
                 onChanged: (value) {
                   _debounce?.cancel();
                   _debounce = Timer(const Duration(milliseconds: 500), () {
@@ -265,20 +558,183 @@ class _ProductListScreenState extends ConsumerState<ProductListScreen> {
             ),
           ),
 
-          // ── LAYER 1: Type Segmentation Tabs ──
-          SliverToBoxAdapter(child: _buildTypeTabs(isDark)),
+          // ── Compact Type Switcher ──
+          SliverToBoxAdapter(
+            child: SizedBox(
+              height: 38,
+              child: ListView(
+                scrollDirection: Axis.horizontal,
+                physics: const BouncingScrollPhysics(),
+                padding: const EdgeInsets.symmetric(horizontal: 12),
+                children: _productTypes
+                    .map(
+                      (type) => Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 3),
+                        child: GestureDetector(
+                          onTap: () {
+                            HapticFeedback.selectionClick();
+                            setState(() {
+                              _selectedType = type.key;
+                              _selectedListId = null;
+                              _currentPage = 1;
+                            });
+                            _loadProducts();
+                          },
+                          child: AnimatedContainer(
+                            duration: const Duration(milliseconds: 200),
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 14,
+                              vertical: 7,
+                            ),
+                            decoration: BoxDecoration(
+                              gradient: _selectedType == type.key
+                                  ? LinearGradient(
+                                      colors: [
+                                        type.color.withValues(alpha: 0.20),
+                                        type.color.withValues(alpha: 0.08),
+                                      ],
+                                    )
+                                  : null,
+                              color: _selectedType == type.key
+                                  ? null
+                                  : (isDark
+                                        ? AppTheme.darkElevated
+                                        : AppTheme.surfaceWhite),
+                              borderRadius: BorderRadius.circular(20),
+                              border: Border.all(
+                                color: _selectedType == type.key
+                                    ? type.color.withValues(alpha: 0.6)
+                                    : (isDark
+                                          ? AppTheme.darkSeparator.withValues(
+                                              alpha: 0.2,
+                                            )
+                                          : AppTheme.separator.withValues(
+                                              alpha: 0.3,
+                                            )),
+                                width: _selectedType == type.key ? 1.5 : 0.5,
+                              ),
+                            ),
+                            child: Row(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                Icon(
+                                  type.icon,
+                                  size: 14,
+                                  color: _selectedType == type.key
+                                      ? type.color
+                                      : (isDark
+                                            ? AppTheme.darkTextSecondary
+                                            : AppTheme.textMuted),
+                                ),
+                                const SizedBox(width: 6),
+                                Text(
+                                  type.label,
+                                  style: TextStyle(
+                                    fontSize: 12,
+                                    fontWeight: _selectedType == type.key
+                                        ? FontWeight.w700
+                                        : FontWeight.w500,
+                                    color: _selectedType == type.key
+                                        ? type.color
+                                        : (isDark
+                                              ? AppTheme.darkTextSecondary
+                                              : AppTheme.textMuted),
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ),
+                      ),
+                    )
+                    .toList(),
+              ),
+            ),
+          ),
 
-          // ── LAYER 2: Sub-Category Pills ──
-          if (_filteredLists.isNotEmpty && _selectedType != null)
-            SliverToBoxAdapter(child: _buildSubCategoryPills(isDark)),
+          // ── Sub-Category Pills ──
+          if (_filteredLists.isNotEmpty)
+            SliverToBoxAdapter(
+              child: Padding(
+                padding: const EdgeInsets.only(top: 6),
+                child: SizedBox(
+                  height: 34,
+                  child: ListView(
+                    scrollDirection: Axis.horizontal,
+                    physics: const BouncingScrollPhysics(),
+                    padding: const EdgeInsets.symmetric(horizontal: 12),
+                    children: [
+                      _buildCompactPill(
+                        'Tất cả',
+                        _selectedListId == null,
+                        currentType.color,
+                        isDark,
+                        () => _selectSubCategory(null),
+                      ),
+                      ..._filteredLists.map(
+                        (cat) => _buildCompactPill(
+                          cat.namevi ?? '',
+                          _selectedListId == cat.id,
+                          currentType.color,
+                          isDark,
+                          () => _selectSubCategory(cat.id),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            ),
 
           // ── Filter Status Bar ──
-          SliverToBoxAdapter(child: _buildFilterBar(isDark)),
+          SliverToBoxAdapter(
+            child: Padding(
+              padding: const EdgeInsets.fromLTRB(16, 8, 16, 4),
+              child: Row(
+                children: [
+                  Text(
+                    _isLoading ? '...' : '$_totalProducts sản phẩm',
+                    style: TextStyle(
+                      fontSize: 12,
+                      fontWeight: FontWeight.w600,
+                      color: isDark
+                          ? AppTheme.darkTextSecondary
+                          : AppTheme.textSecondary,
+                    ),
+                  ),
+                  const Spacer(),
+                  if (_sortBy != 'default')
+                    Container(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 8,
+                        vertical: 3,
+                      ),
+                      decoration: BoxDecoration(
+                        color: currentType.color.withValues(alpha: 0.1),
+                        borderRadius: BorderRadius.circular(6),
+                      ),
+                      child: Text(
+                        _sortBy == 'price_asc'
+                            ? '↑ Giá'
+                            : _sortBy == 'price_desc'
+                            ? '↓ Giá'
+                            : 'A→Z',
+                        style: TextStyle(
+                          fontSize: 10,
+                          fontWeight: FontWeight.w600,
+                          color: currentType.color,
+                        ),
+                      ),
+                    ),
+                ],
+              ),
+            ),
+          ),
 
           // Pull to refresh
           CupertinoSliverRefreshControl(onRefresh: _loadProducts),
 
-          // ── LAYER 3: Product Grid ──
+          // ── Product Grid ──
           if (_isLoading)
             SliverPadding(
               padding: const EdgeInsets.all(16),
@@ -289,9 +745,9 @@ class _ProductListScreenState extends ConsumerState<ProductListScreen> {
                 ),
                 gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
                   crossAxisCount: 2,
-                  childAspectRatio: 0.62,
-                  crossAxisSpacing: 12,
-                  mainAxisSpacing: 12,
+                  childAspectRatio: 0.72,
+                  crossAxisSpacing: 10,
+                  mainAxisSpacing: 10,
                 ),
               ),
             )
@@ -299,7 +755,7 @@ class _ProductListScreenState extends ConsumerState<ProductListScreen> {
             SliverFillRemaining(child: EmptyState.noResults())
           else
             SliverPadding(
-              padding: const EdgeInsets.all(16),
+              padding: const EdgeInsets.all(12),
               sliver: SliverGrid(
                 delegate: SliverChildBuilderDelegate(
                   (context, index) => AnimatedProductCard(
@@ -310,16 +766,66 @@ class _ProductListScreenState extends ConsumerState<ProductListScreen> {
                 ),
                 gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
                   crossAxisCount: 2,
-                  childAspectRatio: 0.62,
-                  crossAxisSpacing: 12,
-                  mainAxisSpacing: 12,
+                  childAspectRatio: 0.72,
+                  crossAxisSpacing: 10,
+                  mainAxisSpacing: 10,
                 ),
               ),
             ),
 
           // ── Pagination ──
           if (_totalPages > 1 && !_isLoading)
-            SliverToBoxAdapter(child: _buildPagination(isDark)),
+            SliverToBoxAdapter(
+              child: Padding(
+                padding: const EdgeInsets.all(16),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    CupertinoButton(
+                      padding: const EdgeInsets.all(8),
+                      onPressed: _currentPage > 1
+                          ? () {
+                              setState(() => _currentPage--);
+                              _loadProducts();
+                            }
+                          : null,
+                      child: const Icon(CupertinoIcons.chevron_left),
+                    ),
+                    Container(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 16,
+                        vertical: 6,
+                      ),
+                      decoration: BoxDecoration(
+                        color: isDark
+                            ? AppTheme.darkElevated
+                            : AppTheme.primaryDark.withValues(alpha: 0.1),
+                        borderRadius: BorderRadius.circular(8),
+                      ),
+                      child: Text(
+                        '$_currentPage / $_totalPages',
+                        style: TextStyle(
+                          fontWeight: FontWeight.w600,
+                          color: isDark
+                              ? AppTheme.darkTextPrimary
+                              : AppTheme.textPrimary,
+                        ),
+                      ),
+                    ),
+                    CupertinoButton(
+                      padding: const EdgeInsets.all(8),
+                      onPressed: _currentPage < _totalPages
+                          ? () {
+                              setState(() => _currentPage++);
+                              _loadProducts();
+                            }
+                          : null,
+                      child: const Icon(CupertinoIcons.chevron_right),
+                    ),
+                  ],
+                ),
+              ),
+            ),
 
           const SliverToBoxAdapter(child: SizedBox(height: 16)),
         ],
@@ -327,419 +833,43 @@ class _ProductListScreenState extends ConsumerState<ProductListScreen> {
     );
   }
 
-  // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-  // LAYER 1: Type Segmentation Tabs
-  // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-
-  Widget _buildTypeTabs(bool isDark) {
-    return Padding(
-      padding: const EdgeInsets.fromLTRB(16, 4, 16, 8),
-      child: Row(
-        children: [
-          Expanded(
-            child: _TypeTab(
-              label: 'Tất cả',
-              icon: CupertinoIcons.square_grid_2x2,
-              accentColor: AppTheme.accentGold,
-              isSelected: _selectedType == null,
-              isDark: isDark,
-              onTap: () => _selectType(null),
-            ),
-          ),
-          const SizedBox(width: 6),
-          Expanded(
-            child: _TypeTab(
-              label: _productTypes[0].label,
-              icon: _productTypes[0].icon,
-              accentColor: _productTypes[0].color,
-              isSelected: _selectedType == _productTypes[0].key,
-              isDark: isDark,
-              onTap: () => _selectType(_productTypes[0].key),
-            ),
-          ),
-          const SizedBox(width: 6),
-          Expanded(
-            child: _TypeTab(
-              label: _productTypes[1].label,
-              icon: _productTypes[1].icon,
-              accentColor: _productTypes[1].color,
-              isSelected: _selectedType == _productTypes[1].key,
-              isDark: isDark,
-              onTap: () => _selectType(_productTypes[1].key),
-            ),
-          ),
-          const SizedBox(width: 6),
-          Expanded(
-            child: _TypeTab(
-              label: _productTypes[2].label,
-              icon: _productTypes[2].icon,
-              accentColor: _productTypes[2].color,
-              isSelected: _selectedType == _productTypes[2].key,
-              isDark: isDark,
-              onTap: () => _selectType(_productTypes[2].key),
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
-  // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-  // LAYER 2: Sub-Category Pills
-  // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-
-  Widget _buildSubCategoryPills(bool isDark) {
-    return SizedBox(
-      height: 42,
-      child: ListView(
-        scrollDirection: Axis.horizontal,
-        physics: const BouncingScrollPhysics(),
-        padding: const EdgeInsets.symmetric(horizontal: 12),
-        children: [
-          _SubCatPill(
-            label: 'Tất cả',
-            selected: _selectedListId == null,
-            isDark: isDark,
-            accentColor: _productTypes
-                .firstWhere(
-                  (t) => t.key == _selectedType,
-                  orElse: () => _productTypes.first,
-                )
-                .color,
-            onTap: () => _selectSubCategory(null),
-          ),
-          ..._filteredLists.map(
-            (cat) => _SubCatPill(
-              label: cat.namevi ?? '',
-              selected: _selectedListId == cat.id,
-              isDark: isDark,
-              accentColor: _productTypes
-                  .firstWhere(
-                    (t) => t.key == _selectedType,
-                    orElse: () => _productTypes.first,
-                  )
-                  .color,
-              onTap: () => _selectSubCategory(cat.id),
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
-  // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-  // Filter Status Bar
-  // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-
-  Widget _buildFilterBar(bool isDark) {
-    final hasActiveFilter = _selectedType != null || _selectedListId != null;
-    final count = _isLoading ? '...' : '$_totalProducts';
-
-    return Padding(
-      padding: const EdgeInsets.fromLTRB(16, 6, 16, 2),
-      child: Row(
-        children: [
-          // Product count
-          Container(
-            padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
-            decoration: BoxDecoration(
-              color: isDark ? AppTheme.darkElevated : AppTheme.groupedBg,
-              borderRadius: BorderRadius.circular(8),
-            ),
-            child: Text(
-              '$count sản phẩm',
-              style: TextStyle(
-                fontSize: 12,
-                fontWeight: FontWeight.w600,
-                color: isDark
-                    ? AppTheme.darkTextSecondary
-                    : AppTheme.textSecondary,
-              ),
-            ),
-          ),
-          if (hasActiveFilter) ...[
-            const SizedBox(width: 8),
-            GestureDetector(
-              onTap: () {
-                HapticFeedback.lightImpact();
-                setState(() {
-                  _selectedType = null;
-                  _selectedListId = null;
-                  _currentPage = 1;
-                });
-                _loadProducts();
-              },
-              child: Container(
-                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                decoration: BoxDecoration(
-                  color: AppTheme.accentGold.withValues(alpha: 0.12),
-                  borderRadius: BorderRadius.circular(8),
-                  border: Border.all(
-                    color: AppTheme.accentGold.withValues(alpha: 0.3),
-                  ),
-                ),
-                child: Row(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Icon(
-                      CupertinoIcons.xmark_circle_fill,
-                      size: 12,
-                      color: AppTheme.accentGold,
-                    ),
-                    const SizedBox(width: 4),
-                    Text(
-                      'Xóa lọc',
-                      style: TextStyle(
-                        fontSize: 11,
-                        fontWeight: FontWeight.w600,
-                        color: AppTheme.accentGold,
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            ),
-          ],
-          const Spacer(),
-          // Sort indicator
-          if (_sortBy != 'default')
-            Container(
-              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-              decoration: BoxDecoration(
-                color: AppTheme.primaryDark.withValues(alpha: 0.08),
-                borderRadius: BorderRadius.circular(8),
-              ),
-              child: Text(
-                _sortBy == 'price_asc'
-                    ? '↑ Giá'
-                    : _sortBy == 'price_desc'
-                    ? '↓ Giá'
-                    : 'A→Z',
-                style: TextStyle(
-                  fontSize: 11,
-                  fontWeight: FontWeight.w600,
-                  color: isDark
-                      ? AppTheme.darkTextSecondary
-                      : AppTheme.textSecondary,
-                ),
-              ),
-            ),
-        ],
-      ),
-    );
-  }
-
-  // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-  // Pagination
-  // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-
-  Widget _buildPagination(bool isDark) {
-    return Padding(
-      padding: const EdgeInsets.all(16),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          CupertinoButton(
-            padding: const EdgeInsets.all(8),
-            onPressed: _currentPage > 1
-                ? () {
-                    setState(() => _currentPage--);
-                    _loadProducts();
-                  }
-                : null,
-            child: const Icon(CupertinoIcons.chevron_left),
-          ),
-          Container(
-            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
-            decoration: BoxDecoration(
-              color: isDark
-                  ? AppTheme.darkElevated
-                  : AppTheme.primaryDark.withValues(alpha: 0.1),
-              borderRadius: BorderRadius.circular(8),
-            ),
-            child: Text(
-              '$_currentPage / $_totalPages',
-              style: TextStyle(
-                fontWeight: FontWeight.w600,
-                color: isDark ? AppTheme.darkTextPrimary : AppTheme.textPrimary,
-              ),
-            ),
-          ),
-          CupertinoButton(
-            padding: const EdgeInsets.all(8),
-            onPressed: _currentPage < _totalPages
-                ? () {
-                    setState(() => _currentPage++);
-                    _loadProducts();
-                  }
-                : null,
-            child: const Icon(CupertinoIcons.chevron_right),
-          ),
-        ],
-      ),
-    );
-  }
-}
-
-// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-// Product Type Definition
-// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-
-class _ProductType {
-  final String key;
-  final String label;
-  final IconData icon;
-  final Color color;
-  const _ProductType(this.key, this.label, this.icon, this.color);
-}
-
-// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-// TYPE TAB — Premium animated tab button
-// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-
-class _TypeTab extends StatelessWidget {
-  final String label;
-  final IconData icon;
-  final Color accentColor;
-  final bool isSelected;
-  final bool isDark;
-  final VoidCallback onTap;
-
-  const _TypeTab({
-    required this.label,
-    required this.icon,
-    required this.accentColor,
-    required this.isSelected,
-    required this.isDark,
-    required this.onTap,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return GestureDetector(
-      onTap: onTap,
-      child: AnimatedContainer(
-        duration: const Duration(milliseconds: 250),
-        curve: Curves.easeOutCubic,
-        padding: const EdgeInsets.symmetric(vertical: 10),
-        decoration: BoxDecoration(
-          gradient: isSelected
-              ? LinearGradient(
-                  begin: Alignment.topLeft,
-                  end: Alignment.bottomRight,
-                  colors: [
-                    accentColor.withValues(alpha: 0.15),
-                    accentColor.withValues(alpha: 0.05),
-                  ],
-                )
-              : null,
-          color: isSelected
-              ? null
-              : (isDark ? AppTheme.darkElevated : AppTheme.surfaceWhite),
-          borderRadius: BorderRadius.circular(12),
-          border: Border.all(
-            color: isSelected
-                ? accentColor.withValues(alpha: 0.6)
-                : (isDark
-                      ? AppTheme.darkSeparator.withValues(alpha: 0.3)
-                      : AppTheme.separator.withValues(alpha: 0.3)),
-            width: isSelected ? 1.5 : 1,
-          ),
-          boxShadow: isSelected
-              ? [
-                  BoxShadow(
-                    color: accentColor.withValues(alpha: 0.2),
-                    blurRadius: 8,
-                    offset: const Offset(0, 2),
-                  ),
-                ]
-              : null,
-        ),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Icon(
-              icon,
-              size: 20,
-              color: isSelected
-                  ? accentColor
-                  : (isDark ? AppTheme.darkTextSecondary : AppTheme.textMuted),
-            ),
-            const SizedBox(height: 4),
-            Text(
-              label,
-              textAlign: TextAlign.center,
-              maxLines: 1,
-              overflow: TextOverflow.ellipsis,
-              style: TextStyle(
-                fontSize: 10,
-                fontWeight: isSelected ? FontWeight.w700 : FontWeight.w500,
-                color: isSelected
-                    ? accentColor
-                    : (isDark
-                          ? AppTheme.darkTextSecondary
-                          : AppTheme.textMuted),
-                letterSpacing: isSelected ? 0.3 : 0,
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-}
-
-// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-// SUB-CATEGORY PILL — Smaller, accent-tinted
-// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-
-class _SubCatPill extends StatelessWidget {
-  final String label;
-  final bool selected;
-  final bool isDark;
-  final Color accentColor;
-  final VoidCallback onTap;
-
-  const _SubCatPill({
-    required this.label,
-    required this.selected,
-    required this.isDark,
-    required this.accentColor,
-    required this.onTap,
-  });
-
-  @override
-  Widget build(BuildContext context) {
+  Widget _buildCompactPill(
+    String label,
+    bool selected,
+    Color accent,
+    bool isDark,
+    VoidCallback onTap,
+  ) {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 3),
       child: GestureDetector(
         onTap: onTap,
         child: AnimatedContainer(
           duration: const Duration(milliseconds: 200),
-          padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
+          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
           decoration: BoxDecoration(
             color: selected
-                ? accentColor.withValues(alpha: 0.15)
+                ? accent.withValues(alpha: 0.15)
                 : (isDark
-                      ? AppTheme.darkElevated.withValues(alpha: 0.6)
+                      ? AppTheme.darkElevated.withValues(alpha: 0.5)
                       : AppTheme.surfaceWhite),
-            borderRadius: BorderRadius.circular(20),
+            borderRadius: BorderRadius.circular(16),
             border: Border.all(
               color: selected
-                  ? accentColor.withValues(alpha: 0.6)
+                  ? accent.withValues(alpha: 0.5)
                   : (isDark
-                        ? AppTheme.darkSeparator.withValues(alpha: 0.2)
-                        : AppTheme.separator.withValues(alpha: 0.3)),
-              width: selected ? 1.5 : 0.5,
+                        ? AppTheme.darkSeparator.withValues(alpha: 0.15)
+                        : AppTheme.separator.withValues(alpha: 0.2)),
+              width: selected ? 1.2 : 0.5,
             ),
           ),
           child: Text(
             label,
             style: TextStyle(
-              fontSize: 12,
+              fontSize: 11,
               fontWeight: selected ? FontWeight.w700 : FontWeight.w500,
               color: selected
-                  ? accentColor
+                  ? accent
                   : (isDark
                         ? AppTheme.darkTextSecondary
                         : AppTheme.textSecondary),
@@ -749,4 +879,20 @@ class _SubCatPill extends StatelessWidget {
       ),
     );
   }
+}
+
+// ━━━━ Data Model ━━━━
+class _ProductType {
+  final String key;
+  final String label;
+  final IconData icon;
+  final Color color;
+  final String subtitle;
+  const _ProductType(
+    this.key,
+    this.label,
+    this.icon,
+    this.color,
+    this.subtitle,
+  );
 }
