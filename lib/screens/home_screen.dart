@@ -30,6 +30,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
   List<PhotoItem> slides = [];
   List<Product> productsAmTuSa = [];
   List<Product> productsTra = [];
+  List<Product> productsTraCu = [];
   List<NewsArticle> newsItems = [];
   List<PhotoItem> certificates = [];
   List<NewsArticle> testimonials = [];
@@ -65,25 +66,51 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
     final api = ref.read(apiServiceProvider);
     try {
       final results = await Future.wait([
-        api.getPhotos(type: 'slide'),
-        api.getProducts(limit: 6, listId: 1),
-        api.getProducts(limit: 6, listId: 2),
-        api.getNews(limit: 6, type: 'baiviet'),
-        api.getPhotos(type: 'chung-nhan'),
-        api.getNews(limit: 6, type: 'camnhan'),
+        api.getPhotos(type: 'slide'), // 0: slides
+        api.getProducts(limit: 8), // 1: all latest (for Ấm Tử Sa filter)
+        api.getProducts(limit: 8, listId: 44), // 2: Trà túi lọc 2026
+        api.getNews(limit: 10), // 3: all news
+        api.getPhotos(type: 'chung-nhan'), // 4: certificates
+        api.getNews(limit: 6, type: 'camnhan'), // 5: testimonials
       ]);
 
       if (mounted) {
+        // Parse all products — split by type
+        final allProducts =
+            (results[1] as ({List<Product> items, int total, int totalPages}))
+                .items;
+        final traProducts =
+            (results[2] as ({List<Product> items, int total, int totalPages}))
+                .items;
+
+        // Client-side: split by type
+        final amTuSaList = allProducts
+            .where((p) => p.type == 'am-tu-sa')
+            .toList();
+        final traList = allProducts.where((p) => p.type == 'tra').toList();
+        final traCuList = allProducts.where((p) => p.type == 'tra-cu').toList();
+
+        // If type-filtered are sparse, fill from all
+        if (amTuSaList.isEmpty) amTuSaList.addAll(allProducts.take(4));
+
+        // Client-side news filter: exclude policy articles
+        final allNews =
+            (results[3] as ({List<NewsArticle> items, int total})).items;
+        final filteredNews = allNews.where((n) {
+          final name = (n.namevi ?? '').toLowerCase();
+          return !name.contains('chính sách') &&
+              !name.contains('thanh toán') &&
+              !name.contains('vận chuyển') &&
+              !name.contains('giao nhận') &&
+              !name.contains('bảo hành');
+        }).toList();
+
         setState(() {
           slides = results[0] as List<PhotoItem>;
-          productsAmTuSa =
-              (results[1] as ({List<Product> items, int total, int totalPages}))
-                  .items;
-          productsTra =
-              (results[2] as ({List<Product> items, int total, int totalPages}))
-                  .items;
-          newsItems =
-              (results[3] as ({List<NewsArticle> items, int total})).items;
+          productsAmTuSa = amTuSaList;
+          productsTra = traList.isNotEmpty ? traList : traProducts;
+          productsTraCu = traCuList;
+          newsItems = filteredNews;
           certificates = results[4] as List<PhotoItem>;
           testimonials =
               (results[5] as ({List<NewsArticle> items, int total})).items;
@@ -190,18 +217,57 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                       ),
                     ],
 
-                    // ── Trà Shan Tuyết — Grid Layout ──
+                    // ── Trà Section — Grid Layout ──
                     if (productsTra.isNotEmpty) ...[
                       SliverToBoxAdapter(
                         child: TeaCeremonyHeader(
-                          title: 'Trà Shan Tuyết Cổ Thụ',
-                          subtitle: 'Hương vị đỉnh núi 1500m',
+                          title: 'Bộ Sưu Tập Trà',
+                          subtitle: 'Trà Thiết Quan Âm, Ô Long, Phổ Nhĩ...',
                           onSeeAll: () => context.push('/products'),
                         ),
                       ),
                       _buildProductGrid(
                         productsTra,
                         indexOffset: productsAmTuSa.length,
+                      ),
+                    ],
+
+                    // ── Trà Cụ — Tea Tools ──
+                    if (productsTraCu.isNotEmpty) ...[
+                      SliverToBoxAdapter(
+                        child: TeaCeremonyHeader(
+                          title: 'Trà Cụ & Phụ Kiện',
+                          subtitle: 'Khay trà, chén, tống, thảm bàn trà',
+                          onSeeAll: () => context.push('/products'),
+                        ),
+                      ),
+                      SliverToBoxAdapter(
+                        child: SizedBox(
+                          height: 280,
+                          child: ListView.builder(
+                            scrollDirection: Axis.horizontal,
+                            physics: const BouncingScrollPhysics(),
+                            padding: const EdgeInsets.symmetric(horizontal: 12),
+                            itemCount: productsTraCu.length,
+                            itemBuilder: (context, index) {
+                              return SizedBox(
+                                width: 200,
+                                child: Padding(
+                                  padding: const EdgeInsets.symmetric(
+                                    horizontal: 4,
+                                  ),
+                                  child: AnimatedProductCard(
+                                    product: productsTraCu[index],
+                                    index:
+                                        productsAmTuSa.length +
+                                        productsTra.length +
+                                        index,
+                                  ),
+                                ),
+                              );
+                            },
+                          ),
+                        ),
                       ),
                     ],
 
