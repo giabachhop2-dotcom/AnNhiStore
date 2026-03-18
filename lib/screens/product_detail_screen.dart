@@ -344,20 +344,25 @@ class _ProductDetailScreenState extends ConsumerState<ProductDetailScreen>
                                   letterSpacing: 0.1,
                                 ),
                                 customStylesBuilder: (element) {
+                                  // GLOBAL: strip ALL underlines from every element
+                                  final styles = <String, String>{
+                                    'text-decoration': 'none',
+                                  };
                                   if (element.localName == 'a') {
-                                    return {
-                                      'text-decoration': 'none',
-                                      'color': '#C8A96E',
-                                      'font-weight': '600',
-                                    };
+                                    styles['color'] = '#C8A96E';
+                                    styles['font-weight'] = '600';
                                   }
                                   if (element.localName == 'strong' ||
                                       element.localName == 'b') {
-                                    return {
-                                      'color': isDark ? '#F5EFE3' : '#2C1810',
-                                    };
+                                    styles['color'] = isDark
+                                        ? '#F5EFE3'
+                                        : '#2C1810';
                                   }
-                                  return null;
+                                  if (element.localName == 'u' ||
+                                      element.localName == 'ins') {
+                                    styles['text-decoration'] = 'none';
+                                  }
+                                  return styles;
                                 },
                               ),
                             ],

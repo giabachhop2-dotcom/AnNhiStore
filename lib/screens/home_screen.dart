@@ -98,11 +98,28 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
             (results[3] as ({List<NewsArticle> items, int total})).items;
         final filteredNews = allNews.where((n) {
           final name = (n.namevi ?? '').toLowerCase();
-          return !name.contains('chính sách') &&
-              !name.contains('thanh toán') &&
-              !name.contains('vận chuyển') &&
-              !name.contains('giao nhận') &&
-              !name.contains('bảo hành');
+          // Exclude spam/policy articles uploaded by previous developers
+          const excludeKeywords = [
+            'chính sách',
+            'thanh toán',
+            'vận chuyển',
+            'giao nhận',
+            'bảo hành',
+            'đổi trả',
+            'miễn phí',
+            'bảo mật',
+            'sở nhiên',
+            'phương hằng',
+            'tại công ty',
+            'chuyển khoản',
+          ];
+          // Also exclude generic "An Nhi Trà" alone (without substantial content)
+          final isGenericAnNhi =
+              name == 'an nhi trà' ||
+              name == 'an nhi tra' ||
+              name == 'an nhi trà sg';
+          return !excludeKeywords.any((kw) => name.contains(kw)) &&
+              !isGenericAnNhi;
         }).toList();
 
         setState(() {

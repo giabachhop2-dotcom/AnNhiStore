@@ -417,7 +417,7 @@ class _AnimatedProductCardState extends ConsumerState<AnimatedProductCard>
                                   letterSpacing: -0.2,
                                 ),
                               ),
-                              const Spacer(),
+                              const SizedBox(height: 6),
                               _buildPrice(formatter, isDark),
                             ],
                           ),
@@ -444,7 +444,7 @@ class _AnimatedProductCardState extends ConsumerState<AnimatedProductCard>
           Text(
             formatter.format(p.salePrice),
             style: const TextStyle(
-              color: AppTheme.priceRed,
+              color: Color(0xFFC8A96E),
               fontWeight: FontWeight.bold,
               fontSize: 15,
             ),
@@ -463,7 +463,7 @@ class _AnimatedProductCardState extends ConsumerState<AnimatedProductCard>
       return Text(
         formatter.format(p.regularPrice),
         style: const TextStyle(
-          color: AppTheme.priceRed,
+          color: Color(0xFFC8A96E),
           fontWeight: FontWeight.bold,
           fontSize: 15,
         ),

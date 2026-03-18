@@ -14,10 +14,13 @@ import '../widgets/empty_state.dart';
 class CartScreen extends ConsumerWidget {
   const CartScreen({super.key});
 
+  static const _goldPrice = Color(0xFFC8A96E);
+
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final cart = ref.watch(cartProvider);
     final cartNotifier = ref.read(cartProvider.notifier);
+    final isDark = CupertinoTheme.brightnessOf(context) == Brightness.dark;
     final formatter = NumberFormat.currency(locale: 'vi_VN', symbol: '₫');
 
     return CupertinoPageScaffold(
@@ -26,8 +29,10 @@ class CartScreen extends ConsumerWidget {
         trailing: cart.isNotEmpty
             ? CupertinoButton(
                 padding: EdgeInsets.zero,
-                child: const Text('Xóa tất cả',
-                    style: TextStyle(color: AppTheme.priceRed, fontSize: 14)),
+                child: const Text(
+                  'Xóa tất cả',
+                  style: TextStyle(color: AppTheme.priceRed, fontSize: 14),
+                ),
                 onPressed: () {
                   HapticFeedback.mediumImpact();
                   showCupertinoDialog(
@@ -57,22 +62,25 @@ class CartScreen extends ConsumerWidget {
             : null,
       ),
       child: cart.isEmpty
-          ? EmptyState.emptyCart(
-              onBrowse: () => context.go('/products'),
-            )
+          ? EmptyState.emptyCart(onBrowse: () => context.go('/products'))
           : Stack(
               children: [
                 // Cart items list
                 ListView.builder(
                   padding: EdgeInsets.fromLTRB(
-                    16, 16, 16,
+                    16,
+                    16,
+                    16,
                     MediaQuery.of(context).padding.bottom + 100,
                   ),
                   physics: const BouncingScrollPhysics(),
                   itemCount: cart.length,
                   itemBuilder: (context, index) {
                     final item = cart[index];
-                    final imageUrl = ApiService.getImageUrl(item.product.photo, 'product');
+                    final imageUrl = ApiService.getImageUrl(
+                      item.product.photo,
+                      'product',
+                    );
 
                     // iOS swipe-to-delete with undo
                     return Dismissible(
@@ -111,10 +119,14 @@ class CartScreen extends ConsumerWidget {
                                   ),
                                 ],
                               ),
-                              backgroundColor: AppTheme.primaryDark.withValues(alpha: 0.95),
+                              backgroundColor: AppTheme.primaryDark.withValues(
+                                alpha: 0.95,
+                              ),
                               behavior: SnackBarBehavior.floating,
                               margin: EdgeInsets.fromLTRB(
-                                16, 0, 16,
+                                16,
+                                0,
+                                16,
                                 MediaQuery.of(context).padding.bottom + 100,
                               ),
                               shape: RoundedRectangleBorder(
@@ -145,13 +157,18 @@ class CartScreen extends ConsumerWidget {
                           color: CupertinoColors.destructiveRed,
                           borderRadius: BorderRadius.circular(12),
                         ),
-                        child: const Icon(CupertinoIcons.trash, color: CupertinoColors.white),
+                        child: const Icon(
+                          CupertinoIcons.trash,
+                          color: CupertinoColors.white,
+                        ),
                       ),
                       child: Container(
                         margin: const EdgeInsets.only(bottom: 10),
                         padding: const EdgeInsets.all(12),
                         decoration: BoxDecoration(
-                          color: CupertinoColors.systemBackground.resolveFrom(context),
+                          color: isDark
+                              ? AppTheme.darkElevated
+                              : AppTheme.surfaceWhite,
                           borderRadius: BorderRadius.circular(12),
                           boxShadow: [
                             BoxShadow(
@@ -170,8 +187,11 @@ class CartScreen extends ConsumerWidget {
                                 width: 80,
                                 height: 80,
                                 fit: BoxFit.cover,
-                                errorWidget: (_, _a, _b) =>
-                                    Container(width: 80, height: 80, color: AppTheme.groupedBg),
+                                errorWidget: (_, _a, _b) => Container(
+                                  width: 80,
+                                  height: 80,
+                                  color: AppTheme.groupedBg,
+                                ),
                               ),
                             ),
                             const SizedBox(width: 12),
@@ -183,29 +203,35 @@ class CartScreen extends ConsumerWidget {
                                     item.product.namevi ?? '',
                                     maxLines: 2,
                                     overflow: TextOverflow.ellipsis,
-                                    style: const TextStyle(
+                                    style: TextStyle(
                                       fontWeight: FontWeight.w600,
                                       fontSize: 14,
-                                      color: AppTheme.textPrimary,
+                                      color: isDark
+                                          ? AppTheme.darkTextPrimary
+                                          : AppTheme.textPrimary,
                                     ),
                                   ),
                                   const SizedBox(height: 4),
                                   item.product.displayPrice > 0
                                       ? Text(
-                                          formatter.format(item.product.displayPrice),
+                                          formatter.format(
+                                            item.product.displayPrice,
+                                          ),
                                           style: const TextStyle(
-                                            color: AppTheme.priceRed,
+                                            color: _goldPrice,
                                             fontWeight: FontWeight.bold,
                                             fontSize: 15,
                                           ),
                                         )
-                                      : const Text('Liên hệ',
+                                      : const Text(
+                                          'Liên hệ',
                                           style: TextStyle(
                                             color: AppTheme.accentGold,
                                             fontWeight: FontWeight.w600,
                                             fontSize: 14,
                                             fontStyle: FontStyle.italic,
-                                          )),
+                                          ),
+                                        ),
                                   const SizedBox(height: 8),
                                   // iOS-style stepper
                                   Row(
@@ -214,26 +240,33 @@ class CartScreen extends ConsumerWidget {
                                         quantity: item.quantity,
                                         onChanged: (qty) {
                                           HapticFeedback.selectionClick();
-                                          cartNotifier.updateQuantity(item.product.id, qty);
+                                          cartNotifier.updateQuantity(
+                                            item.product.id,
+                                            qty,
+                                          );
                                         },
                                       ),
                                       const Spacer(),
                                       item.lineTotal > 0
                                           ? Text(
                                               formatter.format(item.lineTotal),
-                                              style: const TextStyle(
+                                              style: TextStyle(
                                                 fontWeight: FontWeight.w600,
                                                 fontSize: 14,
-                                                color: AppTheme.textPrimary,
+                                                color: isDark
+                                                    ? AppTheme.darkTextPrimary
+                                                    : AppTheme.textPrimary,
                                               ),
                                             )
-                                          : const Text('Liên hệ',
+                                          : const Text(
+                                              'Liên hệ',
                                               style: TextStyle(
                                                 fontWeight: FontWeight.w600,
                                                 fontSize: 13,
                                                 color: AppTheme.accentGold,
                                                 fontStyle: FontStyle.italic,
-                                              )),
+                                              ),
+                                            ),
                                     ],
                                   ),
                                 ],
@@ -254,13 +287,17 @@ class CartScreen extends ConsumerWidget {
                   child: ClipRect(
                     child: Container(
                       padding: EdgeInsets.fromLTRB(
-                        20, 14, 20,
+                        20,
+                        14,
+                        20,
                         MediaQuery.of(context).padding.bottom + 14,
                       ),
                       decoration: BoxDecoration(
-                        color: CupertinoColors.systemBackground
-                            .resolveFrom(context)
-                            .withValues(alpha: 0.95),
+                        color:
+                            (isDark
+                                    ? AppTheme.darkSurface
+                                    : AppTheme.surfaceWhite)
+                                .withValues(alpha: 0.97),
                         border: Border(
                           top: BorderSide(
                             color: AppTheme.separator.withValues(alpha: 0.3),
@@ -273,25 +310,56 @@ class CartScreen extends ConsumerWidget {
                             crossAxisAlignment: CrossAxisAlignment.start,
                             mainAxisSize: MainAxisSize.min,
                             children: [
-                              const Text('Tổng cộng:',
-                                  style: TextStyle(color: AppTheme.textMuted, fontSize: 12)),
-                              Builder(builder: (_) {
-                                final total = cart.fold(0.0, (sum, item) => sum + item.lineTotal);
-                                final hasContactItems = cart.any((item) => item.product.displayPrice <= 0);
-                                return Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    total > 0
-                                        ? Text(formatter.format(total),
-                                            style: const TextStyle(fontSize: 22, fontWeight: FontWeight.bold, color: AppTheme.priceRed))
-                                        : const Text('Liên hệ',
-                                            style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: AppTheme.accentGold, fontStyle: FontStyle.italic)),
-                                    if (hasContactItems && total > 0)
-                                      const Text('+ SP liên hệ giá',
-                                          style: TextStyle(fontSize: 11, color: AppTheme.accentGold)),
-                                  ],
-                                );
-                              }),
+                              const Text(
+                                'Tổng cộng:',
+                                style: TextStyle(
+                                  color: AppTheme.textMuted,
+                                  fontSize: 12,
+                                ),
+                              ),
+                              Builder(
+                                builder: (_) {
+                                  final total = cart.fold(
+                                    0.0,
+                                    (sum, item) => sum + item.lineTotal,
+                                  );
+                                  final hasContactItems = cart.any(
+                                    (item) => item.product.displayPrice <= 0,
+                                  );
+                                  return Column(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
+                                    children: [
+                                      total > 0
+                                          ? Text(
+                                              formatter.format(total),
+                                              style: const TextStyle(
+                                                fontSize: 22,
+                                                fontWeight: FontWeight.bold,
+                                                color: _goldPrice,
+                                              ),
+                                            )
+                                          : const Text(
+                                              'Liên hệ',
+                                              style: TextStyle(
+                                                fontSize: 20,
+                                                fontWeight: FontWeight.bold,
+                                                color: AppTheme.accentGold,
+                                                fontStyle: FontStyle.italic,
+                                              ),
+                                            ),
+                                      if (hasContactItems && total > 0)
+                                        const Text(
+                                          '+ SP liên hệ giá',
+                                          style: TextStyle(
+                                            fontSize: 11,
+                                            color: AppTheme.accentGold,
+                                          ),
+                                        ),
+                                    ],
+                                  );
+                                },
+                              ),
                             ],
                           ),
                           const SizedBox(width: 16),
@@ -302,8 +370,13 @@ class CartScreen extends ConsumerWidget {
                                 context.push('/checkout');
                               },
                               borderRadius: BorderRadius.circular(14),
-                              child: const Text('Đặt hàng',
-                                  style: TextStyle(fontWeight: FontWeight.w600, fontSize: 16)),
+                              child: const Text(
+                                'Đặt hàng',
+                                style: TextStyle(
+                                  fontWeight: FontWeight.w600,
+                                  fontSize: 16,
+                                ),
+                              ),
                             ),
                           ),
                         ],

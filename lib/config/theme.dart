@@ -7,18 +7,18 @@ import 'package:flutter/services.dart';
 /// Inspired by traditional Vietnamese/Asian tea ceremony aesthetics.
 class AppTheme {
   // ── Trà Đạo Brand Colors ──
-  static const primaryDark   = Color(0xFF1A3C28); // Rêu trà đậm
-  static const primaryMid    = Color(0xFF2D5E3E); // Lá trà tươi
-  static const primaryLight  = Color(0xFF4A7C5C); // Lá trà nhạt
-  static const primaryBg     = Color(0xFFF5F0E8); // Giấy dó cổ / parchment
-  static const accentGold    = Color(0xFFC49B2C); // Vàng đồng cổ
-  static const priceRed      = Color(0xFFC62828); // Đỏ son
-  static const surfaceWhite  = Color(0xFFFAF8F4); // Trắng ngà
-  static const textPrimary   = Color(0xFF2C2416); // Mực nâu đậm
+  static const primaryDark = Color(0xFF1A3C28); // Rêu trà đậm
+  static const primaryMid = Color(0xFF2D5E3E); // Lá trà tươi
+  static const primaryLight = Color(0xFF4A7C5C); // Lá trà nhạt
+  static const primaryBg = Color(0xFFF5F0E8); // Giấy dó cổ / parchment
+  static const accentGold = Color(0xFFC49B2C); // Vàng đồng cổ
+  static const priceRed = Color(0xFFC62828); // Đỏ son
+  static const surfaceWhite = Color(0xFFFAF8F4); // Trắng ngà
+  static const textPrimary = Color(0xFF2C2416); // Mực nâu đậm
   static const textSecondary = Color(0xFF5C4E3C); // Mực nâu nhạt
-  static const textMuted     = Color(0xFF8C7E6A); // Nâu bạc
-  static const separator     = Color(0xFFD9CEBD); // Gạch ngà
-  static const groupedBg     = Color(0xFFF0EBE0); // Nền grouped ấm
+  static const textMuted = Color(0xFF8C7E6A); // Nâu bạc
+  static const separator = Color(0xFFD9CEBD); // Gạch ngà
+  static const groupedBg = Color(0xFFF0EBE0); // Nền grouped ấm
 
   // ── Animation Constants ──
   static const Duration animFast = Duration(milliseconds: 150);
@@ -87,7 +87,10 @@ class AppTheme {
           borderRadius: BorderRadius.circular(10),
           borderSide: BorderSide(color: separator),
         ),
-        contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+        contentPadding: const EdgeInsets.symmetric(
+          horizontal: 16,
+          vertical: 12,
+        ),
       ),
     );
   }
@@ -96,17 +99,21 @@ class AppTheme {
   static void setStatusBarStyle({bool dark = true}) {
     SystemChrome.setSystemUIOverlayStyle(
       dark
-          ? SystemUiOverlayStyle.dark.copyWith(statusBarColor: Colors.transparent)
-          : SystemUiOverlayStyle.light.copyWith(statusBarColor: Colors.transparent),
+          ? SystemUiOverlayStyle.dark.copyWith(
+              statusBarColor: Colors.transparent,
+            )
+          : SystemUiOverlayStyle.light.copyWith(
+              statusBarColor: Colors.transparent,
+            ),
     );
   }
 
-  // ── Dark Mode — Trà Đạo đêm (warm candlelight) ──
-  static const darkSurface       = Color(0xFF241F19); // Gỗ nâu ấm
-  static const darkGroupedBg     = Color(0xFF1C1814); // Nền ấm đêm trà
-  static const darkElevated      = Color(0xFF322B23); // Gỗ nâu nổi
-  static const darkSeparator     = Color(0xFF4A4038); // Viền gỗ ấm
-  static const darkTextPrimary   = Color(0xFFF5F0E8); // Giấy dó sáng
+  // ── Dark Mode — Trà Đạo đêm (deep tea-green) ──
+  static const darkSurface = Color(0xFF0D1F14); // Rêu trà đậm đêm
+  static const darkGroupedBg = Color(0xFF0A1A10); // Nền xanh trà sâu
+  static const darkElevated = Color(0xFF16291E); // Lá trà nổi
+  static const darkSeparator = Color(0xFF2A4035); // Viền rêu ấm
+  static const darkTextPrimary = Color(0xFFF5F0E8); // Giấy dó sáng
   static const darkTextSecondary = Color(0xFFD9CEBD); // Ngà nhạt
 
   /// Dark Cupertino — tea ceremony by candlelight
