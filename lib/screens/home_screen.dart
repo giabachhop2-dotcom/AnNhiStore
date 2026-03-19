@@ -557,7 +557,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
     const darkGreen = Color(0xFF114402);
     final categories = [
       {'icon': CupertinoIcons.flame, 'label': 'Ấm Tử Sa'},
-      {'icon': CupertinoIcons.leaf_arrow_circlepath, 'label': 'Trà Shan'},
+      {'icon': CupertinoIcons.leaf_arrow_circlepath, 'label': 'Trà'},
       {'icon': CupertinoIcons.tray_2, 'label': 'Phụ Kiện'},
       {'icon': CupertinoIcons.gift, 'label': 'Quà Tặng'},
     ];
@@ -591,7 +591,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                     child: Icon(
                       cat['icon'] as IconData,
                       size: 24,
-                      color: darkGreen,
+                      color: AppTheme.accentGold,
                     ),
                   ),
                 ),
