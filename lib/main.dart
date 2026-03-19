@@ -98,13 +98,16 @@ class _AnNhiTraAppState extends ConsumerState<AnNhiTraApp> {
         final isDark = Theme.of(context).brightness == Brightness.dark;
         return CupertinoTheme(
           data: isDark ? AppTheme.darkCupertinoTheme : AppTheme.cupertinoTheme,
-          child: DefaultTextStyle(
-            style: TextStyle(
-              fontFamily: 'UTMKhuccamta',
-              color: isDark ? AppTheme.darkTextPrimary : AppTheme.textPrimary,
-              decoration: TextDecoration.none,
+          child: ColoredBox(
+            color: isDark ? AppTheme.darkGroupedBg : AppTheme.groupedBg,
+            child: DefaultTextStyle(
+              style: TextStyle(
+                fontFamily: 'UTMKhuccamta',
+                color: isDark ? AppTheme.darkTextPrimary : AppTheme.textPrimary,
+                decoration: TextDecoration.none,
+              ),
+              child: child!,
             ),
-            child: child!,
           ),
         );
       },
