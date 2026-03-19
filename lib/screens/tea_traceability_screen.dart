@@ -625,7 +625,7 @@ final Map<String, _TeaBatch> _mockDatabase = {
     process:
         'Hái thủ công → Héo nắng → Sao chảo gang → Vò → Phơi âm can → Ủ kho lạnh',
     farmer: 'HTX Trà Shan Tuyết Hoàng Su Phì',
-    certificate: 'Chứng nhận VietGAP · Truy xuất TXNG Bộ NN&PTNT',
+    certificate: 'ISO:9001 · ISO:22000 · FDA Approved',
   ),
   'ANT-2025-002': const _TeaBatch(
     productName: 'Hồng Trà Shan Tuyết - Yên Bái',
@@ -638,7 +638,7 @@ final Map<String, _TeaBatch> _mockDatabase = {
     process:
         'Hái thủ công → Héo tự nhiên → Vò nén → Lên men 8h → Sấy than hoa → Ủ 3 tháng',
     farmer: 'Nông hộ Giàng A Chải - bản Suối Giàng',
-    certificate: 'Chứng nhận hữu cơ USDA Organic',
+    certificate: 'ISO:9001 · ISO:22000 · Chứng nhận hữu cơ',
   ),
   'ANT-2025-003': const _TeaBatch(
     productName: 'Trà Ô Long Shan Tuyết Đặc Biệt',
@@ -651,7 +651,7 @@ final Map<String, _TeaBatch> _mockDatabase = {
     process:
         'Hái búp 1 tôm 2 lá → Héo nắng → Rung lắc oxy hóa → Sao cố định → Vò → Sấy nhẹ → Ủ',
     farmer: 'Đối tác ANNSHAN - Vùng nguyên liệu Tà Xùa',
-    certificate: 'Sản phẩm OCOP 4 sao · Bảo hộ chỉ dẫn địa lý',
+    certificate: 'ISO:22000 · FDA · Sản phẩm OCOP 4 sao',
   ),
   'ANT-2025-004': const _TeaBatch(
     productName: 'Phổ Nhĩ Chín Shan Tuyết 2023',
@@ -664,7 +664,7 @@ final Map<String, _TeaBatch> _mockDatabase = {
     process:
         'Sao mao trà → Phơi dương → Ủ ướt 45 ngày → Lật giở → Sấy → Nén bánh → Ủ khô 12 tháng',
     farmer: 'HTX Lũng Phìn - Cao nguyên đá Đồng Văn',
-    certificate: 'Di sản Công viên Địa chất Toàn cầu UNESCO',
+    certificate: 'ISO:9001 · FDA · Di sản UNESCO',
   ),
   'ANT-2025-005': const _TeaBatch(
     productName: 'Bạch Trà Shan Tuyết Tuyển Chọn',
@@ -677,6 +677,6 @@ final Map<String, _TeaBatch> _mockDatabase = {
     process:
         'Hái búp non sáng sớm → Héo mát 48h → Phơi âm can 72h → Đóng gói chân không',
     farmer: 'Gia đình bà Vàng Thị Mỷ - bản Phìn Hồ',
-    certificate: 'Chứng nhận An toàn thực phẩm · Sản phẩm OCOP 3 sao',
+    certificate: 'ISO:22000 · FDA · Sản phẩm OCOP 3 sao',
   ),
 };

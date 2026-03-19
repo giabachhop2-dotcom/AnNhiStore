@@ -398,10 +398,15 @@ class _IosStepper extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final isDark = CupertinoTheme.brightnessOf(context) == Brightness.dark;
     return Container(
       decoration: BoxDecoration(
-        color: AppTheme.groupedBg,
+        color: isDark ? AppTheme.darkElevated : AppTheme.groupedBg,
         borderRadius: BorderRadius.circular(8),
+        border: Border.all(
+          color: isDark ? AppTheme.darkSeparator : AppTheme.separator,
+          width: 0.5,
+        ),
       ),
       child: Row(
         mainAxisSize: MainAxisSize.min,
@@ -413,7 +418,9 @@ class _IosStepper extends StatelessWidget {
             child: Icon(
               CupertinoIcons.minus,
               size: 14,
-              color: quantity > 1 ? AppTheme.textPrimary : AppTheme.textMuted,
+              color: quantity > 1
+                  ? (isDark ? AppTheme.accentGold : AppTheme.primaryDark)
+                  : AppTheme.textMuted,
             ),
           ),
           SizedBox(
@@ -422,11 +429,9 @@ class _IosStepper extends StatelessWidget {
               '$quantity',
               textAlign: TextAlign.center,
               style: TextStyle(
-                fontWeight: FontWeight.w600,
+                fontWeight: FontWeight.bold,
                 fontSize: 15,
-                color: CupertinoTheme.brightnessOf(context) == Brightness.dark
-                    ? AppTheme.darkTextPrimary
-                    : AppTheme.textPrimary,
+                color: isDark ? AppTheme.accentGold : AppTheme.primaryDark,
               ),
             ),
           ),
@@ -434,7 +439,11 @@ class _IosStepper extends StatelessWidget {
             padding: const EdgeInsets.all(6),
             minimumSize: Size.zero,
             onPressed: () => onChanged(quantity + 1),
-            child: const Icon(CupertinoIcons.plus, size: 14),
+            child: Icon(
+              CupertinoIcons.plus,
+              size: 14,
+              color: isDark ? AppTheme.accentGold : AppTheme.primaryDark,
+            ),
           ),
         ],
       ),

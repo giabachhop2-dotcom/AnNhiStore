@@ -868,17 +868,26 @@ class _ProductDetailScreenState extends ConsumerState<ProductDetailScreen>
   }
 
   Widget _buildQuantitySelector() {
+    final isDark = CupertinoTheme.brightnessOf(context) == Brightness.dark;
     return Row(
       children: [
-        const Text(
+        Text(
           'Số lượng:',
-          style: TextStyle(fontSize: 15, fontWeight: FontWeight.w500),
+          style: TextStyle(
+            fontSize: 15,
+            fontWeight: FontWeight.w500,
+            color: isDark ? AppTheme.darkTextPrimary : AppTheme.textPrimary,
+          ),
         ),
         const SizedBox(width: 16),
         Container(
           decoration: BoxDecoration(
-            color: AppTheme.groupedBg,
+            color: isDark ? AppTheme.darkElevated : AppTheme.groupedBg,
             borderRadius: BorderRadius.circular(10),
+            border: Border.all(
+              color: isDark ? AppTheme.darkSeparator : AppTheme.separator,
+              width: 0.5,
+            ),
           ),
           child: Row(
             children: [
@@ -895,7 +904,7 @@ class _ProductDetailScreenState extends ConsumerState<ProductDetailScreen>
                   CupertinoIcons.minus,
                   size: 16,
                   color: quantity > 1
-                      ? AppTheme.textPrimary
+                      ? (isDark ? AppTheme.accentGold : AppTheme.primaryDark)
                       : AppTheme.textMuted,
                 ),
               ),
@@ -906,11 +915,8 @@ class _ProductDetailScreenState extends ConsumerState<ProductDetailScreen>
                   textAlign: TextAlign.center,
                   style: TextStyle(
                     fontSize: 17,
-                    fontWeight: FontWeight.w600,
-                    color:
-                        CupertinoTheme.brightnessOf(context) == Brightness.dark
-                        ? AppTheme.darkTextPrimary
-                        : AppTheme.textPrimary,
+                    fontWeight: FontWeight.bold,
+                    color: isDark ? AppTheme.accentGold : AppTheme.primaryDark,
                   ),
                 ),
               ),
@@ -921,7 +927,11 @@ class _ProductDetailScreenState extends ConsumerState<ProductDetailScreen>
                   HapticFeedback.selectionClick();
                   setState(() => quantity++);
                 },
-                child: const Icon(CupertinoIcons.plus, size: 16),
+                child: Icon(
+                  CupertinoIcons.plus,
+                  size: 16,
+                  color: isDark ? AppTheme.accentGold : AppTheme.primaryDark,
+                ),
               ),
             ],
           ),
