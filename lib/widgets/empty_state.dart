@@ -71,12 +71,15 @@ class EmptyState extends StatefulWidget {
   State<EmptyState> createState() => _EmptyStateState();
 }
 
-class _EmptyStateState extends State<EmptyState>
-    with SingleTickerProviderStateMixin {
+class _EmptyStateState extends State<EmptyState> with TickerProviderStateMixin {
   late AnimationController _controller;
   late Animation<double> _fadeAnimation;
   late Animation<Offset> _slideAnimation;
   late Animation<double> _iconScale;
+
+  // Breathing pulse
+  late AnimationController _breathController;
+  late Animation<double> _breathScale;
 
   @override
   void initState() {
@@ -93,15 +96,13 @@ class _EmptyStateState extends State<EmptyState>
       ),
     );
 
-    _slideAnimation = Tween<Offset>(
-      begin: const Offset(0, 0.15),
-      end: Offset.zero,
-    ).animate(
-      CurvedAnimation(
-        parent: _controller,
-        curve: const Interval(0.1, 0.8, curve: Curves.easeOutCubic),
-      ),
-    );
+    _slideAnimation =
+        Tween<Offset>(begin: const Offset(0, 0.15), end: Offset.zero).animate(
+          CurvedAnimation(
+            parent: _controller,
+            curve: const Interval(0.1, 0.8, curve: Curves.easeOutCubic),
+          ),
+        );
 
     _iconScale = Tween<double>(begin: 0.5, end: 1.0).animate(
       CurvedAnimation(
@@ -111,11 +112,22 @@ class _EmptyStateState extends State<EmptyState>
     );
 
     _controller.forward();
+
+    // Gentle breathing pulse loop
+    _breathController = AnimationController(
+      duration: const Duration(milliseconds: 2000),
+      vsync: this,
+    );
+    _breathScale = Tween<double>(begin: 1.0, end: 1.08).animate(
+      CurvedAnimation(parent: _breathController, curve: Curves.easeInOut),
+    );
+    _breathController.repeat(reverse: true);
   }
 
   @override
   void dispose() {
     _controller.dispose();
+    _breathController.dispose();
     super.dispose();
   }
 
@@ -134,26 +146,31 @@ class _EmptyStateState extends State<EmptyState>
                 // Animated icon with background circle
                 ScaleTransition(
                   scale: _iconScale,
-                  child: Container(
-                    width: 100,
-                    height: 100,
-                    decoration: BoxDecoration(
-                      shape: BoxShape.circle,
-                      gradient: LinearGradient(
-                        begin: Alignment.topLeft,
-                        end: Alignment.bottomRight,
-                        colors: [
-                          (widget.iconColor ?? AppTheme.textMuted)
-                              .withValues(alpha: 0.12),
-                          (widget.iconColor ?? AppTheme.textMuted)
-                              .withValues(alpha: 0.05),
-                        ],
+                  child: ScaleTransition(
+                    scale: _breathScale,
+                    child: Container(
+                      width: 100,
+                      height: 100,
+                      decoration: BoxDecoration(
+                        shape: BoxShape.circle,
+                        gradient: LinearGradient(
+                          begin: Alignment.topLeft,
+                          end: Alignment.bottomRight,
+                          colors: [
+                            (widget.iconColor ?? AppTheme.textMuted).withValues(
+                              alpha: 0.12,
+                            ),
+                            (widget.iconColor ?? AppTheme.textMuted).withValues(
+                              alpha: 0.05,
+                            ),
+                          ],
+                        ),
                       ),
-                    ),
-                    child: Icon(
-                      widget.icon,
-                      size: 44,
-                      color: widget.iconColor ?? AppTheme.textMuted,
+                      child: Icon(
+                        widget.icon,
+                        size: 44,
+                        color: widget.iconColor ?? AppTheme.textMuted,
+                      ),
                     ),
                   ),
                 ),

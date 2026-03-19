@@ -5,6 +5,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'config/theme.dart';
 import 'config/router.dart';
+import 'screens/splash_screen.dart';
 import 'screens/onboarding_screen.dart';
 
 void main() {
@@ -69,6 +70,7 @@ class AnNhiTraApp extends ConsumerStatefulWidget {
 }
 
 class _AnNhiTraAppState extends ConsumerState<AnNhiTraApp> {
+  bool _showSplash = true;
   bool _showOnboarding = false;
   bool _initialized = false;
 
@@ -101,6 +103,18 @@ class _AnNhiTraAppState extends ConsumerState<AnNhiTraApp> {
       );
     }
 
+    // Phase 1: Splash screen
+    if (_showSplash) {
+      return MaterialApp(
+        debugShowCheckedModeBanner: false,
+        theme: AppTheme.materialTheme,
+        home: SplashScreen(
+          onComplete: () => setState(() => _showSplash = false),
+        ),
+      );
+    }
+
+    // Phase 2: Onboarding (if not done)
     if (_showOnboarding) {
       return MaterialApp(
         debugShowCheckedModeBanner: false,

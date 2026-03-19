@@ -49,18 +49,24 @@ class _AnimatedNavBarState extends State<AnimatedNavBar>
     );
     _badgeScale = TweenSequence<double>([
       TweenSequenceItem(
-        tween: Tween(begin: 1.0, end: 1.4)
-            .chain(CurveTween(curve: Curves.easeOut)),
+        tween: Tween(
+          begin: 1.0,
+          end: 1.4,
+        ).chain(CurveTween(curve: Curves.easeOut)),
         weight: 40,
       ),
       TweenSequenceItem(
-        tween: Tween(begin: 1.4, end: 0.9)
-            .chain(CurveTween(curve: Curves.easeIn)),
+        tween: Tween(
+          begin: 1.4,
+          end: 0.9,
+        ).chain(CurveTween(curve: Curves.easeIn)),
         weight: 30,
       ),
       TweenSequenceItem(
-        tween: Tween(begin: 0.9, end: 1.0)
-            .chain(CurveTween(curve: Curves.elasticOut)),
+        tween: Tween(
+          begin: 0.9,
+          end: 1.0,
+        ).chain(CurveTween(curve: Curves.elasticOut)),
         weight: 30,
       ),
     ]).animate(_badgeController);
@@ -104,8 +110,8 @@ class _AnimatedNavBarState extends State<AnimatedNavBar>
         border: Border(
           top: BorderSide(
             color: isDark
-                ? AppTheme.accentGold.withValues(alpha: 0.15)
-                : AppTheme.accentGold.withValues(alpha: 0.2),
+                ? Colors.white.withValues(alpha: 0.08)
+                : Colors.black.withValues(alpha: 0.06),
             width: 0.5,
           ),
         ),
@@ -135,15 +141,13 @@ class _AnimatedNavBarState extends State<AnimatedNavBar>
                     width: _tabWidth(context),
                     height: 3,
                     decoration: BoxDecoration(
-                      gradient: const LinearGradient(
-                        colors: [AppTheme.accentGold, AppTheme.primaryDark],
-                      ),
+                      color: const Color(0xFF114402),
                       borderRadius: const BorderRadius.vertical(
                         bottom: Radius.circular(2),
                       ),
                       boxShadow: [
                         BoxShadow(
-                          color: AppTheme.accentGold.withValues(alpha: 0.4),
+                          color: const Color(0xFF114402).withValues(alpha: 0.4),
                           blurRadius: 8,
                           spreadRadius: 1,
                         ),
@@ -227,9 +231,10 @@ class _TabItemState extends State<_TabItem>
       lowerBound: 0.0,
       upperBound: 1.0,
     );
-    _scale = Tween<double>(begin: 1.0, end: 1.15).animate(
-      CurvedAnimation(parent: _scaleController, curve: Curves.easeOut),
-    );
+    _scale = Tween<double>(
+      begin: 1.0,
+      end: 1.15,
+    ).animate(CurvedAnimation(parent: _scaleController, curve: Curves.easeOut));
   }
 
   @override
@@ -248,8 +253,7 @@ class _TabItemState extends State<_TabItem>
 
   @override
   Widget build(BuildContext context) {
-    final isDark = CupertinoTheme.brightnessOf(context) == Brightness.dark;
-    final activeColor = isDark ? AppTheme.accentGold : AppTheme.primaryDark;
+    final activeColor = const Color(0xFF114402);
     final color = widget.isActive ? activeColor : AppTheme.textMuted;
 
     Widget iconWidget = ScaleTransition(

@@ -58,6 +58,13 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
     setState(() => _scrollOffset = _scrollController.offset);
   }
 
+  String _greeting() {
+    final hour = DateTime.now().hour;
+    if (hour < 12) return 'Chào buổi sáng! ☀️';
+    if (hour < 18) return 'Chào buổi chiều! 🌤️';
+    return 'Chào buổi tối! 🌙';
+  }
+
   Future<void> _loadData() async {
     setState(() {
       isLoading = true;
@@ -163,22 +170,116 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                     parent: AlwaysScrollableScrollPhysics(),
                   ),
                   slivers: [
-                    // ── iOS Large Title Navigation Bar ──
-                    CupertinoSliverNavigationBar(
-                      largeTitle: Row(
-                        children: [
-                          Image.asset('assets/images/logo.png', height: 28),
-                          const SizedBox(width: 8),
-                          const Text('An Nhi Trà'),
-                        ],
+                    // ── Greeting Header (Tea Bliss style) ──
+                    SliverToBoxAdapter(
+                      child: Container(
+                        padding: EdgeInsets.only(
+                          top: MediaQuery.of(context).padding.top + 12,
+                          left: 20,
+                          right: 20,
+                          bottom: 4,
+                        ),
+                        child: Row(
+                          children: [
+                            Expanded(
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text(
+                                    _greeting(),
+                                    style: TextStyle(
+                                      fontSize: 24,
+                                      fontWeight: FontWeight.bold,
+                                      color:
+                                          CupertinoTheme.brightnessOf(
+                                                context,
+                                              ) ==
+                                              Brightness.dark
+                                          ? AppTheme.darkTextPrimary
+                                          : AppTheme.textPrimary,
+                                      letterSpacing: -0.3,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                            // Avatar / Logo
+                            GestureDetector(
+                              onTap: () => context.push('/search'),
+                              child: Container(
+                                width: 40,
+                                height: 40,
+                                decoration: BoxDecoration(
+                                  shape: BoxShape.circle,
+                                  color: const Color(0xFF114402),
+                                  boxShadow: [
+                                    BoxShadow(
+                                      color: const Color(
+                                        0xFF114402,
+                                      ).withValues(alpha: 0.3),
+                                      blurRadius: 8,
+                                      offset: const Offset(0, 2),
+                                    ),
+                                  ],
+                                ),
+                                child: ClipOval(
+                                  child: Image.asset(
+                                    'assets/images/logo.png',
+                                    fit: BoxFit.cover,
+                                  ),
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
                       ),
-                      trailing: CupertinoButton(
-                        padding: EdgeInsets.zero,
-                        child: const Icon(CupertinoIcons.search),
-                        onPressed: () => context.push('/search'),
+                    ),
+
+                    // ── Inline Search Bar ──
+                    SliverToBoxAdapter(
+                      child: Padding(
+                        padding: const EdgeInsets.fromLTRB(16, 12, 16, 4),
+                        child: GestureDetector(
+                          onTap: () => context.push('/search'),
+                          child: Container(
+                            height: 44,
+                            padding: const EdgeInsets.symmetric(horizontal: 14),
+                            decoration: BoxDecoration(
+                              color:
+                                  CupertinoTheme.brightnessOf(context) ==
+                                      Brightness.dark
+                                  ? AppTheme.darkElevated
+                                  : const Color(0xFFF2F2F7),
+                              borderRadius: BorderRadius.circular(12),
+                            ),
+                            child: Row(
+                              children: [
+                                Icon(
+                                  CupertinoIcons.search,
+                                  size: 18,
+                                  color:
+                                      CupertinoTheme.brightnessOf(context) ==
+                                          Brightness.dark
+                                      ? AppTheme.darkTextSecondary
+                                      : AppTheme.textMuted,
+                                ),
+                                const SizedBox(width: 10),
+                                Text(
+                                  'Tìm kiếm sản phẩm...',
+                                  style: TextStyle(
+                                    fontSize: 15,
+                                    color:
+                                        CupertinoTheme.brightnessOf(context) ==
+                                            Brightness.dark
+                                        ? AppTheme.darkTextSecondary
+                                        : AppTheme.textMuted,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ),
                       ),
-                      backgroundColor: CupertinoColors.systemBackground,
-                      border: null,
                     ),
 
                     // ── Pull to Refresh ──
@@ -453,6 +554,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
 
   Widget _buildCategoryGrid() {
     final isDark = CupertinoTheme.brightnessOf(context) == Brightness.dark;
+    const darkGreen = Color(0xFF114402);
     final categories = [
       {'icon': CupertinoIcons.flame, 'label': 'Ấm Tử Sa'},
       {'icon': CupertinoIcons.leaf_arrow_circlepath, 'label': 'Trà Shan'},
@@ -461,7 +563,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
     ];
 
     return Padding(
-      padding: const EdgeInsets.fromLTRB(16, 20, 16, 8),
+      padding: const EdgeInsets.fromLTRB(16, 16, 16, 8),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceAround,
         children: categories.map((cat) {
@@ -473,36 +575,23 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
             child: Column(
               children: [
                 Container(
-                  width: 64,
-                  height: 64,
+                  width: 60,
+                  height: 60,
                   decoration: BoxDecoration(
                     shape: BoxShape.circle,
-                    gradient: LinearGradient(
-                      begin: Alignment.topLeft,
-                      end: Alignment.bottomRight,
-                      colors: isDark
-                          ? [AppTheme.darkElevated, AppTheme.darkSurface]
-                          : [AppTheme.surfaceWhite, const Color(0xFFF5EFE3)],
-                    ),
+                    color: isDark
+                        ? darkGreen.withValues(alpha: 0.25)
+                        : const Color(0xFFE8F5E9),
                     border: Border.all(
-                      color: AppTheme.accentGold.withValues(alpha: 0.5),
+                      color: darkGreen.withValues(alpha: isDark ? 0.4 : 0.3),
                       width: 1.5,
                     ),
-                    boxShadow: [
-                      BoxShadow(
-                        color: AppTheme.accentGold.withValues(
-                          alpha: isDark ? 0.1 : 0.15,
-                        ),
-                        blurRadius: 10,
-                        offset: const Offset(0, 3),
-                      ),
-                    ],
                   ),
                   child: Center(
                     child: Icon(
                       cat['icon'] as IconData,
-                      size: 26,
-                      color: AppTheme.accentGold,
+                      size: 24,
+                      color: darkGreen,
                     ),
                   ),
                 ),
