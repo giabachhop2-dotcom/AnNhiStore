@@ -415,6 +415,46 @@ class _AnimatedProductCardState extends ConsumerState<AnimatedProductCard>
                                 letterSpacing: -0.2,
                               ),
                             ),
+                            // Star rating + review count
+                            if (widget.product.avgRating > 0) ...[
+                              const SizedBox(height: 3),
+                              Row(
+                                children: [
+                                  ...List.generate(
+                                    5,
+                                    (i) => Icon(
+                                      i < widget.product.avgRating.round()
+                                          ? CupertinoIcons.star_fill
+                                          : CupertinoIcons.star,
+                                      size: 11,
+                                      color: AppTheme.accentGold,
+                                    ),
+                                  ),
+                                  const SizedBox(width: 4),
+                                  Text(
+                                    '${widget.product.avgRating.toStringAsFixed(1)}',
+                                    style: TextStyle(
+                                      fontSize: 11,
+                                      fontWeight: FontWeight.w600,
+                                      color: isDark
+                                          ? AppTheme.darkTextSecondary
+                                          : AppTheme.textSecondary,
+                                    ),
+                                  ),
+                                  if (widget.product.reviewsCount > 0) ...[
+                                    Text(
+                                      ' (${widget.product.reviewsCount})',
+                                      style: TextStyle(
+                                        fontSize: 10,
+                                        color: isDark
+                                            ? AppTheme.darkTextSecondary
+                                            : AppTheme.textMuted,
+                                      ),
+                                    ),
+                                  ],
+                                ],
+                              ),
+                            ],
                             const SizedBox(height: 5),
                             _buildPrice(formatter, isDark),
                           ],
