@@ -216,7 +216,7 @@ class _SplashScreenState extends State<SplashScreen>
                           ),
                           const SizedBox(height: 10),
                           Text(
-                            'Trà Shan Tuyết · Ấm Tử Sa · Yến Sào',
+                            'Tinh hoa trà · Hồn gốm Việt · Vị yến quý',
                             style: TextStyle(
                               fontSize: 12,
                               color: const Color(
@@ -224,6 +224,7 @@ class _SplashScreenState extends State<SplashScreen>
                               ).withValues(alpha: 0.7),
                               letterSpacing: 1,
                               fontFamily: 'UTMKhuccamta',
+                              decoration: TextDecoration.none,
                             ),
                           ),
                         ],
