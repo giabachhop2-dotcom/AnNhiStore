@@ -1,5 +1,6 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:url_launcher/url_launcher.dart';
@@ -50,7 +51,6 @@ class MoreScreen extends ConsumerWidget {
               ),
               child: Stack(
                 children: [
-                  // Decorative pattern
                   Positioned(
                     right: -20,
                     top: -20,
@@ -80,14 +80,20 @@ class MoreScreen extends ConsumerWidget {
                               decoration: BoxDecoration(
                                 borderRadius: BorderRadius.circular(16),
                                 border: Border.all(
-                                  color: AppTheme.accentGold.withValues(alpha: 0.5),
+                                  color: AppTheme.accentGold.withValues(
+                                    alpha: 0.5,
+                                  ),
                                   width: 2,
                                 ),
                               ),
                               child: ClipRRect(
                                 borderRadius: BorderRadius.circular(13),
-                                child: Image.asset('assets/images/logo.png',
-                                    height: 56, width: 56, fit: BoxFit.cover),
+                                child: Image.asset(
+                                  'assets/images/logo.png',
+                                  height: 56,
+                                  width: 56,
+                                  fit: BoxFit.cover,
+                                ),
                               ),
                             ),
                             const SizedBox(width: 16),
@@ -95,28 +101,33 @@ class MoreScreen extends ConsumerWidget {
                               child: Column(
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
-                                  const Text('An Nhi Trà',
-                                      style: TextStyle(
-                                        color: CupertinoColors.white,
-                                        fontSize: 22,
-                                        fontWeight: FontWeight.bold,
-                                        letterSpacing: 0.5,
-                                      )),
+                                  const Text(
+                                    'An Nhi Trà',
+                                    style: TextStyle(
+                                      color: CupertinoColors.white,
+                                      fontSize: 22,
+                                      fontWeight: FontWeight.bold,
+                                      letterSpacing: 0.5,
+                                    ),
+                                  ),
                                   const SizedBox(height: 4),
-                                  Text('Trà Đạo · Ấm Tử Sa · Yến Sào',
-                                      style: TextStyle(
-                                        color: AppTheme.accentGold.withValues(alpha: 0.9),
-                                        fontSize: 12,
-                                        fontWeight: FontWeight.w600,
-                                        letterSpacing: 0.8,
-                                      )),
+                                  Text(
+                                    'Trà Đạo · Ấm Tử Sa · Yến Sào',
+                                    style: TextStyle(
+                                      color: AppTheme.accentGold.withValues(
+                                        alpha: 0.9,
+                                      ),
+                                      fontSize: 12,
+                                      fontWeight: FontWeight.w600,
+                                      letterSpacing: 0.8,
+                                    ),
+                                  ),
                                 ],
                               ),
                             ),
                           ],
                         ),
                         const SizedBox(height: 20),
-                        // Brand stats row
                         Row(
                           mainAxisAlignment: MainAxisAlignment.spaceAround,
                           children: [
@@ -124,13 +135,17 @@ class MoreScreen extends ConsumerWidget {
                             Container(
                               width: 1,
                               height: 30,
-                              color: CupertinoColors.white.withValues(alpha: 0.15),
+                              color: CupertinoColors.white.withValues(
+                                alpha: 0.15,
+                              ),
                             ),
                             _BrandStat(value: '3', label: 'Thương hiệu'),
                             Container(
                               width: 1,
                               height: 30,
-                              color: CupertinoColors.white.withValues(alpha: 0.15),
+                              color: CupertinoColors.white.withValues(
+                                alpha: 0.15,
+                              ),
                             ),
                             _BrandStat(value: '2025', label: 'Top 10 VN'),
                           ],
@@ -143,126 +158,147 @@ class MoreScreen extends ConsumerWidget {
             ),
           ),
 
-          // ── Menu: Thông tin ──
+          // ── Grid: Khám Phá ──
           SliverToBoxAdapter(
-            child: _MenuSection(
-              title: 'THÔNG TIN',
+            child: _GridSection(
+              title: 'KHÁM PHÁ',
               isDark: isDark,
               items: [
-                _MenuItem(
+                _GridItem(
                   icon: CupertinoIcons.qrcode_viewfinder,
                   gradientColors: const [Color(0xFFD4A830), Color(0xFFB8860B)],
-                  title: 'Truy Xuất Nguồn Gốc',
-                  subtitle: 'Nhập mã — xem lô trà, vùng trồng',
+                  title: 'Nguồn Gốc',
                   onTap: () => context.push('/traceability'),
                 ),
-                _MenuItem(
-                  icon: CupertinoIcons.info_circle_fill,
-                  gradientColors: const [Color(0xFF4A90D9), Color(0xFF3478C7)],
-                  title: 'Giới thiệu',
-                  subtitle: 'Về An Nhi Trà & sứ mệnh',
-                  onTap: () => context.push('/about'),
-                ),
-                _MenuItem(
-                  icon: CupertinoIcons.mail_solid,
-                  gradientColors: const [Color(0xFF4CAF50), Color(0xFF2E7D32)],
-                  title: 'Liên hệ',
-                  subtitle: 'Gửi yêu cầu & góp ý',
-                  onTap: () => context.push('/contact'),
-                ),
-                _MenuItem(
-                  icon: CupertinoIcons.heart_fill,
-                  gradientColors: const [Color(0xFFE91E63), Color(0xFFC2185B)],
-                  title: 'Sản phẩm yêu thích',
-                  subtitle: 'Bộ sưu tập cá nhân',
-                  onTap: () => context.push('/favorites'),
-                ),
-                _MenuItem(
-                  icon: CupertinoIcons.cube_box_fill,
-                  gradientColors: const [Color(0xFFFF9800), Color(0xFFF57C00)],
-                  title: 'Lịch sử đơn hàng',
-                  subtitle: 'Theo dõi đơn hàng',
-                  onTap: () => context.push('/orders'),
-                ),
-                _MenuItem(
+                _GridItem(
                   icon: CupertinoIcons.timer,
                   gradientColors: const [Color(0xFF26A69A), Color(0xFF00897B)],
-                  title: 'Hẹn Giờ Pha Trà',
-                  subtitle: 'Pha đúng cách, thưởng đúng vị',
+                  title: 'Pha Trà',
                   onTap: () => context.push('/tea-timer'),
                 ),
-                _MenuItem(
+                _GridItem(
                   icon: CupertinoIcons.arrow_right_arrow_left,
                   gradientColors: const [Color(0xFF7B1FA2), Color(0xFF9C27B0)],
-                  title: 'So Sánh Trà',
-                  subtitle: 'Đặt 2 loại trà cạnh nhau',
+                  title: 'So Sánh',
                   onTap: () => context.push('/compare'),
                 ),
-                _MenuItem(
+                _GridItem(
                   icon: CupertinoIcons.table,
                   gradientColors: const [Color(0xFF5D4037), Color(0xFF795548)],
-                  title: 'Thiết Lập Bàn Trà',
-                  subtitle: 'Hướng dẫn bày bàn trà đạo',
+                  title: 'Bàn Trà',
                   onTap: () => context.push('/tea-table'),
                 ),
-                _MenuItem(
+              ],
+            ),
+          ),
+
+          // ── Grid: Tài Khoản ──
+          SliverToBoxAdapter(
+            child: _GridSection(
+              title: 'TÀI KHOẢN',
+              isDark: isDark,
+              items: [
+                _GridItem(
+                  icon: CupertinoIcons.heart_fill,
+                  gradientColors: const [Color(0xFFE91E63), Color(0xFFC2185B)],
+                  title: 'Yêu thích',
+                  onTap: () => context.push('/favorites'),
+                ),
+                _GridItem(
+                  icon: CupertinoIcons.cube_box_fill,
+                  gradientColors: const [Color(0xFFFF9800), Color(0xFFF57C00)],
+                  title: 'Đơn hàng',
+                  onTap: () => context.push('/orders'),
+                ),
+                _GridItem(
                   icon: CupertinoIcons.star_circle_fill,
                   gradientColors: const [Color(0xFFD4A830), Color(0xFFB8860B)],
-                  title: 'Thẻ VIP Thành Viên',
-                  subtitle: 'Tích điểm, đổi quà, ưu đãi',
+                  title: 'VIP',
                   onTap: () => context.push('/vip-card'),
                 ),
-                _MenuItem(
+                _GridItem(
                   icon: CupertinoIcons.calendar,
                   gradientColors: const [Color(0xFFE53935), Color(0xFFC62828)],
-                  title: 'Sự Kiện & Workshop',
-                  subtitle: 'Workshop trà đạo, tasting, khuyến mãi',
+                  title: 'Sự Kiện',
                   onTap: () => context.push('/events'),
                 ),
               ],
             ),
           ),
 
-          // ── Menu: Kết nối ──
+          // ── Grid: Thông Tin ──
+          SliverToBoxAdapter(
+            child: _GridSection(
+              title: 'THÔNG TIN',
+              isDark: isDark,
+              items: [
+                _GridItem(
+                  icon: CupertinoIcons.info_circle_fill,
+                  gradientColors: const [Color(0xFF4A90D9), Color(0xFF3478C7)],
+                  title: 'Giới thiệu',
+                  onTap: () => context.push('/about'),
+                ),
+                _GridItem(
+                  icon: CupertinoIcons.mail_solid,
+                  gradientColors: const [Color(0xFF4CAF50), Color(0xFF2E7D32)],
+                  title: 'Liên hệ',
+                  onTap: () => context.push('/contact'),
+                ),
+              ],
+            ),
+          ),
+
+          // ── Grid: Kết Nối ──
           SliverToBoxAdapter(
             child: settingsAsync.when(
               data: (settings) {
-                final opts = settings['optionsParsed'] as Map<String, dynamic>? ?? {};
+                final opts =
+                    settings['optionsParsed'] as Map<String, dynamic>? ?? {};
                 final phone = opts['hotline'] ?? opts['phone'] ?? '0827626962';
                 final zalo = opts['zalo'] ?? phone;
                 final website = opts['website'] ?? 'https://annhitra.com';
-                final fanpage = opts['fanpage'] ?? 'https://facebook.com/annhitra';
+                final fanpage =
+                    opts['fanpage'] ?? 'https://facebook.com/annhitra';
 
-                return _MenuSection(
+                return _GridSection(
                   title: 'KẾT NỐI',
                   isDark: isDark,
                   items: [
-                    _MenuItem(
+                    _GridItem(
                       icon: CupertinoIcons.phone_fill,
-                      gradientColors: const [Color(0xFF66BB6A), Color(0xFF43A047)],
+                      gradientColors: const [
+                        Color(0xFF66BB6A),
+                        Color(0xFF43A047),
+                      ],
                       title: 'Hotline',
-                      subtitle: _formatPhone(phone.toString()),
                       onTap: () => launchUrl(Uri.parse('tel:$phone')),
                     ),
-                    _MenuItem(
+                    _GridItem(
                       icon: CupertinoIcons.chat_bubble_2_fill,
-                      gradientColors: const [Color(0xFF42A5F5), Color(0xFF1E88E5)],
-                      title: 'Chat Zalo',
-                      subtitle: 'Tư vấn trực tiếp',
-                      onTap: () => launchUrl(Uri.parse('https://zalo.me/$zalo')),
+                      gradientColors: const [
+                        Color(0xFF42A5F5),
+                        Color(0xFF1E88E5),
+                      ],
+                      title: 'Zalo',
+                      onTap: () =>
+                          launchUrl(Uri.parse('https://zalo.me/$zalo')),
                     ),
-                    _MenuItem(
+                    _GridItem(
                       icon: CupertinoIcons.globe,
-                      gradientColors: const [Color(0xFFAB47BC), Color(0xFF8E24AA)],
+                      gradientColors: const [
+                        Color(0xFFAB47BC),
+                        Color(0xFF8E24AA),
+                      ],
                       title: 'Website',
-                      subtitle: website.toString().replaceAll('https://', ''),
                       onTap: () => launchUrl(Uri.parse(website.toString())),
                     ),
-                    _MenuItem(
+                    _GridItem(
                       icon: CupertinoIcons.person_2_fill,
-                      gradientColors: const [Color(0xFF5C6BC0), Color(0xFF3F51B5)],
+                      gradientColors: const [
+                        Color(0xFF5C6BC0),
+                        Color(0xFF3F51B5),
+                      ],
                       title: 'Facebook',
-                      subtitle: 'Fanpage chính thức',
                       onTap: () => launchUrl(Uri.parse(fanpage.toString())),
                     ),
                   ],
@@ -276,32 +312,25 @@ class MoreScreen extends ConsumerWidget {
             ),
           ),
 
-          // ── Menu: Cài đặt ──
+          // ── Settings + Share (keep as list for special widgets) ──
           SliverToBoxAdapter(
-            child: _MenuSection(
+            child: _ListSection(
               title: 'CÀI ĐẶT',
               isDark: isDark,
               items: [
-                _MenuItem(
+                _ListItem(
                   icon: CupertinoIcons.moon_fill,
                   gradientColors: const [Color(0xFF5C6BC0), Color(0xFF3949AB)],
                   title: 'Giao diện',
                   subtitle: 'Chế độ sáng / tối',
                   trailing: _ThemeModeSelector(),
                 ),
-              ],
-            ),
-          ),
-
-          // ── Share ──
-          SliverToBoxAdapter(
-            child: _MenuSection(
-              title: 'CHIA SẺ',
-              isDark: isDark,
-              items: [
-                _MenuItem(
+                _ListItem(
                   icon: CupertinoIcons.share_up,
-                  gradientColors: const [AppTheme.accentGold, Color(0xFFD4A830)],
+                  gradientColors: const [
+                    AppTheme.accentGold,
+                    Color(0xFFD4A830),
+                  ],
                   title: 'Giới thiệu app cho bạn bè',
                   subtitle: 'Chia sẻ trải nghiệm trà đạo',
                   onTap: () {
@@ -316,23 +345,31 @@ class MoreScreen extends ConsumerWidget {
             ),
           ),
 
+          // ── Footer ──
           SliverToBoxAdapter(
             child: Padding(
-              padding: const EdgeInsets.fromLTRB(24, 8, 24, 32),
+              padding: const EdgeInsets.fromLTRB(24, 12, 24, 32),
               child: Center(
                 child: Column(
                   children: [
-                    Text('Phiên bản 1.1.0',
-                        style: TextStyle(
-                          color: isDark ? AppTheme.darkTextSecondary : AppTheme.textMuted,
-                          fontSize: 12,
-                        )),
+                    Text(
+                      'Phiên bản 1.1.0',
+                      style: TextStyle(
+                        color: isDark
+                            ? AppTheme.darkTextSecondary
+                            : AppTheme.textMuted,
+                        fontSize: 12,
+                      ),
+                    ),
                     const SizedBox(height: 4),
                     Text(
                       '© 2025 Phương Nam Group',
                       style: TextStyle(
-                        color: (isDark ? AppTheme.darkTextSecondary : AppTheme.textMuted)
-                            .withValues(alpha: 0.5),
+                        color:
+                            (isDark
+                                    ? AppTheme.darkTextSecondary
+                                    : AppTheme.textMuted)
+                                .withValues(alpha: 0.5),
                         fontSize: 11,
                       ),
                     ),
@@ -345,48 +382,224 @@ class MoreScreen extends ConsumerWidget {
       ),
     );
   }
-
-  String _formatPhone(String phone) {
-    if (phone.length == 10) {
-      return '${phone.substring(0, 3)} ${phone.substring(3, 6)} ${phone.substring(6)}';
-    }
-    return phone;
-  }
 }
 
-// ── Brand Stat Widget ──
-class _BrandStat extends StatelessWidget {
-  final String value;
-  final String label;
-  const _BrandStat({required this.value, required this.label});
+// ═════════════════════════════════════════════
+// Grid Section — 2-column card grid
+// ═════════════════════════════════════════════
+class _GridSection extends StatelessWidget {
+  final String title;
+  final bool isDark;
+  final List<_GridItem> items;
+  const _GridSection({
+    required this.title,
+    required this.isDark,
+    required this.items,
+  });
 
   @override
   Widget build(BuildContext context) {
-    return Column(
-      children: [
-        Text(value,
-            style: const TextStyle(
-              color: AppTheme.accentGold,
-              fontSize: 18,
-              fontWeight: FontWeight.bold,
-            )),
-        const SizedBox(height: 2),
-        Text(label,
-            style: TextStyle(
-              color: CupertinoColors.white.withValues(alpha: 0.6),
-              fontSize: 11,
-            )),
-      ],
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(16, 0, 16, 16),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Padding(
+            padding: const EdgeInsets.only(left: 4, bottom: 10),
+            child: Text(
+              title,
+              style: TextStyle(
+                fontSize: 12,
+                fontWeight: FontWeight.w600,
+                color: isDark ? AppTheme.darkTextSecondary : AppTheme.textMuted,
+                letterSpacing: 1.5,
+              ),
+            ),
+          ),
+          GridView.count(
+            crossAxisCount: 2,
+            crossAxisSpacing: 12,
+            mainAxisSpacing: 12,
+            childAspectRatio: 1.5,
+            shrinkWrap: true,
+            physics: const NeverScrollableScrollPhysics(),
+            children: items.map((item) => item.build(context, isDark)).toList(),
+          ),
+        ],
+      ),
     );
   }
 }
 
-// ── Menu Section ──
-class _MenuSection extends StatelessWidget {
+// ═════════════════════════════════════════════
+// Grid Item — Tap-to-scale card
+// ═════════════════════════════════════════════
+class _GridItem {
+  final IconData icon;
+  final List<Color> gradientColors;
+  final String title;
+  final VoidCallback? onTap;
+
+  const _GridItem({
+    required this.icon,
+    required this.gradientColors,
+    required this.title,
+    this.onTap,
+  });
+
+  Widget build(BuildContext context, bool isDark) {
+    return _GridCard(
+      icon: icon,
+      gradientColors: gradientColors,
+      title: title,
+      isDark: isDark,
+      onTap: onTap,
+    );
+  }
+}
+
+class _GridCard extends StatefulWidget {
+  final IconData icon;
+  final List<Color> gradientColors;
   final String title;
   final bool isDark;
-  final List<_MenuItem> items;
-  const _MenuSection({required this.title, required this.isDark, required this.items});
+  final VoidCallback? onTap;
+
+  const _GridCard({
+    required this.icon,
+    required this.gradientColors,
+    required this.title,
+    required this.isDark,
+    this.onTap,
+  });
+
+  @override
+  State<_GridCard> createState() => _GridCardState();
+}
+
+class _GridCardState extends State<_GridCard>
+    with SingleTickerProviderStateMixin {
+  late AnimationController _scaleController;
+  late Animation<double> _scale;
+
+  @override
+  void initState() {
+    super.initState();
+    _scaleController = AnimationController(
+      duration: const Duration(milliseconds: 100),
+      vsync: this,
+      lowerBound: 0.0,
+      upperBound: 1.0,
+    );
+    _scale = Tween<double>(
+      begin: 1.0,
+      end: 0.95,
+    ).animate(CurvedAnimation(parent: _scaleController, curve: Curves.easeOut));
+  }
+
+  @override
+  void dispose() {
+    _scaleController.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return GestureDetector(
+      onTapDown: (_) => _scaleController.forward(),
+      onTapUp: (_) {
+        _scaleController.reverse();
+        HapticFeedback.selectionClick();
+        widget.onTap?.call();
+      },
+      onTapCancel: () => _scaleController.reverse(),
+      child: ScaleTransition(
+        scale: _scale,
+        child: Container(
+          decoration: BoxDecoration(
+            color: widget.isDark
+                ? AppTheme.darkElevated
+                : AppTheme.surfaceWhite,
+            borderRadius: BorderRadius.circular(16),
+            border: Border.all(
+              color: widget.gradientColors.first.withValues(
+                alpha: widget.isDark ? 0.15 : 0.1,
+              ),
+              width: 1,
+            ),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black.withValues(
+                  alpha: widget.isDark ? 0.15 : 0.04,
+                ),
+                blurRadius: 10,
+                offset: const Offset(0, 3),
+              ),
+            ],
+          ),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              // Icon with gradient background
+              Container(
+                width: 44,
+                height: 44,
+                decoration: BoxDecoration(
+                  gradient: LinearGradient(
+                    begin: Alignment.topLeft,
+                    end: Alignment.bottomRight,
+                    colors: widget.gradientColors,
+                  ),
+                  borderRadius: BorderRadius.circular(12),
+                  boxShadow: [
+                    BoxShadow(
+                      color: widget.gradientColors.first.withValues(alpha: 0.3),
+                      blurRadius: 8,
+                      offset: const Offset(0, 3),
+                    ),
+                  ],
+                ),
+                child: Icon(
+                  widget.icon,
+                  size: 22,
+                  color: CupertinoColors.white,
+                ),
+              ),
+              const SizedBox(height: 10),
+              // Title
+              Text(
+                widget.title,
+                style: TextStyle(
+                  fontSize: 13,
+                  fontWeight: FontWeight.w600,
+                  color: widget.isDark
+                      ? AppTheme.darkTextPrimary
+                      : AppTheme.textPrimary,
+                ),
+                textAlign: TextAlign.center,
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+// ═════════════════════════════════════════════
+// List Section — For items needing trailing widgets (settings)
+// ═════════════════════════════════════════════
+class _ListSection extends StatelessWidget {
+  final String title;
+  final bool isDark;
+  final List<_ListItem> items;
+  const _ListSection({
+    required this.title,
+    required this.isDark,
+    required this.items,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -397,13 +610,15 @@ class _MenuSection extends StatelessWidget {
         children: [
           Padding(
             padding: const EdgeInsets.only(left: 4, bottom: 8),
-            child: Text(title,
-                style: TextStyle(
-                  fontSize: 12,
-                  fontWeight: FontWeight.w600,
-                  color: isDark ? AppTheme.darkTextSecondary : AppTheme.textMuted,
-                  letterSpacing: 1.5,
-                )),
+            child: Text(
+              title,
+              style: TextStyle(
+                fontSize: 12,
+                fontWeight: FontWeight.w600,
+                color: isDark ? AppTheme.darkTextSecondary : AppTheme.textMuted,
+                letterSpacing: 1.5,
+              ),
+            ),
           ),
           Container(
             decoration: BoxDecoration(
@@ -438,8 +653,7 @@ class _MenuSection extends StatelessWidget {
   }
 }
 
-// ── Menu Item ──
-class _MenuItem {
+class _ListItem {
   final IconData icon;
   final List<Color> gradientColors;
   final String title;
@@ -447,7 +661,7 @@ class _MenuItem {
   final VoidCallback? onTap;
   final Widget? trailing;
 
-  const _MenuItem({
+  const _ListItem({
     required this.icon,
     required this.gradientColors,
     required this.title,
@@ -489,19 +703,27 @@ class _MenuItem {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(title,
-                      style: TextStyle(
-                        fontSize: 15,
-                        fontWeight: FontWeight.w500,
-                        color: isDark ? AppTheme.darkTextPrimary : AppTheme.textPrimary,
-                      )),
+                  Text(
+                    title,
+                    style: TextStyle(
+                      fontSize: 15,
+                      fontWeight: FontWeight.w500,
+                      color: isDark
+                          ? AppTheme.darkTextPrimary
+                          : AppTheme.textPrimary,
+                    ),
+                  ),
                   if (subtitle != null) ...[
                     const SizedBox(height: 1),
-                    Text(subtitle!,
-                        style: TextStyle(
-                          fontSize: 12,
-                          color: isDark ? AppTheme.darkTextSecondary : AppTheme.textMuted,
-                        )),
+                    Text(
+                      subtitle!,
+                      style: TextStyle(
+                        fontSize: 12,
+                        color: isDark
+                            ? AppTheme.darkTextSecondary
+                            : AppTheme.textMuted,
+                      ),
+                    ),
                   ],
                 ],
               ),
@@ -521,7 +743,39 @@ class _MenuItem {
   }
 }
 
-// ── Theme Mode Selector ──
+// ═════════════════════════════════════════════
+// Supporting Widgets
+// ═════════════════════════════════════════════
+class _BrandStat extends StatelessWidget {
+  final String value;
+  final String label;
+  const _BrandStat({required this.value, required this.label});
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      children: [
+        Text(
+          value,
+          style: const TextStyle(
+            color: AppTheme.accentGold,
+            fontSize: 18,
+            fontWeight: FontWeight.bold,
+          ),
+        ),
+        const SizedBox(height: 2),
+        Text(
+          label,
+          style: TextStyle(
+            color: CupertinoColors.white.withValues(alpha: 0.6),
+            fontSize: 11,
+          ),
+        ),
+      ],
+    );
+  }
+}
+
 class _ThemeModeSelector extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
