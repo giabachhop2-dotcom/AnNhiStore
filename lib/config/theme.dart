@@ -11,14 +11,14 @@ class AppTheme {
   static const primaryDark = Color(0xFF1A3C28); // Rêu trà đậm
   static const primaryMid = Color(0xFF2D5E3E); // Lá trà tươi
   static const primaryLight = Color(0xFF4A7C5C); // Lá trà nhạt
-  static const primaryBg = Color(0xFFEDE7DA); // Giấy dó cổ / parchment
+  static const primaryBg = Color(0xFFFBF6EC); // Vàng kem nhạt (vanilla)
   static const accentGold = Color(0xFFC49B2C); // Vàng đồng cổ
-  static const surfaceWhite = Color(0xFFF5F0E6); // Trắng ngà ấm
+  static const surfaceWhite = Color(0xFFFFF9EF); // Kem trắng ấm (cream)
   static const textPrimary = Color(0xFF2C2416); // Mực nâu đậm
   static const textSecondary = Color(0xFF5C4E3C); // Mực nâu nhạt
   static const textMuted = Color(0xFF8C7E6A); // Nâu bạc
   static const separator = Color(0xFFD9CEBD); // Gạch ngà
-  static const groupedBg = Color(0xFFE8E0D0); // Nền grouped ấm
+  static const groupedBg = Color(0xFFF5EFE0); // Nền grouped vàng kem
 
   /// ⚠️ DEPRECATED — use BrandColors.goldMid instead
   static const priceRed = BrandColors.goldMid;
