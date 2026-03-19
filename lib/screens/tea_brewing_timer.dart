@@ -6,8 +6,8 @@ import 'package:flutter/services.dart';
 import '../config/theme.dart';
 
 /// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-/// TEA BREWING TIMER — Exclusive USP feature
-/// Circular countdown with steam animation, preset tea types.
+/// TEA BREWING TIMER — Based on real tea brewing research
+/// Supports 3 strength levels per tea type + multiple infusions.
 /// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 class TeaBrewingTimerScreen extends StatefulWidget {
   const TeaBrewingTimerScreen({super.key});
@@ -23,19 +23,92 @@ class _TeaBrewingTimerScreenState extends State<TeaBrewingTimerScreen>
   // Timer state
   Timer? _timer;
   int _selectedPresetIndex = 0;
-  int _totalSeconds = 180; // default 3 min
+  int _selectedStrength = 1; // 0=nhạt, 1=vừa, 2=đậm
+  int _infusionNumber = 1; // Lần pha thứ mấy
+  int _totalSeconds = 60;
   int _remainingSeconds = 0;
   bool _isRunning = false;
   bool _isDone = false;
 
+  // ── Tea presets based on real brewing research ──
+  // Sources: hacoocha.com, tamviet.net.vn, minhtea.com, artoftea.com, etc.
   static const _presets = [
-    _TeaPreset('Trà Xanh', '🍃', 120, '70-80°C', 'Thanh mát, chát nhẹ'),
-    _TeaPreset('Trà Shan Tuyết', '🏔️', 180, '85-90°C', 'Đậm đà, vị ngọt hậu'),
-    _TeaPreset('Trà Ô Long', '🫖', 240, '90-95°C', 'Hương hoa, đa lần hãm'),
-    _TeaPreset('Trà Phổ Nhĩ', '🟤', 300, '95-100°C', 'Mạnh mẽ, đất mùn'),
-    _TeaPreset('Hồng Trà', '🔴', 210, '90-95°C', 'Chát ngọt, dậy mùi'),
-    _TeaPreset('Bạch Trà', '⚪', 90, '65-75°C', 'Nhẹ nhàng, tinh tế'),
+    _TeaPreset(
+      name: 'Trà Shan Tuyết',
+      emoji: '🏔️',
+      temp: '85-95°C',
+      flavor: 'Đậm đà, vị ngọt hậu, pha được 4-8 nước',
+      lightSeconds: 30, // Nhạt: 30s
+      mediumSeconds: 60, // Vừa: 1 phút
+      strongSeconds: 90, // Đậm: 1.5 phút
+      infusionAdd: 15, // Mỗi lần pha thêm +15s
+      maxInfusions: 8,
+      tips: 'Tráng trà 5s trước khi pha. Nước 3-5 ngon nhất.',
+    ),
+    _TeaPreset(
+      name: 'Trà Xanh',
+      emoji: '🍃',
+      temp: '70-80°C',
+      flavor: 'Thanh mát, chát nhẹ, hậu ngọt',
+      lightSeconds: 60, // 1 phút
+      mediumSeconds: 120, // 2 phút
+      strongSeconds: 180, // 3 phút
+      infusionAdd: 30,
+      maxInfusions: 3,
+      tips: 'KHÔNG dùng nước sôi 100°C — sẽ làm cháy lá, gây đắng.',
+    ),
+    _TeaPreset(
+      name: 'Trà Ô Long',
+      emoji: '🫖',
+      temp: '90-95°C',
+      flavor: 'Hương hoa, đa lần hãm, bán lên men 30-40%',
+      lightSeconds: 120, // 2 phút
+      mediumSeconds: 180, // 3 phút
+      strongSeconds: 300, // 5 phút
+      infusionAdd: 20,
+      maxInfusions: 7,
+      tips: 'Ô Long nhẹ (hoa): 85°C. Ô Long rang đậm: 95°C.',
+    ),
+    _TeaPreset(
+      name: 'Phổ Nhĩ Chín',
+      emoji: '🟤',
+      temp: '95-100°C',
+      flavor: 'Mạnh mẽ, đất mùn, vị ngọt sâu',
+      lightSeconds: 120, // 2 phút
+      mediumSeconds: 180, // 3 phút
+      strongSeconds: 300, // 5 phút
+      infusionAdd: 15,
+      maxInfusions: 10,
+      tips: 'Tráng trà 10s bắt buộc. Có thể pha tới 10 nước.',
+    ),
+    _TeaPreset(
+      name: 'Hồng Trà',
+      emoji: '🔴',
+      temp: '90-100°C',
+      flavor: 'Chát ngọt, dậy mùi, hậu vị kéo dài',
+      lightSeconds: 180, // 3 phút
+      mediumSeconds: 240, // 4 phút
+      strongSeconds: 300, // 5 phút
+      infusionAdd: 30,
+      maxInfusions: 3,
+      tips: 'Darjeeling: 85-90°C. Hồng trà Shan Tuyết: 90-95°C.',
+    ),
+    _TeaPreset(
+      name: 'Bạch Trà',
+      emoji: '⚪',
+      temp: '65-75°C',
+      flavor: 'Nhẹ nhàng, tinh tế, oxy hóa <5%',
+      lightSeconds: 60, // 1 phút
+      mediumSeconds: 120, // 2 phút
+      strongSeconds: 180, // 3 phút
+      infusionAdd: 30,
+      maxInfusions: 5,
+      tips: 'Búp non sáng sớm, héo mát 48h. Nhiệt thấp nhất.',
+    ),
   ];
+
+  static const _strengthLabels = ['Nhạt', 'Vừa', 'Đậm'];
+  static const _strengthEmoji = ['💧', '🍵', '🔥'];
 
   @override
   void initState() {
@@ -44,7 +117,7 @@ class _TeaBrewingTimerScreenState extends State<TeaBrewingTimerScreen>
       duration: const Duration(seconds: 3),
       vsync: this,
     )..repeat();
-    _totalSeconds = _presets[0].seconds;
+    _updateTime();
   }
 
   @override
@@ -54,14 +127,37 @@ class _TeaBrewingTimerScreenState extends State<TeaBrewingTimerScreen>
     super.dispose();
   }
 
+  void _updateTime() {
+    final preset = _presets[_selectedPresetIndex];
+    final baseSec = _selectedStrength == 0
+        ? preset.lightSeconds
+        : _selectedStrength == 1
+        ? preset.mediumSeconds
+        : preset.strongSeconds;
+    // Each subsequent infusion adds time
+    _totalSeconds = baseSec + ((_infusionNumber - 1) * preset.infusionAdd);
+  }
+
   void _selectPreset(int index) {
     if (_isRunning) return;
     HapticFeedback.selectionClick();
     setState(() {
       _selectedPresetIndex = index;
-      _totalSeconds = _presets[index].seconds;
+      _infusionNumber = 1;
       _remainingSeconds = 0;
       _isDone = false;
+      _updateTime();
+    });
+  }
+
+  void _selectStrength(int strength) {
+    if (_isRunning) return;
+    HapticFeedback.selectionClick();
+    setState(() {
+      _selectedStrength = strength;
+      _remainingSeconds = 0;
+      _isDone = false;
+      _updateTime();
     });
   }
 
@@ -96,6 +192,28 @@ class _TeaBrewingTimerScreenState extends State<TeaBrewingTimerScreen>
     });
   }
 
+  void _nextInfusion() {
+    final preset = _presets[_selectedPresetIndex];
+    if (_infusionNumber >= preset.maxInfusions) return;
+    HapticFeedback.selectionClick();
+    setState(() {
+      _infusionNumber++;
+      _isDone = false;
+      _remainingSeconds = 0;
+      _updateTime();
+    });
+  }
+
+  void _resetInfusion() {
+    HapticFeedback.lightImpact();
+    setState(() {
+      _infusionNumber = 1;
+      _isDone = false;
+      _remainingSeconds = 0;
+      _updateTime();
+    });
+  }
+
   String _formatTime(int seconds) {
     final m = seconds ~/ 60;
     final s = seconds % 60;
@@ -117,7 +235,7 @@ class _TeaBrewingTimerScreenState extends State<TeaBrewingTimerScreen>
       child: SafeArea(
         child: Column(
           children: [
-            const SizedBox(height: 20),
+            const SizedBox(height: 12),
 
             // ── Tea type presets (horizontal chips) ──
             SizedBox(
@@ -136,26 +254,30 @@ class _TeaBrewingTimerScreenState extends State<TeaBrewingTimerScreen>
                       child: AnimatedContainer(
                         duration: const Duration(milliseconds: 250),
                         padding: const EdgeInsets.symmetric(
-                            horizontal: 14, vertical: 8),
+                          horizontal: 14,
+                          vertical: 8,
+                        ),
                         decoration: BoxDecoration(
                           gradient: active
                               ? const LinearGradient(
                                   colors: [
                                     Color(0xFF1A3C28),
-                                    Color(0xFF2D5E3E)
+                                    Color(0xFF2D5E3E),
                                   ],
                                 )
                               : null,
                           color: active
                               ? null
                               : (isDark
-                                  ? AppTheme.darkElevated
-                                  : AppTheme.groupedBg),
+                                    ? AppTheme.darkElevated
+                                    : AppTheme.groupedBg),
                           borderRadius: BorderRadius.circular(22),
                           border: active
                               ? Border.all(
-                                  color: AppTheme.accentGold
-                                      .withValues(alpha: 0.4))
+                                  color: AppTheme.accentGold.withValues(
+                                    alpha: 0.4,
+                                  ),
+                                )
                               : null,
                         ),
                         child: Row(
@@ -167,13 +289,14 @@ class _TeaBrewingTimerScreenState extends State<TeaBrewingTimerScreen>
                               p.name,
                               style: TextStyle(
                                 fontSize: 13,
-                                fontWeight:
-                                    active ? FontWeight.w600 : FontWeight.w400,
+                                fontWeight: active
+                                    ? FontWeight.w600
+                                    : FontWeight.w400,
                                 color: active
                                     ? CupertinoColors.white
                                     : (isDark
-                                        ? AppTheme.darkTextPrimary
-                                        : AppTheme.textPrimary),
+                                          ? AppTheme.darkTextPrimary
+                                          : AppTheme.textPrimary),
                               ),
                             ),
                           ],
@@ -185,35 +308,121 @@ class _TeaBrewingTimerScreenState extends State<TeaBrewingTimerScreen>
               ),
             ),
 
+            const SizedBox(height: 12),
+
+            // ── Strength selector (nhạt / vừa / đậm) ──
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 24),
+              child: Container(
+                padding: const EdgeInsets.all(3),
+                decoration: BoxDecoration(
+                  color: isDark ? AppTheme.darkElevated : AppTheme.groupedBg,
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                child: Row(
+                  children: List.generate(3, (i) {
+                    final active = i == _selectedStrength;
+                    return Expanded(
+                      child: GestureDetector(
+                        onTap: () => _selectStrength(i),
+                        child: AnimatedContainer(
+                          duration: const Duration(milliseconds: 200),
+                          padding: const EdgeInsets.symmetric(vertical: 8),
+                          decoration: BoxDecoration(
+                            color: active
+                                ? (isDark
+                                      ? AppTheme.primaryDark
+                                      : AppTheme.primaryDark)
+                                : Colors.transparent,
+                            borderRadius: BorderRadius.circular(10),
+                            boxShadow: active
+                                ? [
+                                    BoxShadow(
+                                      color: AppTheme.primaryDark.withValues(
+                                        alpha: 0.3,
+                                      ),
+                                      blurRadius: 8,
+                                      offset: const Offset(0, 2),
+                                    ),
+                                  ]
+                                : null,
+                          ),
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              Text(
+                                _strengthEmoji[i],
+                                style: const TextStyle(fontSize: 14),
+                              ),
+                              const SizedBox(width: 4),
+                              Text(
+                                _strengthLabels[i],
+                                style: TextStyle(
+                                  fontSize: 13,
+                                  fontWeight: active
+                                      ? FontWeight.w600
+                                      : FontWeight.w400,
+                                  color: active
+                                      ? CupertinoColors.white
+                                      : (isDark
+                                            ? AppTheme.darkTextSecondary
+                                            : AppTheme.textSecondary),
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+                    );
+                  }),
+                ),
+              ),
+            ),
+
             const SizedBox(height: 8),
 
-            // Tea info
+            // ── Info row: temp + time + infusion ──
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 24),
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   _InfoChip(
-                      icon: CupertinoIcons.thermometer,
-                      label: preset.temp,
-                      isDark: isDark),
-                  const SizedBox(width: 12),
+                    icon: CupertinoIcons.thermometer,
+                    label: preset.temp,
+                    isDark: isDark,
+                  ),
+                  const SizedBox(width: 8),
                   _InfoChip(
-                      icon: CupertinoIcons.timer,
-                      label: _formatTime(preset.seconds),
-                      isDark: isDark),
+                    icon: CupertinoIcons.timer,
+                    label: _formatTime(_totalSeconds),
+                    isDark: isDark,
+                  ),
+                  const SizedBox(width: 8),
+                  _InfoChip(
+                    icon: CupertinoIcons.drop,
+                    label: 'Nước $_infusionNumber/${preset.maxInfusions}',
+                    isDark: isDark,
+                  ),
                 ],
               ),
             ),
 
-            const SizedBox(height: 8),
+            const SizedBox(height: 4),
 
-            Text(
-              preset.flavor,
-              style: TextStyle(
-                fontSize: 13,
-                color: isDark ? AppTheme.darkTextSecondary : AppTheme.textMuted,
-                fontStyle: FontStyle.italic,
+            // ── Flavor + tips ──
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 32),
+              child: Text(
+                preset.flavor,
+                textAlign: TextAlign.center,
+                style: TextStyle(
+                  fontSize: 12,
+                  color: isDark
+                      ? AppTheme.darkTextSecondary
+                      : AppTheme.textMuted,
+                  fontStyle: FontStyle.italic,
+                ),
               ),
             ),
 
@@ -221,14 +430,14 @@ class _TeaBrewingTimerScreenState extends State<TeaBrewingTimerScreen>
             Expanded(
               child: Center(
                 child: SizedBox(
-                  width: 260,
-                  height: 260,
+                  width: 240,
+                  height: 240,
                   child: Stack(
                     alignment: Alignment.center,
                     children: [
                       // Background ring
                       CustomPaint(
-                        size: const Size(260, 260),
+                        size: const Size(240, 240),
                         painter: _TimerRingPainter(
                           progress: progress,
                           isDone: _isDone,
@@ -250,26 +459,24 @@ class _TeaBrewingTimerScreenState extends State<TeaBrewingTimerScreen>
                       Column(
                         mainAxisSize: MainAxisSize.min,
                         children: [
-                          if (_isRunning) ...[
-                            const SizedBox(height: 30),
-                          ],
+                          if (_isRunning) ...[const SizedBox(height: 30)],
                           Text(
                             _isDone
                                 ? 'Hoàn tất!'
                                 : _isRunning
-                                    ? _formatTime(_remainingSeconds)
-                                    : _formatTime(_totalSeconds),
+                                ? _formatTime(_remainingSeconds)
+                                : _formatTime(_totalSeconds),
                             style: TextStyle(
-                              fontSize: _isDone ? 28 : 48,
+                              fontSize: _isDone ? 26 : 44,
                               fontWeight: FontWeight.w300,
                               color: _isDone
                                   ? AppTheme.accentGold
                                   : (isDark
-                                      ? AppTheme.darkTextPrimary
-                                      : AppTheme.textPrimary),
+                                        ? AppTheme.darkTextPrimary
+                                        : AppTheme.textPrimary),
                               letterSpacing: 2,
                               fontFeatures: const [
-                                FontFeature.tabularFigures()
+                                FontFeature.tabularFigures(),
                               ],
                             ),
                           ),
@@ -278,7 +485,7 @@ class _TeaBrewingTimerScreenState extends State<TeaBrewingTimerScreen>
                             Text(
                               'Trà đã sẵn sàng thưởng thức 🍵',
                               style: TextStyle(
-                                fontSize: 14,
+                                fontSize: 13,
                                 color: isDark
                                     ? AppTheme.darkTextSecondary
                                     : AppTheme.textMuted,
@@ -293,14 +500,55 @@ class _TeaBrewingTimerScreenState extends State<TeaBrewingTimerScreen>
               ),
             ),
 
+            // ── Tips bar ──
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 24),
+              child: Container(
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 14,
+                  vertical: 8,
+                ),
+                decoration: BoxDecoration(
+                  color: isDark
+                      ? AppTheme.accentGold.withValues(alpha: 0.1)
+                      : AppTheme.accentGold.withValues(alpha: 0.08),
+                  borderRadius: BorderRadius.circular(10),
+                  border: Border.all(
+                    color: AppTheme.accentGold.withValues(alpha: 0.2),
+                    width: 0.5,
+                  ),
+                ),
+                child: Row(
+                  children: [
+                    const Text('💡', style: TextStyle(fontSize: 14)),
+                    const SizedBox(width: 8),
+                    Expanded(
+                      child: Text(
+                        preset.tips,
+                        style: TextStyle(
+                          fontSize: 11,
+                          color: isDark
+                              ? AppTheme.darkTextSecondary
+                              : AppTheme.textSecondary,
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+
+            const SizedBox(height: 12),
+
             // ── Control buttons ──
             Padding(
-              padding: const EdgeInsets.fromLTRB(32, 0, 32, 32),
+              padding: const EdgeInsets.fromLTRB(24, 0, 24, 24),
               child: _isRunning
-                  ? GestureDetector(
+                  ? // Stop button
+                    GestureDetector(
                       onTap: _stopTimer,
                       child: Container(
-                        height: 52,
+                        height: 50,
                         decoration: BoxDecoration(
                           borderRadius: BorderRadius.circular(14),
                           border: Border.all(
@@ -320,52 +568,120 @@ class _TeaBrewingTimerScreenState extends State<TeaBrewingTimerScreen>
                         ),
                       ),
                     )
-                  : GestureDetector(
-                      onTap: _startTimer,
-                      child: Container(
-                        height: 52,
-                        decoration: BoxDecoration(
-                          gradient: const LinearGradient(
-                            colors: [Color(0xFF1A3C28), Color(0xFF2D5E3E)],
-                          ),
-                          borderRadius: BorderRadius.circular(14),
-                          border: Border.all(
-                            color: AppTheme.accentGold.withValues(alpha: 0.35),
-                          ),
-                          boxShadow: [
-                            BoxShadow(
-                              color:
-                                  AppTheme.primaryDark.withValues(alpha: 0.3),
-                              blurRadius: 12,
-                              offset: const Offset(0, 4),
-                            ),
-                          ],
-                        ),
-                        child: Center(
-                          child: Row(
-                            mainAxisSize: MainAxisSize.min,
-                            children: [
-                              Icon(
-                                _isDone
-                                    ? CupertinoIcons.arrow_counterclockwise
-                                    : CupertinoIcons.play_fill,
-                                size: 18,
-                                color: AppTheme.accentGold,
+                  : // Start / Next infusion buttons
+                    Row(
+                      children: [
+                        // Main start/restart button
+                        Expanded(
+                          child: GestureDetector(
+                            onTap: _startTimer,
+                            child: Container(
+                              height: 50,
+                              decoration: BoxDecoration(
+                                gradient: const LinearGradient(
+                                  colors: [
+                                    Color(0xFF1A3C28),
+                                    Color(0xFF2D5E3E),
+                                  ],
+                                ),
+                                borderRadius: BorderRadius.circular(14),
+                                border: Border.all(
+                                  color: AppTheme.accentGold.withValues(
+                                    alpha: 0.35,
+                                  ),
+                                ),
+                                boxShadow: [
+                                  BoxShadow(
+                                    color: AppTheme.primaryDark.withValues(
+                                      alpha: 0.3,
+                                    ),
+                                    blurRadius: 12,
+                                    offset: const Offset(0, 4),
+                                  ),
+                                ],
                               ),
-                              const SizedBox(width: 10),
-                              Text(
-                                _isDone ? 'Pha lại' : 'Bắt đầu pha trà',
-                                style: const TextStyle(
-                                  color: Color(0xFFF5F0E8),
-                                  fontSize: 16,
-                                  fontWeight: FontWeight.w600,
-                                  letterSpacing: 0.5,
+                              child: Center(
+                                child: Row(
+                                  mainAxisSize: MainAxisSize.min,
+                                  children: [
+                                    Icon(
+                                      _isDone
+                                          ? CupertinoIcons
+                                                .arrow_counterclockwise
+                                          : CupertinoIcons.play_fill,
+                                      size: 18,
+                                      color: AppTheme.accentGold,
+                                    ),
+                                    const SizedBox(width: 10),
+                                    Text(
+                                      _isDone ? 'Pha lại' : 'Bắt đầu pha trà',
+                                      style: TextStyle(
+                                        color: isDark
+                                            ? AppTheme.darkTextPrimary
+                                            : const Color(0xFFF5F0E8),
+                                        fontSize: 15,
+                                        fontWeight: FontWeight.w600,
+                                        letterSpacing: 0.5,
+                                      ),
+                                    ),
+                                  ],
                                 ),
                               ),
-                            ],
+                            ),
                           ),
                         ),
-                      ),
+                        // Next infusion button (only when done and more infusions left)
+                        if (_isDone &&
+                            _infusionNumber < preset.maxInfusions) ...[
+                          const SizedBox(width: 10),
+                          GestureDetector(
+                            onTap: _nextInfusion,
+                            child: Container(
+                              height: 50,
+                              width: 50,
+                              decoration: BoxDecoration(
+                                color: AppTheme.accentGold,
+                                borderRadius: BorderRadius.circular(14),
+                              ),
+                              child: const Center(
+                                child: Icon(
+                                  CupertinoIcons.drop_fill,
+                                  size: 20,
+                                  color: CupertinoColors.white,
+                                ),
+                              ),
+                            ),
+                          ),
+                        ],
+                        // Reset infusions
+                        if (_infusionNumber > 1 && !_isRunning) ...[
+                          const SizedBox(width: 10),
+                          GestureDetector(
+                            onTap: _resetInfusion,
+                            child: Container(
+                              height: 50,
+                              width: 50,
+                              decoration: BoxDecoration(
+                                border: Border.all(
+                                  color: isDark
+                                      ? AppTheme.darkSeparator
+                                      : AppTheme.separator,
+                                ),
+                                borderRadius: BorderRadius.circular(14),
+                              ),
+                              child: Center(
+                                child: Icon(
+                                  CupertinoIcons.refresh,
+                                  size: 18,
+                                  color: isDark
+                                      ? AppTheme.darkTextSecondary
+                                      : AppTheme.textMuted,
+                                ),
+                              ),
+                            ),
+                          ),
+                        ],
+                      ],
                     ),
             ),
           ],
@@ -375,23 +691,40 @@ class _TeaBrewingTimerScreenState extends State<TeaBrewingTimerScreen>
   }
 }
 
+/// ── Tea preset with 3 strength levels ──
 class _TeaPreset {
-  final String name, emoji, temp, flavor;
-  final int seconds;
-  const _TeaPreset(this.name, this.emoji, this.seconds, this.temp, this.flavor);
+  final String name, emoji, temp, flavor, tips;
+  final int lightSeconds, mediumSeconds, strongSeconds;
+  final int infusionAdd, maxInfusions;
+
+  const _TeaPreset({
+    required this.name,
+    required this.emoji,
+    required this.temp,
+    required this.flavor,
+    required this.lightSeconds,
+    required this.mediumSeconds,
+    required this.strongSeconds,
+    required this.infusionAdd,
+    required this.maxInfusions,
+    required this.tips,
+  });
 }
 
 class _InfoChip extends StatelessWidget {
   final IconData icon;
   final String label;
   final bool isDark;
-  const _InfoChip(
-      {required this.icon, required this.label, required this.isDark});
+  const _InfoChip({
+    required this.icon,
+    required this.label,
+    required this.isDark,
+  });
 
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
       decoration: BoxDecoration(
         color: isDark ? AppTheme.darkElevated : AppTheme.groupedBg,
         borderRadius: BorderRadius.circular(20),
@@ -399,16 +732,20 @@ class _InfoChip extends StatelessWidget {
       child: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
-          Icon(icon,
-              size: 14,
-              color: isDark ? AppTheme.accentGold : AppTheme.primaryDark),
-          const SizedBox(width: 6),
-          Text(label,
-              style: TextStyle(
-                fontSize: 13,
-                fontWeight: FontWeight.w500,
-                color: isDark ? AppTheme.darkTextPrimary : AppTheme.textPrimary,
-              )),
+          Icon(
+            icon,
+            size: 13,
+            color: isDark ? AppTheme.accentGold : AppTheme.primaryDark,
+          ),
+          const SizedBox(width: 5),
+          Text(
+            label,
+            style: TextStyle(
+              fontSize: 12,
+              fontWeight: FontWeight.w500,
+              color: isDark ? AppTheme.darkTextPrimary : AppTheme.textPrimary,
+            ),
+          ),
         ],
       ),
     );
@@ -499,8 +836,9 @@ class _SteamPainter extends CustomPainter {
       final offset = i * 0.33;
       final t = (progress + offset) % 1.0;
       final opacity = (1 - t) * 0.4;
-      paint.color =
-          AppTheme.accentGold.withValues(alpha: opacity.clamp(0.0, 1.0));
+      paint.color = AppTheme.accentGold.withValues(
+        alpha: opacity.clamp(0.0, 1.0),
+      );
 
       final x = size.width * (0.3 + i * 0.2);
       final startY = size.height;
