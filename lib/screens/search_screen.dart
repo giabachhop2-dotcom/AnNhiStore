@@ -4,8 +4,11 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:cached_network_image/cached_network_image.dart';
+import 'package:go_router/go_router.dart';
 import '../providers/providers.dart';
 import '../models/models.dart';
+import '../services/api_service.dart';
 import '../widgets/animated_product_card.dart';
 import '../widgets/empty_state.dart';
 import '../config/theme.dart';
@@ -216,6 +219,18 @@ class _SearchScreenState extends ConsumerState<SearchScreen>
   }
 
   Widget _buildResultsGrid() {
+    // Group products by type for visual differentiation
+    final amTuSa = _results.where((p) => p.type == 'am-tu-sa').toList();
+    final tra = _results
+        .where((p) => p.type == 'tra' || p.type == 'tra-cu')
+        .toList();
+    final other = _results
+        .where(
+          (p) => p.type != 'am-tu-sa' && p.type != 'tra' && p.type != 'tra-cu',
+        )
+        .toList();
+    final isDark = CupertinoTheme.brightnessOf(context) == Brightness.dark;
+
     return CustomScrollView(
       physics: const BouncingScrollPhysics(),
       slivers: [
@@ -224,30 +239,143 @@ class _SearchScreenState extends ConsumerState<SearchScreen>
           sliver: SliverToBoxAdapter(
             child: Text(
               '${_results.length} sản phẩm được tìm thấy',
-              style: const TextStyle(
+              style: TextStyle(
                 fontSize: 14,
-                color: AppTheme.textMuted,
+                color: isDark ? AppTheme.darkTextSecondary : AppTheme.textMuted,
                 fontWeight: FontWeight.w500,
               ),
             ),
           ),
         ),
-        SliverPadding(
-          padding: const EdgeInsets.all(16),
-          sliver: SliverGrid(
-            delegate: SliverChildBuilderDelegate(
-              (context, index) =>
-                  AnimatedProductCard(product: _results[index], index: index),
-              childCount: _results.length,
-            ),
-            gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-              crossAxisCount: 2,
-              childAspectRatio: 0.62,
-              crossAxisSpacing: 12,
-              mainAxisSpacing: 12,
+
+        // ── Ấm Tử Sa — Horizontal circular cards ──
+        if (amTuSa.isNotEmpty) ...[
+          SliverToBoxAdapter(
+            child: Padding(
+              padding: const EdgeInsets.fromLTRB(16, 12, 16, 8),
+              child: Row(
+                children: [
+                  Container(
+                    width: 28,
+                    height: 28,
+                    decoration: BoxDecoration(
+                      shape: BoxShape.circle,
+                      gradient: LinearGradient(
+                        colors: [
+                          AppTheme.accentGold,
+                          AppTheme.accentGold.withValues(alpha: 0.6),
+                        ],
+                      ),
+                    ),
+                    child: const Center(
+                      child: Text('🏺', style: TextStyle(fontSize: 14)),
+                    ),
+                  ),
+                  const SizedBox(width: 8),
+                  Text(
+                    'Ấm Tử Sa (${amTuSa.length})',
+                    style: TextStyle(
+                      fontSize: 15,
+                      fontWeight: FontWeight.bold,
+                      color: isDark
+                          ? AppTheme.darkTextPrimary
+                          : AppTheme.textPrimary,
+                    ),
+                  ),
+                ],
+              ),
             ),
           ),
-        ),
+          SliverToBoxAdapter(
+            child: SizedBox(
+              height: 160,
+              child: ListView.builder(
+                scrollDirection: Axis.horizontal,
+                physics: const BouncingScrollPhysics(),
+                padding: const EdgeInsets.symmetric(horizontal: 12),
+                itemCount: amTuSa.length,
+                itemBuilder: (context, index) {
+                  final product = amTuSa[index];
+                  return _AmTuSaCircleCard(product: product, isDark: isDark);
+                },
+              ),
+            ),
+          ),
+        ],
+
+        // ── Trà — Standard grid with brewing badge ──
+        if (tra.isNotEmpty) ...[
+          SliverToBoxAdapter(
+            child: Padding(
+              padding: const EdgeInsets.fromLTRB(16, 12, 16, 8),
+              child: Row(
+                children: [
+                  Container(
+                    width: 28,
+                    height: 28,
+                    decoration: BoxDecoration(
+                      shape: BoxShape.circle,
+                      gradient: LinearGradient(
+                        colors: [AppTheme.primaryDark, AppTheme.primaryMid],
+                      ),
+                    ),
+                    child: const Center(
+                      child: Text('🍃', style: TextStyle(fontSize: 14)),
+                    ),
+                  ),
+                  const SizedBox(width: 8),
+                  Text(
+                    'Trà & Trà Cụ (${tra.length})',
+                    style: TextStyle(
+                      fontSize: 15,
+                      fontWeight: FontWeight.bold,
+                      color: isDark
+                          ? AppTheme.darkTextPrimary
+                          : AppTheme.textPrimary,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+          SliverPadding(
+            padding: const EdgeInsets.symmetric(horizontal: 16),
+            sliver: SliverGrid(
+              delegate: SliverChildBuilderDelegate(
+                (context, index) =>
+                    AnimatedProductCard(product: tra[index], index: index),
+                childCount: tra.length,
+              ),
+              gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                crossAxisCount: 2,
+                childAspectRatio: 0.62,
+                crossAxisSpacing: 12,
+                mainAxisSpacing: 12,
+              ),
+            ),
+          ),
+        ],
+
+        // ── Other products — Standard grid ──
+        if (other.isNotEmpty) ...[
+          SliverPadding(
+            padding: const EdgeInsets.symmetric(horizontal: 16),
+            sliver: SliverGrid(
+              delegate: SliverChildBuilderDelegate(
+                (context, index) =>
+                    AnimatedProductCard(product: other[index], index: index),
+                childCount: other.length,
+              ),
+              gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                crossAxisCount: 2,
+                childAspectRatio: 0.62,
+                crossAxisSpacing: 12,
+                mainAxisSpacing: 12,
+              ),
+            ),
+          ),
+        ],
+
         const SliverToBoxAdapter(child: SizedBox(height: 40)),
       ],
     );
@@ -392,6 +520,86 @@ class _SearchScreenState extends ConsumerState<SearchScreen>
           }),
         ],
       ],
+    );
+  }
+}
+
+/// ── Circular card for Ấm Tử Sa in search results ──
+class _AmTuSaCircleCard extends StatelessWidget {
+  final Product product;
+  final bool isDark;
+  const _AmTuSaCircleCard({required this.product, required this.isDark});
+
+  @override
+  Widget build(BuildContext context) {
+    return GestureDetector(
+      onTap: () {
+        HapticFeedback.selectionClick();
+        context.push('/product/${product.id}');
+      },
+      child: Container(
+        width: 120,
+        margin: const EdgeInsets.symmetric(horizontal: 6),
+        child: Column(
+          children: [
+            // Circular image
+            Container(
+              width: 90,
+              height: 90,
+              decoration: BoxDecoration(
+                shape: BoxShape.circle,
+                border: Border.all(
+                  color: AppTheme.accentGold.withValues(alpha: 0.5),
+                  width: 2,
+                ),
+                boxShadow: [
+                  BoxShadow(
+                    color: AppTheme.accentGold.withValues(alpha: 0.15),
+                    blurRadius: 12,
+                    offset: const Offset(0, 4),
+                  ),
+                ],
+              ),
+              child: ClipOval(
+                child: CachedNetworkImage(
+                  imageUrl: ApiService.getImageUrl(product.photo, 'product'),
+                  fit: BoxFit.cover,
+                  errorWidget: (_, __, ___) => Container(
+                    color: isDark ? AppTheme.darkElevated : AppTheme.groupedBg,
+                    child: const Icon(
+                      CupertinoIcons.flame,
+                      color: AppTheme.accentGold,
+                    ),
+                  ),
+                ),
+              ),
+            ),
+            const SizedBox(height: 8),
+            // Name
+            Text(
+              product.namevi ?? '',
+              maxLines: 2,
+              overflow: TextOverflow.ellipsis,
+              textAlign: TextAlign.center,
+              style: TextStyle(
+                fontSize: 12,
+                fontWeight: FontWeight.w600,
+                color: isDark ? AppTheme.darkTextPrimary : AppTheme.textPrimary,
+              ),
+            ),
+            const SizedBox(height: 2),
+            // Price
+            Text(
+              '${product.displayPrice ~/ 1000}K',
+              style: const TextStyle(
+                fontSize: 12,
+                fontWeight: FontWeight.bold,
+                color: AppTheme.accentGold,
+              ),
+            ),
+          ],
+        ),
+      ),
     );
   }
 }
