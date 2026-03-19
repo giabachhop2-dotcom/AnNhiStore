@@ -186,10 +186,10 @@ class _AuthScreenState extends State<AuthScreen> with TickerProviderStateMixin {
                 begin: Alignment.topCenter,
                 end: Alignment.bottomCenter,
                 colors: [
+                  Color(0xFF061E0D),
                   Color(0xFF0A2E14),
                   Color(0xFF114402),
-                  Color(0xFF1A5A0E),
-                  Color(0xFF0A2E14),
+                  Color(0xFF061E0D),
                 ],
               ),
             ),
@@ -267,7 +267,7 @@ class _AuthScreenState extends State<AuthScreen> with TickerProviderStateMixin {
                       child: ClipRRect(
                         borderRadius: BorderRadius.circular(18),
                         child: Image.asset(
-                          'assets/images/logo.png',
+                          'assets/images/app_icon.png',
                           height: 72,
                           width: 72,
                           fit: BoxFit.cover,

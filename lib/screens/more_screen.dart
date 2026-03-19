@@ -23,138 +23,187 @@ class MoreScreen extends ConsumerWidget {
         physics: const BouncingScrollPhysics(),
         slivers: [
           const CupertinoSliverNavigationBar(
-            largeTitle: Text('Thêm'),
+            largeTitle: Text('Cá Nhân'),
             border: null,
           ),
 
-          // ── Premium Brand Header ──
+          // ── User Profile Header ──
           SliverToBoxAdapter(
-            child: Container(
-              margin: const EdgeInsets.fromLTRB(16, 8, 16, 24),
-              decoration: BoxDecoration(
-                gradient: const LinearGradient(
-                  begin: Alignment.topLeft,
-                  end: Alignment.bottomRight,
-                  colors: [
-                    Color(0xFF142E1F),
-                    AppTheme.primaryDark,
-                    Color(0xFF1E4A32),
+            child: GestureDetector(
+              onTap: () => context.push('/auth'),
+              child: Container(
+                margin: const EdgeInsets.fromLTRB(16, 8, 16, 24),
+                decoration: BoxDecoration(
+                  gradient: const LinearGradient(
+                    begin: Alignment.topLeft,
+                    end: Alignment.bottomRight,
+                    colors: [
+                      Color(0xFF0A2E14),
+                      Color(0xFF114402),
+                      Color(0xFF1A5A0E),
+                    ],
+                  ),
+                  borderRadius: BorderRadius.circular(20),
+                  boxShadow: [
+                    BoxShadow(
+                      color: AppTheme.primaryDark.withValues(alpha: 0.4),
+                      blurRadius: 20,
+                      offset: const Offset(0, 8),
+                    ),
                   ],
                 ),
-                borderRadius: BorderRadius.circular(20),
-                boxShadow: [
-                  BoxShadow(
-                    color: AppTheme.primaryDark.withValues(alpha: 0.4),
-                    blurRadius: 20,
-                    offset: const Offset(0, 8),
-                  ),
-                ],
-              ),
-              child: Stack(
-                children: [
-                  Positioned(
-                    right: -20,
-                    top: -20,
-                    child: Icon(
-                      CupertinoIcons.leaf_arrow_circlepath,
-                      size: 120,
-                      color: CupertinoColors.white.withValues(alpha: 0.04),
+                child: Stack(
+                  children: [
+                    Positioned(
+                      right: -20,
+                      top: -20,
+                      child: Icon(
+                        CupertinoIcons.leaf_arrow_circlepath,
+                        size: 120,
+                        color: CupertinoColors.white.withValues(alpha: 0.04),
+                      ),
                     ),
-                  ),
-                  Positioned(
-                    left: -10,
-                    bottom: -10,
-                    child: Icon(
-                      CupertinoIcons.leaf_arrow_circlepath,
-                      size: 80,
-                      color: CupertinoColors.white.withValues(alpha: 0.03),
-                    ),
-                  ),
-                  Padding(
-                    padding: const EdgeInsets.all(24),
-                    child: Column(
-                      children: [
-                        Row(
-                          children: [
-                            Container(
-                              padding: const EdgeInsets.all(3),
-                              decoration: BoxDecoration(
-                                borderRadius: BorderRadius.circular(16),
-                                border: Border.all(
-                                  color: AppTheme.accentGold.withValues(
-                                    alpha: 0.5,
-                                  ),
-                                  width: 2,
-                                ),
-                              ),
-                              child: ClipRRect(
-                                borderRadius: BorderRadius.circular(13),
-                                child: Image.asset(
-                                  'assets/images/logo.png',
-                                  height: 56,
-                                  width: 56,
-                                  fit: BoxFit.cover,
-                                ),
-                              ),
-                            ),
-                            const SizedBox(width: 16),
-                            Expanded(
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  const Text(
-                                    'An Nhi Trà',
-                                    style: TextStyle(
-                                      color: CupertinoColors.white,
-                                      fontSize: 22,
-                                      fontWeight: FontWeight.bold,
-                                      letterSpacing: 0.5,
-                                    ),
-                                  ),
-                                  const SizedBox(height: 4),
-                                  Text(
-                                    'Trà Đạo · Ấm Tử Sa · Yến Sào',
-                                    style: TextStyle(
-                                      color: AppTheme.accentGold.withValues(
-                                        alpha: 0.9,
+                    Padding(
+                      padding: const EdgeInsets.all(24),
+                      child: Column(
+                        children: [
+                          Row(
+                            children: [
+                              // Avatar
+                              Container(
+                                width: 60,
+                                height: 60,
+                                decoration: BoxDecoration(
+                                  shape: BoxShape.circle,
+                                  gradient: LinearGradient(
+                                    begin: Alignment.topLeft,
+                                    end: Alignment.bottomRight,
+                                    colors: [
+                                      AppTheme.accentGold.withValues(
+                                        alpha: 0.8,
                                       ),
-                                      fontSize: 12,
-                                      fontWeight: FontWeight.w600,
-                                      letterSpacing: 0.8,
-                                    ),
+                                      AppTheme.accentGold,
+                                    ],
                                   ),
-                                ],
+                                  border: Border.all(
+                                    color: AppTheme.accentGold.withValues(
+                                      alpha: 0.5,
+                                    ),
+                                    width: 2,
+                                  ),
+                                ),
+                                child: const Icon(
+                                  CupertinoIcons.person_fill,
+                                  color: Colors.white,
+                                  size: 28,
+                                ),
                               ),
-                            ),
-                          ],
-                        ),
-                        const SizedBox(height: 20),
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceAround,
-                          children: [
-                            _BrandStat(value: '200+', label: 'Sản phẩm'),
-                            Container(
-                              width: 1,
-                              height: 30,
-                              color: CupertinoColors.white.withValues(
-                                alpha: 0.15,
+                              const SizedBox(width: 16),
+                              Expanded(
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    const Text(
+                                      'Khách hàng',
+                                      style: TextStyle(
+                                        color: CupertinoColors.white,
+                                        fontSize: 20,
+                                        fontWeight: FontWeight.bold,
+                                        letterSpacing: 0.3,
+                                        decoration: TextDecoration.none,
+                                      ),
+                                    ),
+                                    const SizedBox(height: 4),
+                                    Row(
+                                      children: [
+                                        Container(
+                                          padding: const EdgeInsets.symmetric(
+                                            horizontal: 8,
+                                            vertical: 2,
+                                          ),
+                                          decoration: BoxDecoration(
+                                            gradient: const LinearGradient(
+                                              colors: [
+                                                Color(0xFFD4A830),
+                                                Color(0xFFB8860B),
+                                              ],
+                                            ),
+                                            borderRadius: BorderRadius.circular(
+                                              8,
+                                            ),
+                                          ),
+                                          child: const Row(
+                                            mainAxisSize: MainAxisSize.min,
+                                            children: [
+                                              Icon(
+                                                CupertinoIcons.star_fill,
+                                                size: 10,
+                                                color: Colors.white,
+                                              ),
+                                              SizedBox(width: 4),
+                                              Text(
+                                                'VIP 0',
+                                                style: TextStyle(
+                                                  color: Colors.white,
+                                                  fontSize: 10,
+                                                  fontWeight: FontWeight.bold,
+                                                ),
+                                              ),
+                                            ],
+                                          ),
+                                        ),
+                                        const SizedBox(width: 8),
+                                        Text(
+                                          'Đăng nhập để nâng VIP',
+                                          style: TextStyle(
+                                            color: AppTheme.accentGold
+                                                .withValues(alpha: 0.8),
+                                            fontSize: 11,
+                                            fontWeight: FontWeight.w500,
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                  ],
+                                ),
                               ),
-                            ),
-                            _BrandStat(value: '3', label: 'Thương hiệu'),
-                            Container(
-                              width: 1,
-                              height: 30,
-                              color: CupertinoColors.white.withValues(
-                                alpha: 0.15,
+                              Icon(
+                                CupertinoIcons.chevron_right,
+                                color: CupertinoColors.white.withValues(
+                                  alpha: 0.4,
+                                ),
+                                size: 18,
                               ),
-                            ),
-                            _BrandStat(value: '2025', label: 'Top 10 VN'),
-                          ],
-                        ),
-                      ],
+                            ],
+                          ),
+                          const SizedBox(height: 20),
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceAround,
+                            children: [
+                              _BrandStat(value: '0', label: 'Yêu thích'),
+                              Container(
+                                width: 1,
+                                height: 30,
+                                color: CupertinoColors.white.withValues(
+                                  alpha: 0.15,
+                                ),
+                              ),
+                              _BrandStat(value: '0', label: 'Đơn hàng'),
+                              Container(
+                                width: 1,
+                                height: 30,
+                                color: CupertinoColors.white.withValues(
+                                  alpha: 0.15,
+                                ),
+                              ),
+                              _BrandStat(value: 'VIP 0', label: 'Hạng thẻ'),
+                            ],
+                          ),
+                        ],
+                      ),
                     ),
-                  ),
-                ],
+                  ],
+                ),
               ),
             ),
           ),

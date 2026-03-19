@@ -15,7 +15,7 @@ class SplashScreen extends StatefulWidget {
 
 class _SplashScreenState extends State<SplashScreen>
     with TickerProviderStateMixin {
-  static const _darkGreen = Color(0xFF114402);
+  static const _darkGreen = Color(0xFF0A2E14);
   static const _gold = Color(0xFFC8A96E);
 
   late AnimationController _logoController;
@@ -162,7 +162,7 @@ class _SplashScreenState extends State<SplashScreen>
                             ),
                             padding: const EdgeInsets.all(20),
                             child: Image.asset(
-                              'assets/images/logo.png',
+                              'assets/images/app_icon.png',
                               fit: BoxFit.contain,
                             ),
                           ),
@@ -187,6 +187,7 @@ class _SplashScreenState extends State<SplashScreen>
                               color: const Color(0xFFF5F0E8),
                               letterSpacing: 4,
                               fontFamily: 'UTMKhuccamta',
+                              decoration: TextDecoration.none,
                             ),
                           ),
                           const SizedBox(height: 8),

@@ -21,7 +21,7 @@ class AnimatedNavBar extends StatefulWidget {
     ('/products', CupertinoIcons.leaf_arrow_circlepath, 'Sản phẩm'),
     ('/news', CupertinoIcons.doc_text, 'Tin tức'),
     ('/cart', CupertinoIcons.cart, 'Giỏ hàng'),
-    ('/more', CupertinoIcons.ellipsis_circle, 'Thêm'),
+    ('/more', CupertinoIcons.person_crop_circle, 'Cá Nhân'),
   ];
 
   @override
