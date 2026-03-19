@@ -39,7 +39,9 @@ class _VipCardScreenState extends State<VipCardScreen>
       _memberName = prefs.getString('vip_name') ?? '';
       _memberId = prefs.getString('vip_id') ?? _generateId();
       _points = prefs.getInt('vip_points') ?? 0;
-      _tier = _points >= 5000 ? 'Diamond' : (_points >= 2000 ? 'Gold' : 'Silver');
+      _tier = _points >= 5000
+          ? 'Diamond'
+          : (_points >= 2000 ? 'Gold' : 'Silver');
     });
     if (prefs.getString('vip_id') == null) {
       await prefs.setString('vip_id', _memberId);
@@ -98,7 +100,9 @@ class _VipCardScreenState extends State<VipCardScreen>
     final isDark = CupertinoTheme.brightnessOf(context) == Brightness.dark;
 
     return CupertinoPageScaffold(
-      navigationBar: const CupertinoNavigationBar(middle: Text('Thẻ Thành Viên')),
+      navigationBar: const CupertinoNavigationBar(
+        middle: Text('Thẻ Thành Viên'),
+      ),
       child: SafeArea(
         child: SingleChildScrollView(
           physics: const BouncingScrollPhysics(),
@@ -117,16 +121,31 @@ class _VipCardScreenState extends State<VipCardScreen>
                         begin: Alignment.topLeft,
                         end: Alignment.bottomRight,
                         colors: _tier == 'Diamond'
-                            ? [const Color(0xFF1A1A2E), const Color(0xFF16213E), const Color(0xFF0F3460)]
+                            ? [
+                                const Color(0xFF1A1A2E),
+                                const Color(0xFF16213E),
+                                const Color(0xFF0F3460),
+                              ]
                             : _tier == 'Gold'
-                                ? [const Color(0xFF8B6914), const Color(0xFFD4A830), const Color(0xFF8B6914)]
-                                : [const Color(0xFF374151), const Color(0xFF6B7280), const Color(0xFF374151)],
+                            ? [
+                                const Color(0xFF8B6914),
+                                const Color(0xFFD4A830),
+                                const Color(0xFF8B6914),
+                              ]
+                            : [
+                                const Color(0xFF374151),
+                                const Color(0xFF6B7280),
+                                const Color(0xFF374151),
+                              ],
                       ),
                       borderRadius: BorderRadius.circular(20),
                       boxShadow: [
                         BoxShadow(
-                          color: (_tier == 'Gold' ? AppTheme.accentGold : const Color(0xFF6B7280))
-                              .withValues(alpha: 0.3),
+                          color:
+                              (_tier == 'Gold'
+                                      ? AppTheme.accentGold
+                                      : const Color(0xFF6B7280))
+                                  .withValues(alpha: 0.3),
                           blurRadius: 20,
                           offset: const Offset(0, 8),
                         ),
@@ -152,19 +171,27 @@ class _VipCardScreenState extends State<VipCardScreen>
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
                               Row(
-                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceBetween,
                                 children: [
-                                  const Text('AN NHI TRÀ',
-                                      style: TextStyle(
-                                        color: Colors.white,
-                                        fontSize: 14,
-                                        fontWeight: FontWeight.w600,
-                                        letterSpacing: 2,
-                                      )),
+                                  const Text(
+                                    'AN NHI TRÀ',
+                                    style: TextStyle(
+                                      color: Colors.white,
+                                      fontSize: 14,
+                                      fontWeight: FontWeight.w600,
+                                      letterSpacing: 2,
+                                    ),
+                                  ),
                                   Container(
-                                    padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                                    padding: const EdgeInsets.symmetric(
+                                      horizontal: 10,
+                                      vertical: 4,
+                                    ),
                                     decoration: BoxDecoration(
-                                      color: Colors.white.withValues(alpha: 0.15),
+                                      color: Colors.white.withValues(
+                                        alpha: 0.15,
+                                      ),
                                       borderRadius: BorderRadius.circular(12),
                                     ),
                                     child: Text(
@@ -173,8 +200,8 @@ class _VipCardScreenState extends State<VipCardScreen>
                                         color: _tier == 'Gold'
                                             ? const Color(0xFFFFD700)
                                             : _tier == 'Diamond'
-                                                ? const Color(0xFF87CEEB)
-                                                : Colors.white,
+                                            ? const Color(0xFF87CEEB)
+                                            : Colors.white,
                                         fontSize: 11,
                                         fontWeight: FontWeight.w700,
                                         letterSpacing: 1,
@@ -195,10 +222,13 @@ class _VipCardScreenState extends State<VipCardScreen>
                               ),
                               const SizedBox(height: 8),
                               Row(
-                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceBetween,
                                 children: [
                                   Text(
-                                    _memberName.isEmpty ? 'Chưa đăng ký' : _memberName.toUpperCase(),
+                                    _memberName.isEmpty
+                                        ? 'Chưa đăng ký'
+                                        : _memberName.toUpperCase(),
                                     style: const TextStyle(
                                       color: Colors.white,
                                       fontSize: 15,
@@ -209,17 +239,24 @@ class _VipCardScreenState extends State<VipCardScreen>
                                   Column(
                                     crossAxisAlignment: CrossAxisAlignment.end,
                                     children: [
-                                      const Text('ĐIỂM', style: TextStyle(
-                                        color: Colors.white54, fontSize: 10, letterSpacing: 1,
-                                      )),
-                                      Text('$_points',
-                                          style: TextStyle(
-                                            color: _tier == 'Gold'
-                                                ? const Color(0xFFFFD700)
-                                                : Colors.white,
-                                            fontSize: 20,
-                                            fontWeight: FontWeight.bold,
-                                          )),
+                                      const Text(
+                                        'ĐIỂM',
+                                        style: TextStyle(
+                                          color: Colors.white54,
+                                          fontSize: 10,
+                                          letterSpacing: 1,
+                                        ),
+                                      ),
+                                      Text(
+                                        '$_points',
+                                        style: TextStyle(
+                                          color: _tier == 'Gold'
+                                              ? const Color(0xFFFFD700)
+                                              : Colors.white,
+                                          fontSize: 20,
+                                          fontWeight: FontWeight.bold,
+                                        ),
+                                      ),
                                     ],
                                   ),
                                 ],
@@ -246,15 +283,26 @@ class _VipCardScreenState extends State<VipCardScreen>
                         colors: [Color(0xFF1A3C28), Color(0xFF2D5E3E)],
                       ),
                       borderRadius: BorderRadius.circular(14),
-                      border: Border.all(color: AppTheme.accentGold.withValues(alpha: 0.3)),
+                      border: Border.all(
+                        color: AppTheme.accentGold.withValues(alpha: 0.3),
+                      ),
                     ),
                     child: const Row(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
-                        Icon(CupertinoIcons.person_badge_plus, color: AppTheme.accentGold, size: 18),
+                        Icon(
+                          CupertinoIcons.person_badge_plus,
+                          color: AppTheme.accentGold,
+                          size: 18,
+                        ),
                         SizedBox(width: 10),
-                        Text('Đăng ký thành viên — nhận 100 điểm',
-                            style: TextStyle(color: Color(0xFFF5F0E8), fontWeight: FontWeight.w600)),
+                        Text(
+                          'Đăng ký thành viên — nhận 100 điểm',
+                          style: TextStyle(
+                            color: Color(0xFFF5F0E8),
+                            fontWeight: FontWeight.w600,
+                          ),
+                        ),
                       ],
                     ),
                   ),
@@ -278,9 +326,9 @@ class _VipCardScreenState extends State<VipCardScreen>
 
   Widget _buildTierProgress(bool isDark) {
     const tiers = [
-      ('Silver', 0, '🥈'),
-      ('Gold', 2000, '🥇'),
-      ('Diamond', 5000, '💎'),
+      ('Silver', 0, CupertinoIcons.shield, Color(0xFF9E9E9E)),
+      ('Gold', 2000, CupertinoIcons.shield_fill, Color(0xFFFFD700)),
+      ('Diamond', 5000, CupertinoIcons.sparkles, Color(0xFF87CEEB)),
     ];
     final currentTierIdx = tiers.indexWhere((t) => t.$1 == _tier);
     final nextTier = currentTierIdx < 2 ? tiers[currentTierIdx + 1] : null;
@@ -296,7 +344,8 @@ class _VipCardScreenState extends State<VipCardScreen>
         boxShadow: [
           BoxShadow(
             color: Colors.black.withValues(alpha: isDark ? 0.15 : 0.04),
-            blurRadius: 8, offset: const Offset(0, 2),
+            blurRadius: 8,
+            offset: const Offset(0, 2),
           ),
         ],
       ),
@@ -306,14 +355,41 @@ class _VipCardScreenState extends State<VipCardScreen>
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Text('Hạng hiện tại: ${tiers[currentTierIdx].$3} $_tier',
-                  style: TextStyle(
-                    fontWeight: FontWeight.w600,
-                    color: isDark ? AppTheme.darkTextPrimary : AppTheme.textPrimary,
-                  )),
+              Row(
+                children: [
+                  Icon(
+                    tiers[currentTierIdx].$3,
+                    size: 18,
+                    color: tiers[currentTierIdx].$4,
+                  ),
+                  const SizedBox(width: 6),
+                  Text(
+                    'Hạng hiện tại: $_tier',
+                    style: TextStyle(
+                      fontWeight: FontWeight.w600,
+                      color: isDark
+                          ? AppTheme.darkTextPrimary
+                          : AppTheme.textPrimary,
+                    ),
+                  ),
+                ],
+              ),
               if (nextTier != null)
-                Text('Còn ${nextTier.$2 - _points} điểm → ${nextTier.$3}',
-                    style: TextStyle(fontSize: 12, color: isDark ? AppTheme.darkTextSecondary : AppTheme.textMuted)),
+                Row(
+                  children: [
+                    Icon(nextTier.$3, size: 14, color: nextTier.$4),
+                    const SizedBox(width: 4),
+                    Text(
+                      'Còn ${nextTier.$2 - _points} điểm',
+                      style: TextStyle(
+                        fontSize: 12,
+                        color: isDark
+                            ? AppTheme.darkTextSecondary
+                            : AppTheme.textMuted,
+                      ),
+                    ),
+                  ],
+                ),
             ],
           ),
           const SizedBox(height: 10),
@@ -321,9 +397,13 @@ class _VipCardScreenState extends State<VipCardScreen>
             borderRadius: BorderRadius.circular(4),
             child: LinearProgressIndicator(
               value: progress,
-              backgroundColor: isDark ? AppTheme.darkSeparator : AppTheme.separator.withValues(alpha: 0.15),
+              backgroundColor: isDark
+                  ? AppTheme.darkSeparator
+                  : AppTheme.separator.withValues(alpha: 0.15),
               valueColor: AlwaysStoppedAnimation<Color>(
-                _tier == 'Diamond' ? const Color(0xFF87CEEB) : AppTheme.accentGold,
+                _tier == 'Diamond'
+                    ? const Color(0xFF87CEEB)
+                    : AppTheme.accentGold,
               ),
               minHeight: 6,
             ),
@@ -335,12 +415,42 @@ class _VipCardScreenState extends State<VipCardScreen>
 
   Widget _buildBenefits(bool isDark) {
     const benefits = [
-      ('🎁', 'Tặng quà sinh nhật', 'Voucher 200K cho thành viên Gold+'),
-      ('🚚', 'Miễn phí giao hàng', 'Đơn từ 500K cho thành viên Silver+'),
-      ('🏷️', 'Giảm giá độc quyền', 'Ưu đãi 15% cho Diamond member'),
-      ('🫖', 'Workshop trà đạo', 'Tham gia miễn phí 2 lần/năm'),
-      ('📦', 'Gói quà premium', 'Hộp sơn mài miễn phí cho Gold+'),
-      ('⭐', 'Tích điểm đổi quà', 'Mỗi 10.000₫ = 1 điểm tích lũy'),
+      (
+        CupertinoIcons.gift_fill,
+        'Tặng quà sinh nhật',
+        'Voucher 200K cho thành viên Gold+',
+        Color(0xFFE57373),
+      ),
+      (
+        CupertinoIcons.car_fill,
+        'Miễn phí giao hàng',
+        'Đơn từ 500K cho thành viên Silver+',
+        Color(0xFF64B5F6),
+      ),
+      (
+        CupertinoIcons.tag_fill,
+        'Giảm giá độc quyền',
+        'Ưu đãi 15% cho Diamond member',
+        Color(0xFFBA68C8),
+      ),
+      (
+        Icons.emoji_food_beverage_rounded,
+        'Workshop trà đạo',
+        'Tham gia miễn phí 2 lần/năm',
+        Color(0xFF81C784),
+      ),
+      (
+        CupertinoIcons.cube_box_fill,
+        'Gói quà premium',
+        'Hộp sơn mài miễn phí cho Gold+',
+        Color(0xFFFFB74D),
+      ),
+      (
+        CupertinoIcons.star_fill,
+        'Tích điểm đổi quà',
+        'Mỗi 10.000₫ = 1 điểm tích lũy',
+        AppTheme.accentGold,
+      ),
     ];
 
     return Container(
@@ -351,40 +461,60 @@ class _VipCardScreenState extends State<VipCardScreen>
         boxShadow: [
           BoxShadow(
             color: Colors.black.withValues(alpha: isDark ? 0.15 : 0.04),
-            blurRadius: 8, offset: const Offset(0, 2),
+            blurRadius: 8,
+            offset: const Offset(0, 2),
           ),
         ],
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text('Quyền lợi thành viên', style: TextStyle(
-            fontWeight: FontWeight.bold, fontSize: 16,
-            color: isDark ? AppTheme.darkTextPrimary : AppTheme.textPrimary,
-          )),
-          const SizedBox(height: 12),
-          ...benefits.map((b) => Padding(
-            padding: const EdgeInsets.only(bottom: 10),
-            child: Row(
-              children: [
-                Text(b.$1, style: const TextStyle(fontSize: 20)),
-                const SizedBox(width: 12),
-                Expanded(child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(b.$2, style: TextStyle(
-                      fontWeight: FontWeight.w600, fontSize: 13,
-                      color: isDark ? AppTheme.darkTextPrimary : AppTheme.textPrimary,
-                    )),
-                    Text(b.$3, style: TextStyle(
-                      fontSize: 12,
-                      color: isDark ? AppTheme.darkTextSecondary : AppTheme.textMuted,
-                    )),
-                  ],
-                )),
-              ],
+          Text(
+            'Quyền lợi thành viên',
+            style: TextStyle(
+              fontWeight: FontWeight.bold,
+              fontSize: 16,
+              color: isDark ? AppTheme.darkTextPrimary : AppTheme.textPrimary,
             ),
-          )),
+          ),
+          const SizedBox(height: 12),
+          ...benefits.map(
+            (b) => Padding(
+              padding: const EdgeInsets.only(bottom: 10),
+              child: Row(
+                children: [
+                  Icon(b.$1, size: 20, color: b.$4),
+                  const SizedBox(width: 12),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          b.$2,
+                          style: TextStyle(
+                            fontWeight: FontWeight.w600,
+                            fontSize: 13,
+                            color: isDark
+                                ? AppTheme.darkTextPrimary
+                                : AppTheme.textPrimary,
+                          ),
+                        ),
+                        Text(
+                          b.$3,
+                          style: TextStyle(
+                            fontSize: 12,
+                            color: isDark
+                                ? AppTheme.darkTextSecondary
+                                : AppTheme.textMuted,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
         ],
       ),
     );

@@ -101,7 +101,7 @@ class _EventsScreenState extends ConsumerState<EventsScreen> {
                               ),
                               child: Column(
                                 children: [
-                                  const Text('🎋', style: TextStyle(fontSize: 36)),
+                                  const Icon(CupertinoIcons.calendar, size: 36, color: AppTheme.accentGold),
                                   const SizedBox(height: 8),
                                   Text('Sự Kiện An Nhi Trà',
                                       style: TextStyle(

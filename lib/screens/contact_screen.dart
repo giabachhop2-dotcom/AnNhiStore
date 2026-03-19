@@ -36,7 +36,12 @@ class _ContactScreenState extends ConsumerState<ContactScreen> {
         builder: (ctx) => CupertinoAlertDialog(
           title: const Text('Thiếu thông tin'),
           content: const Text('Vui lòng nhập họ tên và số điện thoại.'),
-          actions: [CupertinoDialogAction(onPressed: () => Navigator.pop(ctx), child: const Text('OK'))],
+          actions: [
+            CupertinoDialogAction(
+              onPressed: () => Navigator.pop(ctx),
+              child: const Text('OK'),
+            ),
+          ],
         ),
       );
       return;
@@ -44,12 +49,14 @@ class _ContactScreenState extends ConsumerState<ContactScreen> {
     HapticFeedback.mediumImpact();
     setState(() => isSubmitting = true);
     try {
-      await ref.read(apiServiceProvider).sendContact(
-        fullname: _nameCtrl.text.trim(),
-        phone: _phoneCtrl.text.trim(),
-        email: _emailCtrl.text.trim(),
-        content: _contentCtrl.text.trim(),
-      );
+      await ref
+          .read(apiServiceProvider)
+          .sendContact(
+            fullname: _nameCtrl.text.trim(),
+            phone: _phoneCtrl.text.trim(),
+            email: _emailCtrl.text.trim(),
+            content: _contentCtrl.text.trim(),
+          );
       if (mounted) {
         _nameCtrl.clear();
         _phoneCtrl.clear();
@@ -60,7 +67,12 @@ class _ContactScreenState extends ConsumerState<ContactScreen> {
           builder: (ctx) => CupertinoAlertDialog(
             title: const Text('Gửi thành công!'),
             content: const Text('Chúng tôi sẽ phản hồi sớm nhất.'),
-            actions: [CupertinoDialogAction(onPressed: () => Navigator.pop(ctx), child: const Text('OK'))],
+            actions: [
+              CupertinoDialogAction(
+                onPressed: () => Navigator.pop(ctx),
+                child: const Text('OK'),
+              ),
+            ],
           ),
         );
       }
@@ -70,8 +82,15 @@ class _ContactScreenState extends ConsumerState<ContactScreen> {
           context: context,
           builder: (ctx) => CupertinoAlertDialog(
             title: const Text('Lỗi'),
-            content: const Text('Không thể gửi liên hệ. Vui lòng kiểm tra kết nối mạng và thử lại.'),
-            actions: [CupertinoDialogAction(onPressed: () => Navigator.pop(ctx), child: const Text('OK'))],
+            content: const Text(
+              'Không thể gửi liên hệ. Vui lòng kiểm tra kết nối mạng và thử lại.',
+            ),
+            actions: [
+              CupertinoDialogAction(
+                onPressed: () => Navigator.pop(ctx),
+                child: const Text('OK'),
+              ),
+            ],
           ),
         );
       }
@@ -82,6 +101,7 @@ class _ContactScreenState extends ConsumerState<ContactScreen> {
   @override
   Widget build(BuildContext context) {
     final settingsAsync = ref.watch(settingsProvider);
+    final isDark = CupertinoTheme.brightnessOf(context) == Brightness.dark;
 
     return CupertinoPageScaffold(
       navigationBar: const CupertinoNavigationBar(middle: Text('Liên Hệ')),
@@ -93,7 +113,8 @@ class _ContactScreenState extends ConsumerState<ContactScreen> {
             // Quick actions from API
             settingsAsync.when(
               data: (settings) {
-                final opts = settings['optionsParsed'] as Map<String, dynamic>? ?? {};
+                final opts =
+                    settings['optionsParsed'] as Map<String, dynamic>? ?? {};
                 final phone = opts['hotline'] ?? opts['phone'] ?? '0827626962';
                 final zalo = opts['zalo'] ?? phone;
                 final address = settings['addressvi'] ?? opts['address'] ?? '';
@@ -102,26 +123,44 @@ class _ContactScreenState extends ConsumerState<ContactScreen> {
                   header: const Text('LIÊN HỆ NHANH'),
                   children: [
                     CupertinoListTile(
-                      leading: const Icon(CupertinoIcons.phone_fill, color: AppTheme.primaryDark),
+                      leading: const Icon(
+                        CupertinoIcons.phone_fill,
+                        color: AppTheme.primaryDark,
+                      ),
                       title: const Text('Hotline'),
                       subtitle: Text(_formatPhone(phone)),
                       trailing: const CupertinoListTileChevron(),
                       onTap: () => launchUrl(Uri.parse('tel:$phone')),
                     ),
                     CupertinoListTile(
-                      leading: Icon(CupertinoIcons.chat_bubble_2_fill, color: Colors.blue),
+                      leading: Icon(
+                        CupertinoIcons.chat_bubble_2_fill,
+                        color: Colors.blue,
+                      ),
                       title: const Text('Zalo'),
                       subtitle: const Text('Chat trực tiếp'),
                       trailing: const CupertinoListTileChevron(),
-                      onTap: () => launchUrl(Uri.parse('https://zalo.me/$zalo')),
+                      onTap: () =>
+                          launchUrl(Uri.parse('https://zalo.me/$zalo')),
                     ),
                     if (address.isNotEmpty)
                       CupertinoListTile(
-                        leading: const Icon(CupertinoIcons.location_fill, color: AppTheme.priceRed),
+                        leading: const Icon(
+                          CupertinoIcons.location_fill,
+                          color: AppTheme.priceRed,
+                        ),
                         title: const Text('Địa chỉ'),
-                        subtitle: Text(address, maxLines: 2, overflow: TextOverflow.ellipsis),
+                        subtitle: Text(
+                          address,
+                          maxLines: 2,
+                          overflow: TextOverflow.ellipsis,
+                        ),
                         trailing: const CupertinoListTileChevron(),
-                        onTap: () => launchUrl(Uri.parse('https://maps.google.com/?q=${Uri.encodeComponent(address)}')),
+                        onTap: () => launchUrl(
+                          Uri.parse(
+                            'https://maps.google.com/?q=${Uri.encodeComponent(address)}',
+                          ),
+                        ),
                       ),
                   ],
                 );
@@ -134,7 +173,10 @@ class _ContactScreenState extends ConsumerState<ContactScreen> {
                 header: const Text('LIÊN HỆ NHANH'),
                 children: [
                   CupertinoListTile(
-                    leading: const Icon(CupertinoIcons.phone_fill, color: AppTheme.primaryDark),
+                    leading: const Icon(
+                      CupertinoIcons.phone_fill,
+                      color: AppTheme.primaryDark,
+                    ),
                     title: const Text('Hotline'),
                     subtitle: const Text('082 762 6962'),
                     trailing: const CupertinoListTileChevron(),
@@ -149,14 +191,20 @@ class _ContactScreenState extends ConsumerState<ContactScreen> {
             // Contact form
             Padding(
               padding: const EdgeInsets.only(left: 4, bottom: 8),
-              child: Text('GỬI LIÊN HỆ',
-                  style: TextStyle(fontSize: 12, fontWeight: FontWeight.w600,
-                      color: AppTheme.textMuted, letterSpacing: 0.5)),
+              child: Text(
+                'GỬI LIÊN HỆ',
+                style: TextStyle(
+                  fontSize: 12,
+                  fontWeight: FontWeight.w600,
+                  color: AppTheme.textMuted,
+                  letterSpacing: 0.5,
+                ),
+              ),
             ),
             Container(
               padding: const EdgeInsets.all(16),
               decoration: BoxDecoration(
-                color: CupertinoColors.white,
+                color: isDark ? AppTheme.darkElevated : CupertinoColors.white,
                 borderRadius: BorderRadius.circular(12),
               ),
               child: Column(
@@ -166,10 +214,17 @@ class _ContactScreenState extends ConsumerState<ContactScreen> {
                     placeholder: 'Họ và tên *',
                     prefix: const Padding(
                       padding: EdgeInsets.only(left: 8),
-                      child: Icon(CupertinoIcons.person, size: 18, color: AppTheme.textMuted),
+                      child: Icon(
+                        CupertinoIcons.person,
+                        size: 18,
+                        color: AppTheme.textMuted,
+                      ),
                     ),
                     padding: const EdgeInsets.all(12),
-                    decoration: BoxDecoration(color: AppTheme.groupedBg, borderRadius: BorderRadius.circular(10)),
+                    decoration: BoxDecoration(
+                      color: isDark ? AppTheme.darkSurface : AppTheme.groupedBg,
+                      borderRadius: BorderRadius.circular(10),
+                    ),
                   ),
                   const SizedBox(height: 10),
                   CupertinoTextField(
@@ -178,10 +233,17 @@ class _ContactScreenState extends ConsumerState<ContactScreen> {
                     keyboardType: TextInputType.phone,
                     prefix: const Padding(
                       padding: EdgeInsets.only(left: 8),
-                      child: Icon(CupertinoIcons.phone, size: 18, color: AppTheme.textMuted),
+                      child: Icon(
+                        CupertinoIcons.phone,
+                        size: 18,
+                        color: AppTheme.textMuted,
+                      ),
                     ),
                     padding: const EdgeInsets.all(12),
-                    decoration: BoxDecoration(color: AppTheme.groupedBg, borderRadius: BorderRadius.circular(10)),
+                    decoration: BoxDecoration(
+                      color: isDark ? AppTheme.darkSurface : AppTheme.groupedBg,
+                      borderRadius: BorderRadius.circular(10),
+                    ),
                   ),
                   const SizedBox(height: 10),
                   CupertinoTextField(
@@ -190,10 +252,17 @@ class _ContactScreenState extends ConsumerState<ContactScreen> {
                     keyboardType: TextInputType.emailAddress,
                     prefix: const Padding(
                       padding: EdgeInsets.only(left: 8),
-                      child: Icon(CupertinoIcons.mail, size: 18, color: AppTheme.textMuted),
+                      child: Icon(
+                        CupertinoIcons.mail,
+                        size: 18,
+                        color: AppTheme.textMuted,
+                      ),
                     ),
                     padding: const EdgeInsets.all(12),
-                    decoration: BoxDecoration(color: AppTheme.groupedBg, borderRadius: BorderRadius.circular(10)),
+                    decoration: BoxDecoration(
+                      color: isDark ? AppTheme.darkSurface : AppTheme.groupedBg,
+                      borderRadius: BorderRadius.circular(10),
+                    ),
                   ),
                   const SizedBox(height: 10),
                   CupertinoTextField(
@@ -201,7 +270,10 @@ class _ContactScreenState extends ConsumerState<ContactScreen> {
                     placeholder: 'Nội dung',
                     maxLines: 4,
                     padding: const EdgeInsets.all(12),
-                    decoration: BoxDecoration(color: AppTheme.groupedBg, borderRadius: BorderRadius.circular(10)),
+                    decoration: BoxDecoration(
+                      color: AppTheme.groupedBg,
+                      borderRadius: BorderRadius.circular(10),
+                    ),
                   ),
                   const SizedBox(height: 16),
                   SizedBox(
@@ -210,7 +282,9 @@ class _ContactScreenState extends ConsumerState<ContactScreen> {
                       onPressed: isSubmitting ? null : _submit,
                       borderRadius: BorderRadius.circular(12),
                       child: isSubmitting
-                          ? const CupertinoActivityIndicator(color: CupertinoColors.white)
+                          ? const CupertinoActivityIndicator(
+                              color: CupertinoColors.white,
+                            )
                           : const Text('Gửi liên hệ'),
                     ),
                   ),
