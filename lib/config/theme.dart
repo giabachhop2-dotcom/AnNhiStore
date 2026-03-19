@@ -62,11 +62,14 @@ class AppTheme {
     return ThemeData(
       useMaterial3: true,
       fontFamily: 'UTMKhuccamta',
-      colorScheme: ColorScheme.fromSeed(
-        seedColor: primaryDark,
+      colorScheme: const ColorScheme.light(
         primary: primaryDark,
+        onPrimary: surfaceWhite,
         secondary: accentGold,
+        onSecondary: surfaceWhite,
         surface: surfaceWhite,
+        onSurface: textPrimary,
+        surfaceContainerHighest: groupedBg,
         error: BrandColors.error,
       ),
       scaffoldBackgroundColor: groupedBg,
@@ -153,12 +156,14 @@ class AppTheme {
       useMaterial3: true,
       brightness: Brightness.dark,
       fontFamily: 'UTMKhuccamta',
-      colorScheme: ColorScheme.fromSeed(
-        seedColor: primaryDark,
-        brightness: Brightness.dark,
+      colorScheme: const ColorScheme.dark(
         primary: accentGold,
+        onPrimary: darkGroupedBg,
         secondary: primaryDark,
+        onSecondary: darkTextPrimary,
         surface: darkSurface,
+        onSurface: darkTextPrimary,
+        surfaceContainerHighest: darkGroupedBg,
         error: BrandColors.error,
       ),
       scaffoldBackgroundColor: darkGroupedBg,
