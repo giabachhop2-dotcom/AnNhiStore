@@ -904,9 +904,13 @@ class _ProductDetailScreenState extends ConsumerState<ProductDetailScreen>
                 child: Text(
                   '$quantity',
                   textAlign: TextAlign.center,
-                  style: const TextStyle(
+                  style: TextStyle(
                     fontSize: 17,
                     fontWeight: FontWeight.w600,
+                    color:
+                        CupertinoTheme.brightnessOf(context) == Brightness.dark
+                        ? AppTheme.darkTextPrimary
+                        : AppTheme.textPrimary,
                   ),
                 ),
               ),

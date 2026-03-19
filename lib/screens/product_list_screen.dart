@@ -116,6 +116,7 @@ class _ProductListScreenState extends ConsumerState<ProductListScreen> {
             page: _currentPage,
             listId: _selectedListId,
             brandId: _selectedBrandId,
+            type: _selectedType,
             limit: 20,
             search: _searchQuery.isNotEmpty ? _searchQuery : null,
           );
@@ -134,9 +135,6 @@ class _ProductListScreenState extends ConsumerState<ProductListScreen> {
 
   List<Product> get _displayProducts {
     var list = [..._products];
-    if (_selectedType != null && _selectedListId == null) {
-      list = list.where((p) => p.type == _selectedType).toList();
-    }
     switch (_sortBy) {
       case 'price_asc':
         list.sort((a, b) => a.displayPrice.compareTo(b.displayPrice));

@@ -35,12 +35,14 @@ class ApiService {
     int? catId,
     int? brandId,
     String? search,
+    String? type,
   }) async {
     final params = <String, dynamic>{'page': page, 'limit': limit};
     if (listId != null) params['list'] = listId;
     if (catId != null) params['cat'] = catId;
     if (brandId != null) params['brand'] = brandId;
     if (search != null && search.isNotEmpty) params['search'] = search;
+    if (type != null) params['type'] = type;
 
     final res = await _dio.get('/products', queryParameters: params);
     final data = res.data['data'];
