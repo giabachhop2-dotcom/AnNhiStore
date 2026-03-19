@@ -86,9 +86,9 @@ class _AuthScreenState extends State<AuthScreen> with TickerProviderStateMixin {
     try {
       final url = _isLogin ? ApiConfig.login : ApiConfig.register;
       final body = _isLogin
-          ? {'phone': phone, 'password': password}
+          ? {'username': phone, 'password': password}
           : {
-              'name': _nameController.text.trim(),
+              'fullname': _nameController.text.trim(),
               'phone': phone,
               'password': password,
             };
@@ -99,15 +99,16 @@ class _AuthScreenState extends State<AuthScreen> with TickerProviderStateMixin {
         body: jsonEncode(body),
       );
 
-      final data = jsonDecode(response.body);
-      if (response.statusCode == 200 && data['success'] == true) {
-        // Save token
+      final resBody = jsonDecode(response.body);
+      if (response.statusCode == 200 && resBody['success'] == true) {
+        // Backend wraps in { success, data: { token, user }, message }
+        final payload = resBody['data'] ?? {};
         final prefs = await SharedPreferences.getInstance();
-        if (data['token'] != null) {
-          await prefs.setString('auth_token', data['token']);
+        if (payload['token'] != null) {
+          await prefs.setString('auth_token', payload['token']);
         }
-        if (data['user'] != null) {
-          await prefs.setString('auth_user', jsonEncode(data['user']));
+        if (payload['user'] != null) {
+          await prefs.setString('auth_user', jsonEncode(payload['user']));
         }
         await prefs.setBool('is_logged_in', true);
 
@@ -119,7 +120,7 @@ class _AuthScreenState extends State<AuthScreen> with TickerProviderStateMixin {
           if (mounted) context.pop();
         }
       } else {
-        _showError(data['message'] ?? 'Có lỗi xảy ra, vui lòng thử lại');
+        _showError(resBody['message'] ?? 'Có lỗi xảy ra, vui lòng thử lại');
       }
     } catch (e) {
       _showError('Không thể kết nối máy chủ');

@@ -3,10 +3,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+
 import 'config/theme.dart';
 import 'config/router.dart';
 import 'screens/splash_screen.dart';
-import 'screens/onboarding_screen.dart';
 
 void main() {
   WidgetsFlutterBinding.ensureInitialized();
@@ -71,37 +71,10 @@ class AnNhiTraApp extends ConsumerStatefulWidget {
 
 class _AnNhiTraAppState extends ConsumerState<AnNhiTraApp> {
   bool _showSplash = true;
-  bool _showOnboarding = false;
-  bool _initialized = false;
-
-  @override
-  void initState() {
-    super.initState();
-    _checkOnboarding();
-  }
-
-  Future<void> _checkOnboarding() async {
-    final prefs = await SharedPreferences.getInstance();
-    final done = prefs.getBool('onboarding_done') ?? false;
-    if (mounted) {
-      setState(() {
-        _showOnboarding = !done;
-        _initialized = true;
-      });
-    }
-  }
 
   @override
   Widget build(BuildContext context) {
     final themeMode = ref.watch(themeModeProvider);
-
-    if (!_initialized) {
-      return const MaterialApp(
-        home: CupertinoPageScaffold(
-          child: Center(child: CupertinoActivityIndicator(radius: 14)),
-        ),
-      );
-    }
 
     // Phase 1: Splash screen
     if (_showSplash) {
@@ -110,31 +83,6 @@ class _AnNhiTraAppState extends ConsumerState<AnNhiTraApp> {
         theme: AppTheme.materialTheme,
         home: SplashScreen(
           onComplete: () => setState(() => _showSplash = false),
-        ),
-      );
-    }
-
-    // Phase 2: Onboarding (if not done)
-    if (_showOnboarding) {
-      return MaterialApp(
-        debugShowCheckedModeBanner: false,
-        theme: AppTheme.materialTheme,
-        darkTheme: AppTheme.darkMaterialTheme,
-        themeMode: themeMode,
-        builder: (context, child) {
-          return DefaultTextStyle(
-            style: const TextStyle(
-              fontFamily: 'UTMKhuccamta',
-              color: Color(0xFFF5F0E8),
-              decoration: TextDecoration.none,
-            ),
-            child: child!,
-          );
-        },
-        home: OnboardingScreen(
-          onComplete: () {
-            setState(() => _showOnboarding = false);
-          },
         ),
       );
     }
