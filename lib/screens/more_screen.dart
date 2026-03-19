@@ -8,7 +8,6 @@ import 'package:url_launcher/url_launcher.dart';
 import 'package:share_plus/share_plus.dart';
 import '../providers/providers.dart';
 import '../config/theme.dart';
-import '../main.dart';
 
 class MoreScreen extends ConsumerWidget {
   const MoreScreen({super.key});
@@ -374,13 +373,6 @@ class MoreScreen extends ConsumerWidget {
               title: 'CÀI ĐẶT',
               isDark: isDark,
               items: [
-                _ListItem(
-                  icon: CupertinoIcons.moon_fill,
-                  gradientColors: const [Color(0xFF5C6BC0), Color(0xFF3949AB)],
-                  title: 'Giao diện',
-                  subtitle: 'Chế độ sáng / tối',
-                  trailing: _ThemeModeSelector(),
-                ),
                 _ListItem(
                   icon: CupertinoIcons.share_up,
                   gradientColors: const [
@@ -834,35 +826,6 @@ class _BrandStat extends StatelessWidget {
           ),
         ),
       ],
-    );
-  }
-}
-
-class _ThemeModeSelector extends ConsumerWidget {
-  @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    final mode = ref.watch(themeModeProvider);
-    return CupertinoSlidingSegmentedControl<ThemeMode>(
-      groupValue: mode,
-      children: const {
-        ThemeMode.system: Padding(
-          padding: EdgeInsets.symmetric(horizontal: 4),
-          child: Text('Tự động', style: TextStyle(fontSize: 12)),
-        ),
-        ThemeMode.light: Padding(
-          padding: EdgeInsets.symmetric(horizontal: 4),
-          child: Text('Sáng', style: TextStyle(fontSize: 12)),
-        ),
-        ThemeMode.dark: Padding(
-          padding: EdgeInsets.symmetric(horizontal: 4),
-          child: Text('Tối', style: TextStyle(fontSize: 12)),
-        ),
-      },
-      onValueChanged: (value) {
-        if (value != null) {
-          ref.read(themeModeProvider.notifier).setMode(value);
-        }
-      },
     );
   }
 }
