@@ -402,14 +402,28 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                           onSeeAll: () => context.go('/news'),
                         ),
                       ),
-                      SliverPadding(
-                        padding: const EdgeInsets.symmetric(horizontal: 16),
-                        sliver: SliverList.builder(
-                          itemCount: newsItems.length > 3
-                              ? 3
-                              : newsItems.length,
-                          itemBuilder: (context, index) =>
-                              _NewsCard(item: newsItems[index]),
+                      SliverToBoxAdapter(
+                        child: SizedBox(
+                          height: 220,
+                          child: ListView.builder(
+                            scrollDirection: Axis.horizontal,
+                            physics: const BouncingScrollPhysics(),
+                            padding: const EdgeInsets.symmetric(horizontal: 12),
+                            itemCount: newsItems.length > 5
+                                ? 5
+                                : newsItems.length,
+                            itemBuilder: (context, index) {
+                              return SizedBox(
+                                width: MediaQuery.of(context).size.width * 0.7,
+                                child: Padding(
+                                  padding: const EdgeInsets.symmetric(
+                                    horizontal: 6,
+                                  ),
+                                  child: _NewsCard(item: newsItems[index]),
+                                ),
+                              );
+                            },
+                          ),
                         ),
                       ),
                     ],
@@ -554,19 +568,50 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
 
   Widget _buildCategoryGrid() {
     final isDark = CupertinoTheme.brightnessOf(context) == Brightness.dark;
-    const darkGreen = Color(0xFF114402);
     final categories = [
-      {'icon': CupertinoIcons.flame, 'label': 'Ấm Tử Sa'},
-      {'icon': CupertinoIcons.leaf_arrow_circlepath, 'label': 'Trà'},
-      {'icon': CupertinoIcons.tray_2, 'label': 'Phụ Kiện'},
-      {'icon': CupertinoIcons.gift, 'label': 'Quà Tặng'},
+      {
+        'icon': CupertinoIcons.flame,
+        'label': 'Ấm Tử Sa',
+        'gradient': [const Color(0xFFD4A574), const Color(0xFFB8860B)],
+      },
+      {
+        'icon': CupertinoIcons.leaf_arrow_circlepath,
+        'label': 'Trà',
+        'gradient': [const Color(0xFF4CAF50), const Color(0xFF2E7D32)],
+      },
+      {
+        'icon': CupertinoIcons.tray_2,
+        'label': 'Phụ Kiện',
+        'gradient': [const Color(0xFF8D6E63), const Color(0xFF5D4037)],
+      },
+      {
+        'icon': CupertinoIcons.gift,
+        'label': 'Quà Tặng',
+        'gradient': [const Color(0xFFE57373), const Color(0xFFC62828)],
+      },
+      {
+        'icon': CupertinoIcons.sparkles,
+        'label': 'Yến Sào',
+        'gradient': [const Color(0xFFFFD54F), const Color(0xFFF9A825)],
+      },
+      {
+        'icon': CupertinoIcons.star_circle,
+        'label': 'VIP',
+        'gradient': [const Color(0xFFCE93D8), const Color(0xFF7B1FA2)],
+      },
     ];
 
-    return Padding(
-      padding: const EdgeInsets.fromLTRB(16, 16, 16, 8),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceAround,
-        children: categories.map((cat) {
+    return SizedBox(
+      height: 100,
+      child: ListView.separated(
+        scrollDirection: Axis.horizontal,
+        physics: const BouncingScrollPhysics(),
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+        itemCount: categories.length,
+        separatorBuilder: (_, __) => const SizedBox(width: 16),
+        itemBuilder: (context, index) {
+          final cat = categories[index];
+          final gradient = cat['gradient'] as List<Color>;
           return GestureDetector(
             onTap: () {
               HapticFeedback.selectionClick();
@@ -575,31 +620,41 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
             child: Column(
               children: [
                 Container(
-                  width: 60,
-                  height: 60,
+                  width: 56,
+                  height: 56,
                   decoration: BoxDecoration(
                     shape: BoxShape.circle,
-                    color: isDark
-                        ? darkGreen.withValues(alpha: 0.25)
-                        : const Color(0xFFE8F5E9),
-                    border: Border.all(
-                      color: darkGreen.withValues(alpha: isDark ? 0.4 : 0.3),
-                      width: 1.5,
+                    gradient: LinearGradient(
+                      begin: Alignment.topLeft,
+                      end: Alignment.bottomRight,
+                      colors: isDark
+                          ? [
+                              gradient[0].withValues(alpha: 0.4),
+                              gradient[1].withValues(alpha: 0.4),
+                            ]
+                          : gradient,
                     ),
+                    boxShadow: [
+                      BoxShadow(
+                        color: gradient[0].withValues(alpha: 0.3),
+                        blurRadius: 8,
+                        offset: const Offset(0, 3),
+                      ),
+                    ],
                   ),
                   child: Center(
                     child: Icon(
                       cat['icon'] as IconData,
                       size: 24,
-                      color: AppTheme.accentGold,
+                      color: CupertinoColors.white,
                     ),
                   ),
                 ),
-                const SizedBox(height: 8),
+                const SizedBox(height: 6),
                 Text(
                   cat['label'] as String,
                   style: TextStyle(
-                    fontSize: 12,
+                    fontSize: 11,
                     fontWeight: FontWeight.w600,
                     color: isDark
                         ? AppTheme.darkTextPrimary
@@ -609,7 +664,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
               ],
             ),
           );
-        }).toList(),
+        },
       ),
     );
   }
@@ -1049,107 +1104,121 @@ class _NewsCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final isDark = CupertinoTheme.brightnessOf(context) == Brightness.dark;
-    return Container(
-      margin: const EdgeInsets.only(bottom: 12),
-      decoration: BoxDecoration(
-        color: isDark ? AppTheme.darkElevated : AppTheme.surfaceWhite,
-        borderRadius: BorderRadius.circular(14),
-        border: Border.all(
-          color: isDark
-              ? AppTheme.darkSeparator.withValues(alpha: 0.2)
-              : AppTheme.separator.withValues(alpha: 0.4),
+    return GestureDetector(
+      onTap: () {
+        HapticFeedback.selectionClick();
+        context.push('/news/${item.id}');
+      },
+      child: Container(
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(16),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withValues(alpha: isDark ? 0.3 : 0.1),
+              blurRadius: 12,
+              offset: const Offset(0, 4),
+            ),
+          ],
         ),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withValues(alpha: isDark ? 0.15 : 0.05),
-            blurRadius: 8,
-            offset: const Offset(0, 2),
-          ),
-        ],
-      ),
-      child: CupertinoButton(
-        padding: EdgeInsets.zero,
-        onPressed: () {
-          HapticFeedback.selectionClick();
-          context.push('/news/${item.id}');
-        },
         child: ClipRRect(
-          borderRadius: BorderRadius.circular(14),
-          child: Row(
+          borderRadius: BorderRadius.circular(16),
+          child: Stack(
+            fit: StackFit.expand,
             children: [
-              ClipRRect(
-                borderRadius: const BorderRadius.horizontal(
-                  left: Radius.circular(14),
-                ),
-                child: CachedNetworkImage(
-                  imageUrl: ApiService.getImageUrl(item.photo, 'news'),
-                  width: 100,
-                  height: 85,
-                  fit: BoxFit.cover,
-                  errorWidget: (_, _a, _b) => Container(
-                    width: 100,
-                    height: 85,
-                    color: isDark ? AppTheme.darkSurface : AppTheme.groupedBg,
-                    child: const Icon(
+              // ── Full-bleed image ──
+              CachedNetworkImage(
+                imageUrl: ApiService.getImageUrl(item.photo, 'news'),
+                fit: BoxFit.cover,
+                errorWidget: (_, __, ___) => Container(
+                  color: isDark ? AppTheme.darkSurface : AppTheme.groupedBg,
+                  child: const Center(
+                    child: Icon(
                       CupertinoIcons.news,
                       color: AppTheme.accentGold,
-                      size: 24,
+                      size: 32,
                     ),
                   ),
                 ),
               ),
-              Expanded(
-                child: Padding(
-                  padding: const EdgeInsets.all(12),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        item.namevi ?? '',
-                        maxLines: 2,
-                        overflow: TextOverflow.ellipsis,
-                        style: TextStyle(
-                          fontWeight: FontWeight.w600,
-                          fontSize: 14,
-                          color: isDark
-                              ? AppTheme.darkTextPrimary
-                              : AppTheme.textPrimary,
-                        ),
-                      ),
-                      const SizedBox(height: 6),
-                      Row(
-                        children: [
-                          Icon(
-                            CupertinoIcons.eye,
-                            size: 12,
-                            color: isDark
-                                ? AppTheme.darkTextSecondary
-                                : AppTheme.textMuted,
-                          ),
-                          const SizedBox(width: 3),
-                          Text(
-                            '${item.view ?? 0}',
-                            style: TextStyle(
-                              fontSize: 11,
-                              color: isDark
-                                  ? AppTheme.darkTextSecondary
-                                  : AppTheme.textMuted,
-                            ),
-                          ),
-                        ],
-                      ),
+              // ── Gradient overlay ──
+              Container(
+                decoration: BoxDecoration(
+                  gradient: LinearGradient(
+                    begin: Alignment.topCenter,
+                    end: Alignment.bottomCenter,
+                    colors: [
+                      Colors.transparent,
+                      Colors.black.withValues(alpha: 0.8),
                     ],
+                    stops: const [0.3, 1.0],
                   ),
                 ),
               ),
-              Padding(
-                padding: const EdgeInsets.only(right: 12),
-                child: Icon(
-                  CupertinoIcons.chevron_right,
-                  size: 16,
-                  color: isDark
-                      ? AppTheme.darkTextSecondary
-                      : AppTheme.textMuted,
+              // ── Text overlay at bottom ──
+              Positioned(
+                left: 12,
+                right: 12,
+                bottom: 12,
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      item.namevi ?? '',
+                      maxLines: 2,
+                      overflow: TextOverflow.ellipsis,
+                      style: const TextStyle(
+                        fontWeight: FontWeight.bold,
+                        fontSize: 14,
+                        color: CupertinoColors.white,
+                        height: 1.3,
+                        shadows: [Shadow(blurRadius: 4, color: Colors.black54)],
+                      ),
+                    ),
+                    const SizedBox(height: 6),
+                    Row(
+                      children: [
+                        Icon(
+                          CupertinoIcons.eye,
+                          size: 12,
+                          color: CupertinoColors.white.withValues(alpha: 0.7),
+                        ),
+                        const SizedBox(width: 4),
+                        Text(
+                          '${item.view ?? 0} lượt xem',
+                          style: TextStyle(
+                            fontSize: 11,
+                            color: CupertinoColors.white.withValues(alpha: 0.7),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
+              ),
+              // ── Circular category badge ──
+              Positioned(
+                top: 10,
+                right: 10,
+                child: Container(
+                  width: 36,
+                  height: 36,
+                  decoration: BoxDecoration(
+                    shape: BoxShape.circle,
+                    color: AppTheme.accentGold.withValues(alpha: 0.9),
+                    boxShadow: [
+                      BoxShadow(
+                        color: AppTheme.accentGold.withValues(alpha: 0.3),
+                        blurRadius: 8,
+                      ),
+                    ],
+                  ),
+                  child: const Center(
+                    child: Icon(
+                      CupertinoIcons.doc_text,
+                      size: 16,
+                      color: CupertinoColors.white,
+                    ),
+                  ),
                 ),
               ),
             ],
