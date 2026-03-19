@@ -1,3 +1,4 @@
+import 'dart:ui';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -198,6 +199,12 @@ class MoreScreen extends ConsumerWidget {
               title: 'TÀI KHOẢN',
               isDark: isDark,
               items: [
+                _GridItem(
+                  icon: CupertinoIcons.person_crop_circle_badge_checkmark,
+                  gradientColors: const [Color(0xFF114402), Color(0xFF1A6B0A)],
+                  title: 'Đăng nhập',
+                  onTap: () => context.push('/auth'),
+                ),
                 _GridItem(
                   icon: CupertinoIcons.heart_fill,
                   gradientColors: const [Color(0xFFE91E63), Color(0xFFC2185B)],
@@ -515,72 +522,78 @@ class _GridCardState extends State<_GridCard>
       onTapCancel: () => _scaleController.reverse(),
       child: ScaleTransition(
         scale: _scale,
-        child: Container(
-          decoration: BoxDecoration(
-            color: widget.isDark
-                ? AppTheme.darkElevated
-                : AppTheme.surfaceWhite,
-            borderRadius: BorderRadius.circular(16),
-            border: Border.all(
-              color: widget.gradientColors.first.withValues(
-                alpha: widget.isDark ? 0.15 : 0.1,
-              ),
-              width: 1,
-            ),
-            boxShadow: [
-              BoxShadow(
-                color: Colors.black.withValues(
-                  alpha: widget.isDark ? 0.15 : 0.04,
-                ),
-                blurRadius: 10,
-                offset: const Offset(0, 3),
-              ),
-            ],
-          ),
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              // Icon with gradient background
-              Container(
-                width: 44,
-                height: 44,
-                decoration: BoxDecoration(
-                  gradient: LinearGradient(
-                    begin: Alignment.topLeft,
-                    end: Alignment.bottomRight,
-                    colors: widget.gradientColors,
-                  ),
-                  borderRadius: BorderRadius.circular(12),
-                  boxShadow: [
-                    BoxShadow(
-                      color: widget.gradientColors.first.withValues(alpha: 0.3),
-                      blurRadius: 8,
-                      offset: const Offset(0, 3),
-                    ),
-                  ],
-                ),
-                child: Icon(
-                  widget.icon,
-                  size: 22,
-                  color: CupertinoColors.white,
-                ),
-              ),
-              const SizedBox(height: 10),
-              // Title
-              Text(
-                widget.title,
-                style: TextStyle(
-                  fontSize: 13,
-                  fontWeight: FontWeight.w600,
+        child: ClipRRect(
+          borderRadius: BorderRadius.circular(16),
+          child: BackdropFilter(
+            filter: ImageFilter.blur(sigmaX: 15, sigmaY: 15),
+            child: Container(
+              decoration: BoxDecoration(
+                color: widget.isDark
+                    ? Colors.white.withValues(alpha: 0.06)
+                    : Colors.white.withValues(alpha: 0.55),
+                borderRadius: BorderRadius.circular(16),
+                border: Border.all(
                   color: widget.isDark
-                      ? AppTheme.darkTextPrimary
-                      : AppTheme.textPrimary,
+                      ? Colors.white.withValues(alpha: 0.1)
+                      : Colors.white.withValues(alpha: 0.7),
+                  width: 0.5,
                 ),
-                textAlign: TextAlign.center,
-                maxLines: 1,
-                overflow: TextOverflow.ellipsis,
+                boxShadow: [
+                  BoxShadow(
+                    color: widget.gradientColors.first.withValues(alpha: 0.1),
+                    blurRadius: 12,
+                    offset: const Offset(0, 4),
+                  ),
+                ],
               ),
-            ],
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  // Icon with gradient background
+                  Container(
+                    width: 44,
+                    height: 44,
+                    decoration: BoxDecoration(
+                      gradient: LinearGradient(
+                        begin: Alignment.topLeft,
+                        end: Alignment.bottomRight,
+                        colors: widget.gradientColors,
+                      ),
+                      borderRadius: BorderRadius.circular(12),
+                      boxShadow: [
+                        BoxShadow(
+                          color: widget.gradientColors.first.withValues(
+                            alpha: 0.35,
+                          ),
+                          blurRadius: 10,
+                          offset: const Offset(0, 3),
+                        ),
+                      ],
+                    ),
+                    child: Icon(
+                      widget.icon,
+                      size: 22,
+                      color: CupertinoColors.white,
+                    ),
+                  ),
+                  const SizedBox(height: 10),
+                  // Title
+                  Text(
+                    widget.title,
+                    style: TextStyle(
+                      fontSize: 13,
+                      fontWeight: FontWeight.w600,
+                      color: widget.isDark
+                          ? AppTheme.darkTextPrimary
+                          : AppTheme.textPrimary,
+                    ),
+                    textAlign: TextAlign.center,
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                ],
+              ),
+            ),
           ),
         ),
       ),

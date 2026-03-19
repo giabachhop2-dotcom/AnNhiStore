@@ -21,6 +21,7 @@ import '../screens/tea_comparison_screen.dart';
 import '../screens/vip_card_screen.dart';
 import '../screens/tea_table_setup_screen.dart';
 import '../screens/events_screen.dart';
+import '../screens/auth_screen.dart';
 
 final _rootNavigatorKey = GlobalKey<NavigatorState>();
 
@@ -66,9 +67,7 @@ final router = GoRouter(
       parentNavigatorKey: _rootNavigatorKey,
       pageBuilder: (context, state) {
         final id = int.parse(state.pathParameters['id']!);
-        return SlideUpTransitionPage(
-          child: ProductDetailScreen(productId: id),
-        );
+        return SlideUpTransitionPage(child: ProductDetailScreen(productId: id));
       },
     ),
     GoRoute(
@@ -76,9 +75,7 @@ final router = GoRouter(
       parentNavigatorKey: _rootNavigatorKey,
       pageBuilder: (context, state) {
         final id = int.parse(state.pathParameters['id']!);
-        return SlideUpTransitionPage(
-          child: NewsDetailScreen(newsId: id),
-        );
+        return SlideUpTransitionPage(child: NewsDetailScreen(newsId: id));
       },
     ),
     GoRoute(
@@ -152,6 +149,12 @@ final router = GoRouter(
       parentNavigatorKey: _rootNavigatorKey,
       pageBuilder: (context, state) =>
           SlideUpTransitionPage(child: const EventsScreen()),
+    ),
+    GoRoute(
+      path: '/auth',
+      parentNavigatorKey: _rootNavigatorKey,
+      pageBuilder: (context, state) =>
+          SlideUpTransitionPage(child: const AuthScreen()),
     ),
   ],
 );
