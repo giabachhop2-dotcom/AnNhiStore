@@ -416,7 +416,7 @@ class _ProductDetailScreenState extends ConsumerState<ProductDetailScreen>
                                 style: TextStyle(
                                   fontSize: 20,
                                   fontWeight: FontWeight.bold,
-                                  color: AppTheme.textPrimary,
+                                  color: AppTheme.accentGold,
                                   letterSpacing: -0.3,
                                 ),
                               ),

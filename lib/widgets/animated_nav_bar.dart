@@ -141,13 +141,13 @@ class _AnimatedNavBarState extends State<AnimatedNavBar>
                     width: _tabWidth(context),
                     height: 3,
                     decoration: BoxDecoration(
-                      color: const Color(0xFF114402),
+                      color: AppTheme.accentGold,
                       borderRadius: const BorderRadius.vertical(
                         bottom: Radius.circular(2),
                       ),
                       boxShadow: [
                         BoxShadow(
-                          color: const Color(0xFF114402).withValues(alpha: 0.4),
+                          color: AppTheme.accentGold.withValues(alpha: 0.4),
                           blurRadius: 8,
                           spreadRadius: 1,
                         ),
@@ -253,7 +253,7 @@ class _TabItemState extends State<_TabItem>
 
   @override
   Widget build(BuildContext context) {
-    final activeColor = const Color(0xFF114402);
+    final activeColor = AppTheme.accentGold;
     final color = widget.isActive ? activeColor : AppTheme.textMuted;
 
     Widget iconWidget = ScaleTransition(

@@ -182,7 +182,7 @@ class _EmptyStateState extends State<EmptyState> with TickerProviderStateMixin {
                   style: const TextStyle(
                     fontSize: 20,
                     fontWeight: FontWeight.bold,
-                    color: AppTheme.textPrimary,
+                    color: AppTheme.accentGold,
                     letterSpacing: -0.3,
                   ),
                   textAlign: TextAlign.center,
