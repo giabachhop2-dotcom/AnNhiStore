@@ -22,7 +22,9 @@ void main() {
 }
 
 // ── Theme mode provider ──
-final themeModeProvider = StateNotifierProvider<ThemeModeNotifier, ThemeMode>((ref) {
+final themeModeProvider = StateNotifierProvider<ThemeModeNotifier, ThemeMode>((
+  ref,
+) {
   return ThemeModeNotifier();
 });
 
@@ -105,6 +107,16 @@ class _AnNhiTraAppState extends ConsumerState<AnNhiTraApp> {
         theme: AppTheme.materialTheme,
         darkTheme: AppTheme.darkMaterialTheme,
         themeMode: themeMode,
+        builder: (context, child) {
+          return DefaultTextStyle(
+            style: const TextStyle(
+              fontFamily: 'UTMKhuccamta',
+              color: Color(0xFFF5F0E8),
+              decoration: TextDecoration.none,
+            ),
+            child: child!,
+          );
+        },
         home: OnboardingScreen(
           onComplete: () {
             setState(() => _showOnboarding = false);

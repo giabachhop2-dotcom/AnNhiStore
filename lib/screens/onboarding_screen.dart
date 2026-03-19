@@ -21,19 +21,22 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
     _OnboardingPage(
       logo: 'assets/images/annshan.png',
       title: 'ANNSHAN',
-      subtitle: 'Trà Shan Tuyết Cổ Thụ\nCác dòng trà cao cấp chính gốc\nHương vị tinh tuý từ núi rừng Việt Nam',
+      subtitle:
+          'Trà Shan Tuyết Cổ Thụ\nCác dòng trà cao cấp chính gốc\nHương vị tinh tuý từ núi rừng Việt Nam',
       gradient: [Color(0xFF142E1F), Color(0xFF1A3C28)],
     ),
     _OnboardingPage(
       logo: 'assets/images/annhi.png',
       title: 'AN NHI',
-      subtitle: 'Ấm Tử Sa & Gốm nghệ thuật\nNghệ nhân hàng đầu Nghi Hưng\nTrà cụ · Bàn trà · Phụ kiện cao cấp',
+      subtitle:
+          'Ấm Tử Sa & Gốm nghệ thuật\nNghệ nhân hàng đầu Nghi Hưng\nTrà cụ · Bàn trà · Phụ kiện cao cấp',
       gradient: [Color(0xFF2C1810), Color(0xFF4A2C1A)],
     ),
     _OnboardingPage(
       logo: 'assets/images/antinhyen.png',
       title: 'AN TINH YẾN',
-      subtitle: 'Yến sào thiên nhiên cao cấp\nTổ yến nguyên chất · Nước yến\nSản phẩm sức khoẻ & làm đẹp',
+      subtitle:
+          'Yến sào thiên nhiên cao cấp\nTổ yến nguyên chất · Nước yến\nSản phẩm sức khoẻ & làm đẹp',
       gradient: [Color(0xFF3A1428), Color(0xFF5C1E3E)],
     ),
   ];
@@ -91,12 +94,14 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
               top: MediaQuery.of(context).padding.top + 8,
               right: 16,
               child: CupertinoButton(
-                child: Text('Bỏ qua',
-                    style: TextStyle(
-                      color: AppTheme.accentGold.withValues(alpha: 0.8),
-                      fontSize: 14,
-                      fontFamily: 'UTMKhuccamta',
-                    )),
+                child: Text(
+                  'Bỏ qua',
+                  style: TextStyle(
+                    color: AppTheme.accentGold.withValues(alpha: 0.8),
+                    fontSize: 14,
+                    fontFamily: 'UTMKhuccamta',
+                  ),
+                ),
                 onPressed: _complete,
               ),
             ),
@@ -137,7 +142,9 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                       borderRadius: BorderRadius.circular(14),
                       onPressed: _next,
                       child: Text(
-                        _currentPage == _pages.length - 1 ? 'Bắt đầu mua sắm' : 'Tiếp tục',
+                        _currentPage == _pages.length - 1
+                            ? 'Bắt đầu mua sắm'
+                            : 'Tiếp tục',
                         style: const TextStyle(
                           color: Color(0xFFF5F0E8),
                           fontWeight: FontWeight.bold,
@@ -179,7 +186,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                   width: 180,
                   height: 160,
                   decoration: BoxDecoration(
-                    color: const Color(0xFFF5F0E8),
+                    color: const Color(0xFF114402),
                     borderRadius: BorderRadius.circular(28),
                     border: Border.all(
                       color: AppTheme.accentGold.withValues(alpha: 0.5),
@@ -232,12 +239,23 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    Container(width: 30, height: 1, color: AppTheme.accentGold.withValues(alpha: 0.5)),
+                    Container(
+                      width: 30,
+                      height: 1,
+                      color: AppTheme.accentGold.withValues(alpha: 0.5),
+                    ),
                     const SizedBox(width: 8),
-                    Icon(CupertinoIcons.leaf_arrow_circlepath,
-                        size: 14, color: AppTheme.accentGold.withValues(alpha: 0.6)),
+                    Icon(
+                      CupertinoIcons.leaf_arrow_circlepath,
+                      size: 14,
+                      color: AppTheme.accentGold.withValues(alpha: 0.6),
+                    ),
                     const SizedBox(width: 8),
-                    Container(width: 30, height: 1, color: AppTheme.accentGold.withValues(alpha: 0.5)),
+                    Container(
+                      width: 30,
+                      height: 1,
+                      color: AppTheme.accentGold.withValues(alpha: 0.5),
+                    ),
                   ],
                 ),
               ),
