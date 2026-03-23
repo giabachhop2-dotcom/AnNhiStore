@@ -5,21 +5,23 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:go_router/go_router.dart';
 import 'package:http/http.dart' as http;
-import 'package:shared_preferences/shared_preferences.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../config/api_config.dart';
 import '../config/theme.dart';
+import '../providers/auth_provider.dart';
 
 /// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 /// AUTH SCREEN — Premium Login / Register
 /// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-class AuthScreen extends StatefulWidget {
+class AuthScreen extends ConsumerStatefulWidget {
   const AuthScreen({super.key});
 
   @override
-  State<AuthScreen> createState() => _AuthScreenState();
+  ConsumerState<AuthScreen> createState() => _AuthScreenState();
 }
 
-class _AuthScreenState extends State<AuthScreen> with TickerProviderStateMixin {
+class _AuthScreenState extends ConsumerState<AuthScreen>
+    with TickerProviderStateMixin {
   bool _isLogin = true; // toggle between login / register
   bool _isLoading = false;
   bool _obscurePassword = true;
@@ -103,21 +105,28 @@ class _AuthScreenState extends State<AuthScreen> with TickerProviderStateMixin {
       if (response.statusCode == 200 && resBody['success'] == true) {
         // Backend wraps in { success, data: { token, user }, message }
         final payload = resBody['data'] ?? {};
-        final prefs = await SharedPreferences.getInstance();
-        if (payload['token'] != null) {
-          await prefs.setString('auth_token', payload['token']);
+        final token = payload['token'] as String?;
+        final user = payload['user'] as Map<String, dynamic>? ?? {};
+
+        // Use AuthNotifier to persist state
+        if (token != null) {
+          await ref.read(authProvider.notifier).login(token: token, user: user);
         }
-        if (payload['user'] != null) {
-          await prefs.setString('auth_user', jsonEncode(payload['user']));
-        }
-        await prefs.setBool('is_logged_in', true);
 
         if (mounted) {
           _showSuccess(
             _isLogin ? 'Đăng nhập thành công!' : 'Đăng ký thành công!',
           );
           await Future.delayed(const Duration(milliseconds: 800));
-          if (mounted) context.pop();
+          if (mounted) {
+            // Role-based redirect
+            final role = user['user_role'] as String?;
+            if (role == 'sale' || role == 'admin') {
+              context.go('/sales-dashboard');
+            } else {
+              context.pop();
+            }
+          }
         }
       } else {
         _showError(resBody['message'] ?? 'Có lỗi xảy ra, vui lòng thử lại');

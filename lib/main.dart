@@ -2,10 +2,12 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutter_localizations/flutter_localizations.dart';
 
 import 'config/theme.dart';
 import 'config/router.dart';
 import 'screens/splash_screen.dart';
+import 'l10n/app_localizations.dart';
 
 void main() {
   WidgetsFlutterBinding.ensureInitialized();
@@ -44,12 +46,22 @@ class _AnNhiTraAppState extends ConsumerState<AnNhiTraApp> {
       );
     }
 
+    final locale = ref.watch(localeProvider);
+
     return MaterialApp.router(
       title: 'An Nhi Trà',
       debugShowCheckedModeBanner: false,
       theme: AppTheme.darkMaterialTheme,
       darkTheme: AppTheme.darkMaterialTheme,
       themeMode: ThemeMode.dark,
+      locale: locale,
+      supportedLocales: const [Locale('vi'), Locale('en')],
+      localizationsDelegates: const [
+        AppLocalizations.delegate,
+        GlobalMaterialLocalizations.delegate,
+        GlobalWidgetsLocalizations.delegate,
+        GlobalCupertinoLocalizations.delegate,
+      ],
       routerConfig: router,
       builder: (context, child) {
         return CupertinoTheme(

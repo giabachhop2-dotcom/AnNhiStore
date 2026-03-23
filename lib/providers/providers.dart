@@ -3,24 +3,25 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../models/models.dart';
 import '../services/api_service.dart';
+export 'auth_provider.dart';
 
 // ── API Service singleton ──
 final apiServiceProvider = Provider<ApiService>((ref) => ApiService());
 
 // ── Products ──
-final productsProvider = FutureProvider.family<
-    ({List<Product> items, int total, int totalPages}),
-    ({int page, int? listId, int? catId, String? search})>(
-  (ref, params) {
-    final api = ref.read(apiServiceProvider);
-    return api.getProducts(
-      page: params.page,
-      listId: params.listId,
-      catId: params.catId,
-      search: params.search,
-    );
-  },
-);
+final productsProvider =
+    FutureProvider.family<
+      ({List<Product> items, int total, int totalPages}),
+      ({int page, int? listId, int? catId, String? search})
+    >((ref, params) {
+      final api = ref.read(apiServiceProvider);
+      return api.getProducts(
+        page: params.page,
+        listId: params.listId,
+        catId: params.catId,
+        search: params.search,
+      );
+    });
 
 final productDetailProvider = FutureProvider.family<Product, int>((ref, id) {
   return ref.read(apiServiceProvider).getProductById(id);
@@ -31,21 +32,24 @@ final productCategoriesProvider = FutureProvider<Map<String, dynamic>>((ref) {
 });
 
 // ── News ──
-final newsProvider = FutureProvider.family<
-    ({List<NewsArticle> items, int total}),
-    ({int page, String? type})>(
-  (ref, params) {
-    final api = ref.read(apiServiceProvider);
-    return api.getNews(page: params.page, type: params.type);
-  },
-);
+final newsProvider =
+    FutureProvider.family<
+      ({List<NewsArticle> items, int total}),
+      ({int page, String? type})
+    >((ref, params) {
+      final api = ref.read(apiServiceProvider);
+      return api.getNews(page: params.page, type: params.type);
+    });
 
 final newsDetailProvider = FutureProvider.family<NewsArticle, int>((ref, id) {
   return ref.read(apiServiceProvider).getNewsById(id);
 });
 
 // ── Photos by type ──
-final photosProvider = FutureProvider.family<List<PhotoItem>, String?>((ref, type) {
+final photosProvider = FutureProvider.family<List<PhotoItem>, String?>((
+  ref,
+  type,
+) {
   return ref.read(apiServiceProvider).getPhotos(type: type);
 });
 
@@ -64,11 +68,9 @@ class CartNotifier extends StateNotifier<List<CartItem>> {
     _loadFromStorage();
   }
 
-  double get totalPrice =>
-      state.fold(0.0, (sum, item) => sum + item.lineTotal);
+  double get totalPrice => state.fold(0.0, (sum, item) => sum + item.lineTotal);
 
-  int get totalItems =>
-      state.fold(0, (sum, item) => sum + item.quantity);
+  int get totalItems => state.fold(0, (sum, item) => sum + item.quantity);
 
   void addItem(Product product, {int quantity = 1}) {
     final index = state.indexWhere((e) => e.product.id == product.id);
@@ -148,7 +150,9 @@ class CartNotifier extends StateNotifier<List<CartItem>> {
 }
 
 // ── Favorites ──
-final favoritesProvider = StateNotifierProvider<FavoritesNotifier, Set<int>>((ref) {
+final favoritesProvider = StateNotifierProvider<FavoritesNotifier, Set<int>>((
+  ref,
+) {
   return FavoritesNotifier();
 });
 
@@ -170,7 +174,10 @@ class FavoritesNotifier extends StateNotifier<Set<int>> {
 
   Future<void> _save() async {
     final prefs = await SharedPreferences.getInstance();
-    await prefs.setStringList('favorites', state.map((e) => e.toString()).toList());
+    await prefs.setStringList(
+      'favorites',
+      state.map((e) => e.toString()).toList(),
+    );
   }
 
   Future<void> _load() async {

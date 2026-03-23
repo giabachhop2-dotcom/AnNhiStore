@@ -8,6 +8,7 @@ import 'package:url_launcher/url_launcher.dart';
 import 'package:share_plus/share_plus.dart';
 import '../providers/providers.dart';
 import '../config/theme.dart';
+import '../l10n/app_localizations.dart';
 
 class MoreScreen extends ConsumerWidget {
   const MoreScreen({super.key});
@@ -373,6 +374,22 @@ class MoreScreen extends ConsumerWidget {
               title: 'CÀI ĐẶT',
               isDark: isDark,
               items: [
+                _ListItem(
+                  icon: CupertinoIcons.globe,
+                  gradientColors: const [Color(0xFF1565C0), Color(0xFF42A5F5)],
+                  title: 'Ngôn ngữ / Language',
+                  subtitle: ref.watch(localeProvider).languageCode == 'vi'
+                      ? '🇻🇳 Tiếng Việt'
+                      : '🇬🇧 English',
+                  trailing: CupertinoSwitch(
+                    value: ref.watch(localeProvider).languageCode == 'en',
+                    activeTrackColor: const Color(0xFF1565C0),
+                    onChanged: (_) {
+                      HapticFeedback.selectionClick();
+                      ref.read(localeProvider.notifier).toggleLocale();
+                    },
+                  ),
+                ),
                 _ListItem(
                   icon: CupertinoIcons.share_up,
                   gradientColors: const [

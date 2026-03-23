@@ -22,6 +22,7 @@ import '../screens/vip_card_screen.dart';
 import '../screens/tea_table_setup_screen.dart';
 import '../screens/events_screen.dart';
 import '../screens/auth_screen.dart';
+import '../screens/sales_dashboard_screen.dart';
 
 final _rootNavigatorKey = GlobalKey<NavigatorState>();
 
@@ -155,6 +156,12 @@ final router = GoRouter(
       parentNavigatorKey: _rootNavigatorKey,
       pageBuilder: (context, state) =>
           SlideUpTransitionPage(child: const AuthScreen()),
+    ),
+    GoRoute(
+      path: '/sales-dashboard',
+      parentNavigatorKey: _rootNavigatorKey,
+      pageBuilder: (context, state) =>
+          SlideUpTransitionPage(child: const SalesDashboardScreen()),
     ),
   ],
 );
