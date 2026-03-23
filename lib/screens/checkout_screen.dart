@@ -26,12 +26,14 @@ class _CheckoutScreenState extends ConsumerState<CheckoutScreen> {
   final _emailCtrl = TextEditingController();
   final _addressCtrl = TextEditingController();
   final _noteCtrl = TextEditingController();
+  final _salespersonCtrl = TextEditingController();
 
   int paymentMethod = 0;
   bool isSubmitting = false;
   bool orderSuccess = false;
   String? orderCode;
   double? orderTotal;
+  String? _salespersonName;
 
   @override
   void dispose() {
@@ -40,19 +42,28 @@ class _CheckoutScreenState extends ConsumerState<CheckoutScreen> {
     _emailCtrl.dispose();
     _addressCtrl.dispose();
     _noteCtrl.dispose();
+    _salespersonCtrl.dispose();
     super.dispose();
   }
 
   Future<void> _submit() async {
-    if (_nameCtrl.text.trim().isEmpty || _phoneCtrl.text.trim().isEmpty || _addressCtrl.text.trim().isEmpty) {
-      _showAlert('Thiếu thông tin', 'Vui lòng nhập đầy đủ họ tên, SĐT và địa chỉ.');
+    if (_nameCtrl.text.trim().isEmpty ||
+        _phoneCtrl.text.trim().isEmpty ||
+        _addressCtrl.text.trim().isEmpty) {
+      _showAlert(
+        'Thiếu thông tin',
+        'Vui lòng nhập đầy đủ họ tên, SĐT và địa chỉ.',
+      );
       return;
     }
 
     // Vietnamese phone validation
     final phone = _phoneCtrl.text.trim();
     if (!RegExp(r'^0[0-9]{9}$').hasMatch(phone)) {
-      _showAlert('Số điện thoại không hợp lệ', 'Vui lòng nhập SĐT 10 số bắt đầu bằng 0.');
+      _showAlert(
+        'Số điện thoại không hợp lệ',
+        'Vui lòng nhập SĐT 10 số bắt đầu bằng 0.',
+      );
       return;
     }
 
@@ -71,18 +82,25 @@ class _CheckoutScreenState extends ConsumerState<CheckoutScreen> {
         email: _emailCtrl.text.trim(),
         address: _addressCtrl.text.trim(),
         requirements: _noteCtrl.text.trim(),
+        salespersonCode: _salespersonCtrl.text.trim().isNotEmpty
+            ? _salespersonCtrl.text.trim()
+            : null,
         tempPrice: total,
         totalPrice: total,
         orderPayment: paymentMethod,
-        items: cart.map((item) => OrderItem(
-          idProduct: item.product.id,
-          name: item.product.namevi ?? '',
-          photo: item.product.photo,
-          code: item.product.code,
-          regularPrice: item.product.regularPrice ?? 0,
-          salePrice: item.product.salePrice ?? 0,
-          quantity: item.quantity,
-        )).toList(),
+        items: cart
+            .map(
+              (item) => OrderItem(
+                idProduct: item.product.id,
+                name: item.product.namevi ?? '',
+                photo: item.product.photo,
+                code: item.product.code,
+                regularPrice: item.product.regularPrice ?? 0,
+                salePrice: item.product.salePrice ?? 0,
+                quantity: item.quantity,
+              ),
+            )
+            .toList(),
       );
 
       final result = await api.createOrder(order);
@@ -108,7 +126,10 @@ class _CheckoutScreenState extends ConsumerState<CheckoutScreen> {
     } catch (e) {
       if (mounted) {
         setState(() => isSubmitting = false);
-        _showAlert('Lỗi đặt hàng', 'Không thể kết nối máy chủ. Vui lòng kiểm tra kết nối mạng và thử lại.');
+        _showAlert(
+          'Lỗi đặt hàng',
+          'Không thể kết nối máy chủ. Vui lòng kiểm tra kết nối mạng và thử lại.',
+        );
       }
     }
   }
@@ -119,7 +140,14 @@ class _CheckoutScreenState extends ConsumerState<CheckoutScreen> {
     final cartNotifier = ref.read(cartProvider.notifier);
     final formatter = NumberFormat.currency(locale: 'vi_VN', symbol: '₫');
 
-    if (orderSuccess) return PopScope(canPop: false, child: TeaLeafCelebration(showCelebration: true, child: _buildSuccess(formatter)));
+    if (orderSuccess)
+      return PopScope(
+        canPop: false,
+        child: TeaLeafCelebration(
+          showCelebration: true,
+          child: _buildSuccess(formatter),
+        ),
+      );
 
     return CupertinoPageScaffold(
       navigationBar: const CupertinoNavigationBar(middle: Text('Thanh Toán')),
@@ -130,26 +158,48 @@ class _CheckoutScreenState extends ConsumerState<CheckoutScreen> {
           children: [
             // Order summary (iOS grouped style)
             _buildSection('Đơn hàng', [
-              ...cart.map((item) => Padding(
-                padding: const EdgeInsets.symmetric(vertical: 6),
-                child: Row(
-                  children: [
-                    Expanded(
-                      child: Text('${item.product.namevi} ×${item.quantity}',
-                          style: const TextStyle(fontSize: 14)),
-                    ),
-                    Text(formatter.format(item.lineTotal),
-                        style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 14)),
-                  ],
+              ...cart.map(
+                (item) => Padding(
+                  padding: const EdgeInsets.symmetric(vertical: 6),
+                  child: Row(
+                    children: [
+                      Expanded(
+                        child: Text(
+                          '${item.product.namevi} ×${item.quantity}',
+                          style: const TextStyle(fontSize: 14),
+                        ),
+                      ),
+                      Text(
+                        formatter.format(item.lineTotal),
+                        style: const TextStyle(
+                          fontWeight: FontWeight.w600,
+                          fontSize: 14,
+                        ),
+                      ),
+                    ],
+                  ),
                 ),
-              )),
+              ),
               const Divider(),
               Row(
                 children: [
-                  const Expanded(child: Text('Tổng cộng:',
-                      style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16))),
-                  Text(formatter.format(cartNotifier.totalPrice),
-                      style: const TextStyle(color: AppTheme.priceRed, fontWeight: FontWeight.bold, fontSize: 18)),
+                  const Expanded(
+                    child: Text(
+                      'Tổng cộng:',
+                      style: TextStyle(
+                        fontWeight: FontWeight.bold,
+                        fontSize: 16,
+                      ),
+                    ),
+                  ),
+                  Text(
+                    formatter.format(cartNotifier.totalPrice),
+                    style: const TextStyle(
+                      color: AppTheme.priceRed,
+                      fontWeight: FontWeight.bold,
+                      fontSize: 18,
+                    ),
+                  ),
                 ],
               ),
             ]),
@@ -158,11 +208,67 @@ class _CheckoutScreenState extends ConsumerState<CheckoutScreen> {
 
             // Customer info (iOS form style)
             _buildSection('Thông tin giao hàng', [
-              _IosTextField(controller: _nameCtrl, placeholder: 'Họ và tên *', icon: CupertinoIcons.person),
-              _IosTextField(controller: _phoneCtrl, placeholder: 'Số điện thoại *', icon: CupertinoIcons.phone, keyboardType: TextInputType.phone),
-              _IosTextField(controller: _emailCtrl, placeholder: 'Email', icon: CupertinoIcons.mail, keyboardType: TextInputType.emailAddress),
-              _IosTextField(controller: _addressCtrl, placeholder: 'Địa chỉ giao hàng *', icon: CupertinoIcons.location),
-              _IosTextField(controller: _noteCtrl, placeholder: 'Ghi chú', icon: CupertinoIcons.text_badge_plus, maxLines: 3),
+              _IosTextField(
+                controller: _nameCtrl,
+                placeholder: 'Họ và tên *',
+                icon: CupertinoIcons.person,
+              ),
+              _IosTextField(
+                controller: _phoneCtrl,
+                placeholder: 'Số điện thoại *',
+                icon: CupertinoIcons.phone,
+                keyboardType: TextInputType.phone,
+              ),
+              _IosTextField(
+                controller: _emailCtrl,
+                placeholder: 'Email',
+                icon: CupertinoIcons.mail,
+                keyboardType: TextInputType.emailAddress,
+              ),
+              _IosTextField(
+                controller: _addressCtrl,
+                placeholder: 'Địa chỉ giao hàng *',
+                icon: CupertinoIcons.location,
+              ),
+              _IosTextField(
+                controller: _noteCtrl,
+                placeholder: 'Ghi chú',
+                icon: CupertinoIcons.text_badge_plus,
+                maxLines: 3,
+              ),
+            ]),
+
+            const SizedBox(height: 16),
+
+            // Salesperson code
+            _buildSection('Nhân viên tư vấn', [
+              _IosTextField(
+                controller: _salespersonCtrl,
+                placeholder: 'Mã nhân viên (nếu có)',
+                icon: CupertinoIcons.person_badge_plus,
+              ),
+              if (_salespersonName != null)
+                Padding(
+                  padding: const EdgeInsets.only(top: 6),
+                  child: Row(
+                    children: [
+                      const Icon(
+                        CupertinoIcons.checkmark_circle_fill,
+                        size: 16,
+                        color: CupertinoColors.activeGreen,
+                      ),
+                      const SizedBox(width: 6),
+                      Text(
+                        'NV: $_salespersonName',
+                        style: const TextStyle(
+                          fontSize: 13,
+                          color: CupertinoColors.activeGreen,
+                          fontWeight: FontWeight.w500,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
             ]),
 
             const SizedBox(height: 16),
@@ -208,7 +314,9 @@ class _CheckoutScreenState extends ConsumerState<CheckoutScreen> {
 
   Widget _buildSuccess(NumberFormat formatter) {
     return CupertinoPageScaffold(
-      navigationBar: const CupertinoNavigationBar(middle: Text('Đặt hàng thành công')),
+      navigationBar: const CupertinoNavigationBar(
+        middle: Text('Đặt hàng thành công'),
+      ),
       child: SafeArea(
         child: SingleChildScrollView(
           padding: const EdgeInsets.all(32),
@@ -232,7 +340,9 @@ class _CheckoutScreenState extends ConsumerState<CheckoutScreen> {
                         decoration: BoxDecoration(
                           shape: BoxShape.circle,
                           border: Border.all(
-                            color: AppTheme.primaryDark.withValues(alpha: 0.3 * (1 - value)),
+                            color: AppTheme.primaryDark.withValues(
+                              alpha: 0.3 * (1 - value),
+                            ),
                             width: 2,
                           ),
                         ),
@@ -260,14 +370,19 @@ class _CheckoutScreenState extends ConsumerState<CheckoutScreen> {
                             shape: BoxShape.circle,
                             boxShadow: [
                               BoxShadow(
-                                color: AppTheme.primaryDark.withValues(alpha: 0.3),
+                                color: AppTheme.primaryDark.withValues(
+                                  alpha: 0.3,
+                                ),
                                 blurRadius: 16,
                                 offset: const Offset(0, 4),
                               ),
                             ],
                           ),
-                          child: const Icon(CupertinoIcons.checkmark_alt,
-                              size: 45, color: Colors.white),
+                          child: const Icon(
+                            CupertinoIcons.checkmark_alt,
+                            size: 45,
+                            color: Colors.white,
+                          ),
                         ),
                       ),
                     ),
@@ -275,15 +390,29 @@ class _CheckoutScreenState extends ConsumerState<CheckoutScreen> {
                 ),
               ),
               const SizedBox(height: 20),
-              const Text('Đặt hàng thành công!',
-                  style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold, color: AppTheme.textPrimary)),
+              const Text(
+                'Đặt hàng thành công!',
+                style: TextStyle(
+                  fontSize: 24,
+                  fontWeight: FontWeight.bold,
+                  color: AppTheme.textPrimary,
+                ),
+              ),
               const SizedBox(height: 8),
-              Text('Mã đơn: ${orderCode ?? ""}',
-                  style: const TextStyle(fontSize: 17, color: AppTheme.accentGold, fontWeight: FontWeight.w600)),
+              Text(
+                'Mã đơn: ${orderCode ?? ""}',
+                style: const TextStyle(
+                  fontSize: 17,
+                  color: AppTheme.accentGold,
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
               const SizedBox(height: 8),
-              const Text('Chúng tôi sẽ liên hệ xác nhận sớm nhất.',
-                  textAlign: TextAlign.center,
-                  style: TextStyle(color: AppTheme.textMuted)),
+              const Text(
+                'Chúng tôi sẽ liên hệ xác nhận sớm nhất.',
+                textAlign: TextAlign.center,
+                style: TextStyle(color: AppTheme.textMuted),
+              ),
 
               // QR Code for bank transfer
               if (paymentMethod == 1 && orderTotal != null) ...[
@@ -294,16 +423,25 @@ class _CheckoutScreenState extends ConsumerState<CheckoutScreen> {
                     color: CupertinoColors.white,
                     borderRadius: BorderRadius.circular(16),
                     boxShadow: [
-                      BoxShadow(color: Colors.black.withValues(alpha: 0.06), blurRadius: 12),
+                      BoxShadow(
+                        color: Colors.black.withValues(alpha: 0.06),
+                        blurRadius: 12,
+                      ),
                     ],
                   ),
                   child: Column(
                     children: [
-                      const Text('Quét mã QR để chuyển khoản',
-                          style: TextStyle(fontWeight: FontWeight.w600, fontSize: 15)),
+                      const Text(
+                        'Quét mã QR để chuyển khoản',
+                        style: TextStyle(
+                          fontWeight: FontWeight.w600,
+                          fontSize: 15,
+                        ),
+                      ),
                       const SizedBox(height: 12),
                       QrImageView(
-                        data: 'https://annhitra.com/pay?code=$orderCode&amount=${orderTotal!.toInt()}',
+                        data:
+                            'https://annhitra.com/pay?code=$orderCode&amount=${orderTotal!.toInt()}',
                         version: QrVersions.auto,
                         size: 200,
                         backgroundColor: Colors.white,
@@ -311,7 +449,11 @@ class _CheckoutScreenState extends ConsumerState<CheckoutScreen> {
                       const SizedBox(height: 12),
                       Text(
                         formatter.format(orderTotal),
-                        style: const TextStyle(fontSize: 22, fontWeight: FontWeight.bold, color: AppTheme.priceRed),
+                        style: const TextStyle(
+                          fontSize: 22,
+                          fontWeight: FontWeight.bold,
+                          color: AppTheme.priceRed,
+                        ),
                       ),
                     ],
                   ),
@@ -336,9 +478,15 @@ class _CheckoutScreenState extends ConsumerState<CheckoutScreen> {
       children: [
         Padding(
           padding: const EdgeInsets.only(left: 4, bottom: 8),
-          child: Text(title.toUpperCase(),
-              style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w600,
-                  color: AppTheme.textMuted, letterSpacing: 0.5)),
+          child: Text(
+            title.toUpperCase(),
+            style: const TextStyle(
+              fontSize: 12,
+              fontWeight: FontWeight.w600,
+              color: AppTheme.textMuted,
+              letterSpacing: 0.5,
+            ),
+          ),
         ),
         Container(
           padding: const EdgeInsets.all(14),
@@ -359,7 +507,10 @@ class _CheckoutScreenState extends ConsumerState<CheckoutScreen> {
         title: Text(title),
         content: Text(content),
         actions: [
-          CupertinoDialogAction(onPressed: () => Navigator.pop(ctx), child: const Text('OK')),
+          CupertinoDialogAction(
+            onPressed: () => Navigator.pop(ctx),
+            child: const Text('OK'),
+          ),
         ],
       ),
     );
@@ -432,17 +583,27 @@ class _PaymentOption extends StatelessWidget {
         padding: const EdgeInsets.symmetric(vertical: 12),
         child: Row(
           children: [
-            Icon(icon, size: 22, color: selected ? AppTheme.primaryDark : AppTheme.textMuted),
+            Icon(
+              icon,
+              size: 22,
+              color: selected ? AppTheme.primaryDark : AppTheme.textMuted,
+            ),
             const SizedBox(width: 12),
             Expanded(
-              child: Text(title,
-                  style: TextStyle(
-                    fontSize: 15,
-                    color: selected ? AppTheme.textPrimary : AppTheme.textSecondary,
-                  )),
+              child: Text(
+                title,
+                style: TextStyle(
+                  fontSize: 15,
+                  color: selected
+                      ? AppTheme.textPrimary
+                      : AppTheme.textSecondary,
+                ),
+              ),
             ),
             Icon(
-              selected ? CupertinoIcons.checkmark_circle_fill : CupertinoIcons.circle,
+              selected
+                  ? CupertinoIcons.checkmark_circle_fill
+                  : CupertinoIcons.circle,
               color: selected ? AppTheme.primaryDark : AppTheme.textMuted,
               size: 22,
             ),

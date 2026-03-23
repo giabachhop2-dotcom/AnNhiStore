@@ -284,6 +284,7 @@ class Order {
   final double? shipPrice;
   final int? orderPayment;
   final int? orderStatus;
+  final String? salespersonCode;
   final List<OrderItem> items;
 
   Order({
@@ -302,6 +303,7 @@ class Order {
     this.shipPrice,
     this.orderPayment,
     this.orderStatus,
+    this.salespersonCode,
     this.items = const [],
   });
 
@@ -319,6 +321,8 @@ class Order {
       'total_price': totalPrice,
       'ship_price': shipPrice ?? 0,
       'order_payment': orderPayment ?? 0,
+      if (salespersonCode != null && salespersonCode!.isNotEmpty)
+        'salesperson_code': salespersonCode,
       'items': items.map((e) => e.toJson()).toList(),
     };
   }
