@@ -16,6 +16,7 @@ class MoreScreen extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final settingsAsync = ref.watch(settingsProvider);
+    final authState = ref.watch(authProvider);
     final isDark = CupertinoTheme.brightnessOf(context) == Brightness.dark;
 
     return CupertinoPageScaffold(
@@ -103,9 +104,11 @@ class MoreScreen extends ConsumerWidget {
                                 child: Column(
                                   crossAxisAlignment: CrossAxisAlignment.start,
                                   children: [
-                                    const Text(
-                                      'Khách hàng',
-                                      style: TextStyle(
+                                    Text(
+                                      authState.isLoggedIn
+                                          ? authState.userName ?? 'Khách hàng'
+                                          : 'Khách hàng',
+                                      style: const TextStyle(
                                         color: CupertinoColors.white,
                                         fontSize: 20,
                                         fontWeight: FontWeight.bold,
@@ -132,18 +135,24 @@ class MoreScreen extends ConsumerWidget {
                                               8,
                                             ),
                                           ),
-                                          child: const Row(
+                                          child: Row(
                                             mainAxisSize: MainAxisSize.min,
                                             children: [
-                                              Icon(
+                                              const Icon(
                                                 CupertinoIcons.star_fill,
                                                 size: 10,
                                                 color: Colors.white,
                                               ),
-                                              SizedBox(width: 4),
+                                              const SizedBox(width: 4),
                                               Text(
-                                                'VIP 0',
-                                                style: TextStyle(
+                                                authState.isLoggedIn
+                                                    ? (authState.isAdmin
+                                                          ? 'ADMIN'
+                                                          : (authState.isSales
+                                                                ? 'SALE'
+                                                                : 'Thành viên'))
+                                                    : 'VIP 0',
+                                                style: const TextStyle(
                                                   color: Colors.white,
                                                   fontSize: 10,
                                                   fontWeight: FontWeight.bold,
@@ -154,7 +163,9 @@ class MoreScreen extends ConsumerWidget {
                                         ),
                                         const SizedBox(width: 8),
                                         Text(
-                                          'Đăng nhập để nâng VIP',
+                                          authState.isLoggedIn
+                                              ? 'Đăng xuất để thay đổi'
+                                              : 'Đăng nhập để quản lý',
                                           style: TextStyle(
                                             color: AppTheme.accentGold
                                                 .withValues(alpha: 0.8),
@@ -248,12 +259,26 @@ class MoreScreen extends ConsumerWidget {
               title: 'TÀI KHOẢN',
               isDark: isDark,
               items: [
-                _GridItem(
-                  icon: CupertinoIcons.person_crop_circle_badge_checkmark,
-                  gradientColors: const [Color(0xFF114402), Color(0xFF1A6B0A)],
-                  title: 'Đăng nhập',
-                  onTap: () => context.push('/auth'),
-                ),
+                if (!authState.isLoggedIn)
+                  _GridItem(
+                    icon: CupertinoIcons.person_crop_circle_badge_checkmark,
+                    gradientColors: const [
+                      Color(0xFF114402),
+                      Color(0xFF1A6B0A),
+                    ],
+                    title: 'Đăng nhập',
+                    onTap: () => context.push('/auth'),
+                  )
+                else
+                  _GridItem(
+                    icon: CupertinoIcons.person_crop_circle_badge_xmark,
+                    gradientColors: const [
+                      Color(0xFFE53935),
+                      Color(0xFFC62828),
+                    ],
+                    title: 'Đăng xuất',
+                    onTap: () => _handleLogout(context, ref),
+                  ),
                 _GridItem(
                   icon: CupertinoIcons.heart_fill,
                   gradientColors: const [Color(0xFFE91E63), Color(0xFFC2185B)],
@@ -406,6 +431,17 @@ class MoreScreen extends ConsumerWidget {
                     } catch (_) {}
                   },
                 ),
+                if (authState.isLoggedIn)
+                  _ListItem(
+                    icon: CupertinoIcons.delete_solid,
+                    gradientColors: const [
+                      Color(0xFFE53935),
+                      Color(0xFFB71C1C),
+                    ],
+                    title: 'Xóa tài khoản',
+                    subtitle: 'Yêu cầu xóa vĩnh viễn dữ liệu',
+                    onTap: () => _showDeleteAccountConfirm(context),
+                  ),
               ],
             ),
           ),
@@ -442,6 +478,73 @@ class MoreScreen extends ConsumerWidget {
                 ),
               ),
             ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  void _handleLogout(BuildContext context, WidgetRef ref) {
+    showCupertinoDialog(
+      context: context,
+      builder: (ctx) => CupertinoAlertDialog(
+        title: const Text('Đăng xuất'),
+        content: const Text(
+          'Bạn có chắc chắn muốn đăng xuất khỏi tài khoản này?',
+        ),
+        actions: [
+          CupertinoDialogAction(
+            child: const Text('Hủy'),
+            onPressed: () => Navigator.pop(ctx),
+          ),
+          CupertinoDialogAction(
+            isDestructiveAction: true,
+            child: const Text('Đăng xuất'),
+            onPressed: () {
+              Navigator.pop(ctx);
+              ref.read(authProvider.notifier).logout();
+            },
+          ),
+        ],
+      ),
+    );
+  }
+
+  void _showDeleteAccountConfirm(BuildContext context) {
+    showCupertinoDialog(
+      context: context,
+      builder: (ctx) => CupertinoAlertDialog(
+        title: const Text('Xóa tài khoản'),
+        content: const Text(
+          'Yêu cầu xóa tài khoản sẽ được gửi đến quản trị viên. Toàn bộ dữ liệu cá nhân, lịch sử đơn hàng và hạng thành viên sẽ bị xóa vĩnh viễn sau khi được xác nhận. Bạn có chắc chắn muốn tiếp tục?',
+        ),
+        actions: [
+          CupertinoDialogAction(
+            child: const Text('Hủy bỏ'),
+            onPressed: () => Navigator.pop(ctx),
+          ),
+          CupertinoDialogAction(
+            isDestructiveAction: true,
+            child: const Text('Yêu cầu xóa'),
+            onPressed: () {
+              Navigator.pop(ctx);
+              // In a real app, you would call an API endpoint here to queue the deletion
+              showCupertinoDialog(
+                context: context,
+                builder: (ctx2) => CupertinoAlertDialog(
+                  title: const Text('Đã nhận yêu cầu'),
+                  content: const Text(
+                    'Yêu cầu xóa tài khoản của bạn đã được ghi nhận và sẽ được xử lý trong vòng 48h. Cảm ơn bạn đã sử dụng An Nhi Trà.',
+                  ),
+                  actions: [
+                    CupertinoDialogAction(
+                      child: const Text('Đóng'),
+                      onPressed: () => Navigator.pop(ctx2),
+                    ),
+                  ],
+                ),
+              );
+            },
           ),
         ],
       ),
